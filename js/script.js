@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoggedIn && currentUser) {
             profileInfo.textContent = currentUser.nickname || currentUser.email;
             if (adminLink) {
-                adminLink.style.display = currentUser.nickname === 'Taki' ? '' : 'none';
+                adminLink.style.display = (currentUser.nickname === 'Taki' || currentUser.email === 'anfajue@bk.ru') ? '' : 'none';
             }
         }
     }
@@ -246,6 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const users = getUsers();
             if (users.find(u => u.email === email.value.trim())) {
                 showFormError(registerForm, 'Этот email уже зарегистрирован');
+                return;
+            }
+            if (users.find(u => u.nickname === nick.value.trim())) {
+                showFormError(registerForm, 'Этот никнейм уже занят');
                 return;
             }
 

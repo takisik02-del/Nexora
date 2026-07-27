@@ -601,7 +601,7 @@
             }
 
             const currentUser = getCurrentUser();
-            const isTaki = currentUser && currentUser.nickname === 'Taki';
+            const isTaki = currentUser && (currentUser.nickname === 'Taki' || currentUser.email === 'anfajue@bk.ru');
 
             const accessDenied = document.getElementById('access-denied');
             const adminPanel = document.getElementById('admin-panel');
@@ -870,11 +870,11 @@
 
                 list.innerHTML = allUsers.map((u, i) => `
                     <tr>
-                        <td style="font-weight:600;color:var(--text)">${u.nickname} ${u.nickname === 'Taki' ? '<span style="color:var(--accent);font-size:10px">● admin</span>' : ''}</td>
+                        <td style="font-weight:600;color:var(--text)">${u.nickname} ${(u.nickname === 'Taki' || u.email === 'anfajue@bk.ru') ? '<span style="color:var(--accent);font-size:10px">● admin</span>' : ''}</td>
                         <td>${u.email}</td>
                         <td style="color:var(--text-muted);font-size:12px">${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString('ru-RU') + ' ' + new Date(u.registeredAt).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '—'}</td>
                         <td style="text-align:right">
-                            ${u.nickname !== 'Taki' ? `<button class="btn btn--ghost admin-delete-user" data-index="${i}" style="color:var(--accent);font-size:11px">Удалить</button>` : ''}
+                            ${u.nickname !== 'Taki' && u.email !== 'anfajue@bk.ru' ? `<button class="btn btn--ghost admin-delete-user" data-index="${i}" style="color:var(--accent);font-size:11px">Удалить</button>` : ''}
                         </td>
                     </tr>
                 `).join('');
@@ -883,7 +883,7 @@
                     btn.addEventListener('click', () => {
                         const idx = parseInt(btn.dataset.index);
                         let allUsers = (() => { try { return JSON.parse(localStorage.getItem('nexora_users')) || []; } catch { return []; } })();
-                        if (idx >= 0 && idx < allUsers.length && allUsers[idx].nickname !== 'Taki') {
+                        if (idx >= 0 && idx < allUsers.length && allUsers[idx].nickname !== 'Taki' && allUsers[idx].email !== 'anfajue@bk.ru') {
                             allUsers.splice(idx, 1);
                             localStorage.setItem('nexora_users', JSON.stringify(allUsers));
                             renderUsers();
