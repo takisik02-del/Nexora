@@ -348,6 +348,25 @@
                         <span style="font-size:11px;color:var(--text-muted)" id="admin-chat-stats"></span>
                     </div>
 
+                    <!-- Chat toolbar -->
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius)">
+                        <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);white-space:nowrap">Лимит отправки:</span>
+                        <select id="admin-chat-cooldown" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:12px;font-family:var(--font-sans);cursor:pointer">
+                            <option value="0">Нет</option>
+                            <option value="5">5 сек</option>
+                            <option value="10" selected>10 сек</option>
+                            <option value="15">15 сек</option>
+                            <option value="20">20 сек</option>
+                            <option value="30">30 сек</option>
+                            <option value="60">60 сек</option>
+                        </select>
+                        <div style="flex:1"></div>
+                        <button id="admin-chat-clear" class="btn" style="font-size:10px;color:var(--accent);border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);padding:4px 12px;border-radius:4px">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            Очистить чат
+                        </button>
+                    </div>
+
                     <div style="display:grid;grid-template-columns:260px 1fr;gap:16px;min-height:400px">
                         <!-- Participants sidebar -->
                         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column">
@@ -933,6 +952,8 @@
             const adminChatMessages = document.getElementById('admin-chat-messages');
             const adminChatInput = document.getElementById('admin-chat-input');
             const adminChatSend = document.getElementById('admin-chat-send');
+            const adminChatCooldown = document.getElementById('admin-chat-cooldown');
+            const adminChatClear = document.getElementById('admin-chat-clear');
             const adminChatTitle = document.getElementById('admin-chat-title');
             const adminChatCount = document.getElementById('admin-chat-count');
             const adminChatStats = document.getElementById('admin-chat-stats');
@@ -1051,6 +1072,8 @@
             adminChatSend.addEventListener('click', function() {
                 const text = adminChatInput.value.trim();
                 if (!text || !adminActiveTournamentId) return;
+                if (adminChatSend.disabled) return;
+
                 const all = getAdminChatMessages();
                 all.push({
                     tournamentId: adminActiveTournamentId,
@@ -1061,6 +1084,35 @@
                 });
                 saveAdminChatMessages(all);
                 adminChatInput.value = '';
+                renderAdminChat();
+
+                // Cooldown
+                const cd = parseInt(adminChatCooldown.value);
+                if (cd > 0) {
+                    adminChatSend.disabled = true;
+                    const origText = '⏳ ' + cd + 'с';
+                    const origHtml = adminChatSend.innerHTML;
+                    adminChatSend.innerHTML = origText;
+                    let remaining = cd;
+                    const timer = setInterval(() => {
+                        remaining--;
+                        if (remaining <= 0) {
+                            clearInterval(timer);
+                            adminChatSend.disabled = false;
+                            adminChatSend.innerHTML = origHtml;
+                        } else {
+                            adminChatSend.innerHTML = '⏳ ' + remaining + 'с';
+                        }
+                    }, 1000);
+                }
+            });
+
+            adminChatClear.addEventListener('click', function() {
+                if (!adminActiveTournamentId) return;
+                if (!confirm('Очистить весь чат этого турнира? Это действие нельзя отменить.')) return;
+                const all = getAdminChatMessages();
+                const filtered = all.filter(m => m.tournamentId !== adminActiveTournamentId);
+                saveAdminChatMessages(filtered);
                 renderAdminChat();
             });
 
