@@ -163,6 +163,7 @@
                     <button class="btn btn--ghost" id="btn-profile">Профиль</button>
                     <div class="profile-dropdown" id="profile-dropdown">
                         <div class="profile-dropdown__info" id="profile-info">Пользователь</div>
+                        <button class="profile-dropdown__exit" id="btn-profile-link" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Личный кабинет</button>
                         <a href="admin.html" class="profile-dropdown__exit" id="admin-link" style="display:none">Админ-панель</a>
                         <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
                     </div>
@@ -208,6 +209,10 @@
             <button class="admin-nav__item" data-admin-section="chats">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 Чаты
+            </button>
+            <button class="admin-nav__item" data-admin-section="results">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20h12M6 4v16M6 4l12 8-12 8"/></svg>
+                Результаты
             </button>
         </aside>
         <main class="admin-main">
@@ -385,6 +390,41 @@
                                 <button class="btn btn--primary" id="admin-chat-send" style="flex-shrink:0">Отправить</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="admin-section" id="section-results">
+                <div class="admin-header">
+                    <h1 class="admin-header__title"><span>Результаты</span> турниров</h1>
+                    <span style="font-size:12px;color:var(--text-muted)">Управление местами участников</span>
+                </div>
+                <div class="admin-card" style="margin-bottom:16px">
+                    <div class="form-group" style="max-width:340px">
+                        <label class="form-label">Выберите турнир</label>
+                        <select class="form-input" id="admin-results-select" style="appearance:auto">
+                            <option value="">— Выберите турнир —</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="admin-card" style="display:none" id="admin-results-area">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                        <span style="font-size:15px;font-weight:600" id="admin-results-title">Участники турнира</span>
+                        <button class="btn btn--primary" id="admin-results-save" style="font-size:12px;padding:6px 16px">Сохранить результаты</button>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;text-align:center">#</th>
+                                    <th>Никнейм</th>
+                                    <th>ID игрока</th>
+                                    <th style="width:120px;text-align:center">Место</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-results-list"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -585,7 +625,42 @@
         </form>
     </div>
 
-    <script src="js/script.js?v=3"></script>
+    <!-- PROFILE MODAL -->
+    <div class="modal" id="profile-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Личный кабинет</h3>
+            <button class="modal__close" data-close-modal>&#10005;</button>
+        </div>
+        <div class="modal__form" id="profile-modal-body">
+            <div style="text-align:center;padding:20px 0">
+                <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <p style="font-size:16px;font-weight:600;color:var(--text)" id="profile-modal-nick">—</p>
+                <p style="font-size:12px;color:var(--text-muted)" id="profile-modal-email">—</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--text)" id="profile-stat-tournaments">0</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Турниров</span>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--accent)" id="profile-stat-best">—</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Лучшее место</span>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--text)" id="profile-stat-prize">0 ₽</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Призовых</span>
+                </div>
+            </div>
+            <p style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:10px">История турниров</p>
+            <div id="profile-history" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto">
+                <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px 0">Нет данных</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=4"></script>
     <script>
         // ===========================================
         // ADMIN PANEL — Taki only
@@ -629,7 +704,8 @@
                 tournaments: document.getElementById('section-tournaments'),
                 users: document.getElementById('section-users'),
                 settings: document.getElementById('section-settings'),
-                chats: document.getElementById('section-chats')
+                chats: document.getElementById('section-chats'),
+                results: document.getElementById('section-results')
             };
 
             navItems.forEach(item => {
@@ -1130,6 +1206,120 @@
                         setTimeout(() => {
                             populateAdminChatSelect();
                             if (adminActiveTournamentId) renderAdminChat();
+                        }, 50);
+                    }
+                });
+            });
+
+            // ===========================================
+            // Results management
+            // ===========================================
+            function getAdminResults() {
+                try { return JSON.parse(localStorage.getItem('nexora_results')) || []; } catch { return []; }
+            }
+            function saveAdminResults(list) {
+                localStorage.setItem('nexora_results', JSON.stringify(list));
+            }
+
+            const adminResultsSelect = document.getElementById('admin-results-select');
+            const adminResultsArea = document.getElementById('admin-results-area');
+            const adminResultsList = document.getElementById('admin-results-list');
+            const adminResultsTitle = document.getElementById('admin-results-title');
+            const adminResultsSave = document.getElementById('admin-results-save');
+
+            function populateAdminResultsSelect() {
+                const tournaments = getAdminTournaments();
+                const current = adminResultsSelect.value;
+                adminResultsSelect.innerHTML = '<option value="">— Выберите турнир —</option>' +
+                    tournaments.filter(t => t.status === 'completed').map(t =>
+                        '<option value="' + t.id + '">' + t.name + '</option>'
+                    ).join('');
+                adminResultsSelect.value = current;
+            }
+
+            function renderAdminResults() {
+                const id = parseInt(adminResultsSelect.value);
+                if (!id) { adminResultsArea.style.display = 'none'; return; }
+                const tournaments = getAdminTournaments();
+                const t = tournaments.find(x => x.id === id);
+                if (!t) { adminResultsArea.style.display = 'none'; return; }
+                adminResultsTitle.textContent = 'Участники — ' + t.name;
+
+                const regs = (() => {
+                    try { return JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch { return []; }
+                })();
+                const participants = regs.filter(r => r.tournamentId === id);
+                const results = getAdminResults();
+
+                if (!participants.length) {
+                    adminResultsList.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;font-size:13px">Нет зарегистрированных участников</td></tr>';
+                    adminResultsArea.style.display = 'block';
+                    return;
+                }
+
+                adminResultsList.innerHTML = participants.map((p, i) => {
+                    const existing = results.find(r => r.tournamentId === id && r.userId === p.userId);
+                    const place = existing ? existing.place : '';
+                    return `
+                        <tr>
+                            <td style="text-align:center;color:var(--text-muted);font-size:12px">${i + 1}</td>
+                            <td style="font-weight:600">${p.userId}</td>
+                            <td style="color:var(--text-secondary)">${p.playerId || '—'}</td>
+                            <td style="text-align:center">
+                                <select class="admin-results-place" data-user="${p.userId}" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 6px;font-size:12px;font-family:var(--font-sans);cursor:pointer;min-width:90px">
+                                    <option value="">—</option>
+                                    <option value="1" ${place === 1 ? 'selected' : ''}>🥇 1 место</option>
+                                    <option value="2" ${place === 2 ? 'selected' : ''}>🥈 2 место</option>
+                                    <option value="3" ${place === 3 ? 'selected' : ''}>🥉 3 место</option>
+                                    <option value="4" ${place === 4 ? 'selected' : ''}>4 место</option>
+                                    <option value="${place && place >= 5 ? place : 'other'}" ${place >= 5 ? 'selected' : ''}>${place >= 5 ? place + ' место' : 'Другое'}</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                adminResultsArea.style.display = 'block';
+            }
+
+            adminResultsSelect.addEventListener('change', renderAdminResults);
+
+            adminResultsSave.addEventListener('click', () => {
+                const tournamentId = parseInt(adminResultsSelect.value);
+                if (!tournamentId) return;
+                const selects = adminResultsList.querySelectorAll('.admin-results-place');
+                const results = getAdminResults();
+                const filtered = results.filter(r => r.tournamentId !== tournamentId);
+                const tournaments = getAdminTournaments();
+                const t = tournaments.find(x => x.id === tournamentId);
+
+                selects.forEach(sel => {
+                    const userId = sel.dataset.user;
+                    const place = sel.value;
+                    if (place) {
+                        filtered.push({
+                            tournamentId,
+                            userId,
+                            place: parseInt(place),
+                            tournamentName: t ? t.name : 'Турнир #' + tournamentId,
+                            date: new Date().toISOString()
+                        });
+                    }
+                });
+
+                saveAdminResults(filtered);
+                // Show saved feedback
+                const orig = adminResultsSave.textContent;
+                adminResultsSave.textContent = '✓ Сохранено';
+                setTimeout(() => { adminResultsSave.textContent = orig; }, 1500);
+            });
+
+            // Refresh results list when section becomes active
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.dataset.adminSection === 'results') {
+                        setTimeout(() => {
+                            populateAdminResultsSelect();
+                            renderAdminResults();
                         }, 50);
                     }
                 });

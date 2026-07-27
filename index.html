@@ -34,6 +34,7 @@
                     <button class="btn btn--ghost" id="btn-profile">Профиль</button>
                     <div class="profile-dropdown" id="profile-dropdown">
                         <div class="profile-dropdown__info" id="profile-info">Пользователь</div>
+                        <button class="profile-dropdown__exit" id="btn-profile-link" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Личный кабинет</button>
                         <a href="admin.html" class="profile-dropdown__exit" id="admin-link" style="display:none">Админ-панель</a>
                         <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
                     </div>
@@ -260,6 +261,41 @@
         </form>
     </div>
 
-    <script src="js/script.js?v=3"></script>
+    <!-- PROFILE MODAL -->
+    <div class="modal" id="profile-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Личный кабинет</h3>
+            <button class="modal__close" data-close-modal>&#10005;</button>
+        </div>
+        <div class="modal__form" id="profile-modal-body">
+            <div style="text-align:center;padding:20px 0">
+                <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <p style="font-size:16px;font-weight:600;color:var(--text)" id="profile-modal-nick">—</p>
+                <p style="font-size:12px;color:var(--text-muted)" id="profile-modal-email">—</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--text)" id="profile-stat-tournaments">0</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Турниров</span>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--accent)" id="profile-stat-best">—</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Лучшее место</span>
+                </div>
+                <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center">
+                    <span style="display:block;font-size:22px;font-weight:700;color:var(--text)" id="profile-stat-prize">0 ₽</span>
+                    <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Призовых</span>
+                </div>
+            </div>
+            <p style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:10px">История турниров</p>
+            <div id="profile-history" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto">
+                <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px 0">Нет данных</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=4"></script>
 </body>
 </html>

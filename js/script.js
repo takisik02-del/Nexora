@@ -425,7 +425,97 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===========================================
-    // 6b. Restore session across pages
+    // 6b. Profile modal
+    // ===========================================
+    const btnProfileLink = document.getElementById('btn-profile-link');
+    if (btnProfileLink) {
+        btnProfileLink.addEventListener('click', e => {
+            e.preventDefault();
+            profileDropdown.classList.remove('open');
+            openModal('profile');
+            renderProfile();
+        });
+    }
+
+    function getResults() {
+        try { return JSON.parse(localStorage.getItem('nexora_results')) || []; } catch { return []; }
+    }
+
+    function getRegistrations() {
+        try { return JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch { return []; }
+    }
+
+    function getTournaments() {
+        try { return JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch { return []; }
+    }
+
+    function renderProfile() {
+        if (!currentUser) return;
+        const nickname = currentUser.nickname || '—';
+        const email = currentUser.email || '—';
+
+        document.getElementById('profile-modal-nick').textContent = nickname;
+        document.getElementById('profile-modal-email').textContent = email;
+
+        const regs = getRegistrations();
+        const results = getResults();
+        const tournaments = getTournaments();
+
+        // My registrations
+        const myRegs = regs.filter(r => r.userId === nickname || r.userId === currentUser.email);
+        // My results
+        const myResults = results.filter(r => r.userId === nickname || r.userId === currentUser.email);
+
+        // Stats
+        const total = myRegs.length;
+        document.getElementById('profile-stat-tournaments').textContent = total;
+
+        const places = myResults.filter(r => r.place).map(r => r.place);
+        const best = places.length ? Math.min(...places) : null;
+        document.getElementById('profile-stat-best').textContent = best ? best + ' место' : '—';
+
+        // Count prize tours (top-3)
+        const prizeCount = places.filter(p => p <= 3).length;
+        document.getElementById('profile-stat-prize').textContent = prizeCount > 0 ? prizeCount + ' 🏆' : '0';
+
+        // History
+        const historyEl = document.getElementById('profile-history');
+        if (!myRegs.length) {
+            historyEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px 0">Вы ещё не участвовали в турнирах</div>';
+            return;
+        }
+
+        // Sort by most recent
+        myRegs.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+        historyEl.innerHTML = myRegs.slice(0, 20).map(r => {
+            const t = tournaments.find(t => t.id === r.tournamentId);
+            const tName = t ? t.name : 'Турнир #' + r.tournamentId;
+            const tStatus = t ? t.status : 'unknown';
+            const res = myResults.find(res => res.tournamentId === r.tournamentId);
+            const placeStr = res && res.place ? res.place + ' место' : (tStatus === 'completed' ? '—' : 'Идёт');
+            const placeColor = res && res.place === 1 ? 'var(--accent)' : (res && res.place <= 3 ? 'var(--text)' : 'var(--text-muted)');
+            const dateStr = r.date ? new Date(r.date).toLocaleDateString('ru-RU') : '—';
+            return `
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);transition:background .15s" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='var(--bg)'">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tName}</div>
+                        <div style="font-size:10px;color:var(--text-muted)">${dateStr} · ID: ${r.playerId || '—'}</div>
+                    </div>
+                    <span style="font-size:13px;font-weight:700;color:${placeColor};white-space:nowrap">${placeStr}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Register profile-modal in the modal system
+    const profileModal = document.getElementById('profile-modal');
+    if (profileModal) {
+        modals.profile = profileModal;
+    }
+
+    // ===========================================
+    // 6c. Restore session across pages
     // ===========================================
     const savedUser = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
     if (savedUser) {
