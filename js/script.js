@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     'use strict';
 
-    // Init EmailJS
-    emailjs.init('Dx0IhVnoksWoXITjb');
+    // Nexora mail API endpoint (Vercel)
+    const MAIL_API = 'https://nexora-xi-ten.vercel.app/api/send-code';
 
     // ===========================================
     // 1. REVEAL ON SCROLL
@@ -270,22 +270,28 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = '⏳ Отправка...';
             submitBtn.disabled = true;
 
-            // Send email via EmailJS
-            emailjs.send('service_m91dbvn', 'template_v73z4rf', {
-                to_email: pendingReg.email,
-                to_name: pendingReg.nickname,
-                code: pendingReg.code
-            }).then(() => {
-                // Email sent — show verification UI
+            // Send email via our API
+            fetch(MAIL_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to_email: pendingReg.email,
+                    to_name: pendingReg.nickname,
+                    code: pendingReg.code
+                })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    submitBtn.textContent = origText;
+                    submitBtn.disabled = false;
+                    showVerificationUI();
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            }).catch(err => {
+                console.error('Mail API error:', err);
                 submitBtn.textContent = origText;
                 submitBtn.disabled = false;
-                showVerificationUI();
-            }, err => {
-                console.error('EmailJS error:', err);
-                submitBtn.textContent = origText;
-                submitBtn.disabled = false;
-                showFormError(registerForm, 'Ошибка отправки письма. Попробуйте ещё раз');
-                // Clean up pending
+                showFormError(registerForm, 'Ошибка отправки письма. Проверьте SMTP_PASSWORD в Vercel');
                 const list = getPendingRegistrations();
                 savePendingRegistrations(list.filter(p => p.email !== pendingReg.email));
                 pendingReg = null;
