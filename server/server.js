@@ -205,6 +205,7 @@ function tgEsc(s) {
 }
 
 async function tgSendMessage(chatId, text) {
+    if (!TG_TOKEN) return;
     try {
         const r = await fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
             method: 'POST',
@@ -557,15 +558,17 @@ app.get('/ping', (req, res) => {
 // генерирует код и открывает https://t.me/<bot>?start=LOGIN_<код>, бот
 // получает сообщение /start LOGIN_<код> вместе с профилем пользователя,
 // а сайт опрашивает /api/tg-check?code=... и завершает вход.
-// Токен бота — тот же, что в js/social-config.js.
-const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk';
-const TG_API = 'https://api.telegram.org/bot' + TG_TOKEN;
+// Токен бота — переменная окружения TELEGRAM_BOT_TOKEN (на Vercel).
+// Локально: если не задан, работает без Telegram-уведомлений.
+const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TG_API = TG_TOKEN ? 'https://api.telegram.org/bot' + TG_TOKEN : '';
 
 // code -> { profile, ts }. In-memory, коды живут 5 минут.
 const tgSessions = new Map();
 
 let tgOffset = 0;
 async function tgPoll() {
+    if (!TG_API) return;
     try {
         const resp = await fetch(TG_API + '/getUpdates?timeout=25&offset=' + tgOffset);
         const data = await resp.json();
@@ -610,6 +613,7 @@ tgPoll();
 
 // GET /test-tg?chat_id=... — тестовое уведомление организатору из админки
 app.get('/test-tg', async (req, res) => {
+    if (!TG_TOKEN) return res.json({ success: false, error: 'TELEGRAM_BOT_TOKEN не задан' });
     const chatId = String(req.query.chat_id || '').trim();
     if (!chatId) return res.json({ success: false, error: 'chat_id не указан' });
     try {

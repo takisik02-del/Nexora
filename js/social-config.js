@@ -16,11 +16,10 @@
 window.NEXORA_SOCIAL_CONFIG = {
     telegram: {
         enabled: true,
-        botName: 'Nexora1s_bot',          // ← юзернейм бота БЕЗ @
-        botToken: '8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk'          // ← токен от @BotFather
+        botName: 'Nexora1s_bot'
     },
     google: {
         enabled: true,
-        clientId: '961867421954-g2f1ltqnood58jgbd7g8dq59k50uhiie.apps.googleusercontent.com'          // ← Client ID из Google Cloud Console
+        clientId: '961867421954-g2f1ltqnood58jgbd7g8dq59k50uhiie.apps.googleusercontent.com'
     }
 };

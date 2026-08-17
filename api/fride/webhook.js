@@ -13,7 +13,7 @@ const { list, get } = require('@vercel/blob');
 const crypto = require('crypto');
 
 const STORE_PREFIX = 'nexora/state.json';
-const TG_TOKEN_DEFAULT = '8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk';
+const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
 function cors(res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -100,8 +100,8 @@ module.exports = async (req, res) => {
             const state = await readState();
             const settings = (state && state.nexora_settings) || {};
             const chatId = String(settings.telegram_chat_id || '').trim() || process.env.ADMIN_TG_CHAT_ID || '';
-            if (chatId) {
-                const token = process.env.TELEGRAM_BOT_TOKEN || TG_TOKEN_DEFAULT;
+            if (chatId && TG_TOKEN) {
+                const token = TG_TOKEN;
                 const amount = Number(body.amount != null ? body.amount : (body.data && body.data.amount)) || 0;
                 const orderId = body.order_id || body.id || (body.data && (body.data.order_id || body.data.id)) || '';
                 await sendTelegram(token, chatId,

@@ -10,9 +10,8 @@ const { put, list, get, del } = require('@vercel/blob');
 
 const STORE_PREFIX = 'nexora/state.json';
 const BACKUP_PREFIX = 'nexora/backups/';
-// Резервный токен: чтобы уведомления работали и без переменных окружения.
-// Основной источник — переменная окружения TELEGRAM_BOT_TOKEN.
-const TG_TOKEN_DEFAULT = '8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk';
+const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+if (!TG_TOKEN) console.warn('[save.js] TELEGRAM_BOT_TOKEN not set — notifications disabled');
 
 const ADMIN_ONLY_KEYS = [
     'nexora_tournaments',
@@ -130,8 +129,8 @@ async function sendTelegram(token, chatId, text) {
 async function notifyChanges(existing, before) {
     const settings = (existing && existing.nexora_settings) || {};
     const chatId = String(settings.telegram_chat_id || '').trim() || process.env.ADMIN_TG_CHAT_ID || '';
-    if (!chatId) return;
-    const token = process.env.TELEGRAM_BOT_TOKEN || TG_TOKEN_DEFAULT;
+    if (!chatId || !TG_TOKEN) return;
+    const token = TG_TOKEN;
 
     const tours = {};
     (existing.nexora_tournaments || []).forEach(function(t) {

@@ -1,7 +1,6 @@
 // Nexora — GET /api/tg-test?chat_id=...: тестовое уведомление организатору в Telegram
 // из админки (Настройки → «Проверить»). Токен бота берётся из переменной
-// окружения TELEGRAM_BOT_TOKEN, с резервным значением из js/social-config.js.
-const TG_TOKEN_DEFAULT = '8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk';
+// окружения TELEGRAM_BOT_TOKEN.
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,9 +11,10 @@ module.exports = async (req, res) => {
     if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
     try {
+        const token = process.env.TELEGRAM_BOT_TOKEN;
+        if (!token) return res.status(500).json({ success: false, error: 'TELEGRAM_BOT_TOKEN не настроен в переменных окружения' });
         const chatId = String(req.query.chat_id || '').trim();
         if (!chatId) return res.json({ success: false, error: 'chat_id не указан' });
-        const token = process.env.TELEGRAM_BOT_TOKEN || TG_TOKEN_DEFAULT;
         const r = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
