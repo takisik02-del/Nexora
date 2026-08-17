@@ -1019,7 +1019,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return JSON.parse(localStorage.getItem('nexora_registrations') || '[]')
                     .some(r => user && (r.userId === user.nickname || r.userId === user.email));
             } catch { return false; }
-        })();
+    })();
+
+    // Миграция: добавление аккаунта Support, если его нет в localStorage
+    (function migrateAddSupportAccount() {
+        try {
+            var users = JSON.parse(localStorage.getItem('nexora_users'));
+            if (Array.isArray(users) && !users.some(function(u) { return u && u.email === 'support@nexora.gg'; })) {
+                users.push({ nickname: 'Support', email: 'support@nexora.gg', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-08-17T13:00:00.000Z' });
+                localStorage.setItem('nexora_users', JSON.stringify(users));
+            }
+        } catch(e) {}
+    })();
         if (!user) {
             // Новый пользователь: ник из @ника соцсети (или имени), при занятости — суффикс
             let nick = wantNick || provider + '_user';
