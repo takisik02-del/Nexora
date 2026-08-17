@@ -353,6 +353,7 @@
                     <div style="display:flex;gap:8px;margin-bottom:12px">
                         <input type="text" id="admin-role-input" class="form-input" placeholder="Никнейм пользователя..." style="flex:1;padding:6px 10px;font-size:12px">
                         <select id="admin-role-select" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font-sans);cursor:pointer">
+                            <option value="admin">Администратор</option>
                             <option value="organizer">Организатор</option>
                         </select>
                         <button class="btn btn--primary" id="admin-role-add" style="font-size:12px;padding:6px 16px">Назначить</button>
@@ -1275,7 +1276,13 @@
                 if (user.nickname === 'Taki') return 'admin';
                 if (user.email === 'anfajue@bk.ru') return 'admin';
                 const roles = getAdminRoles();
-                return roles[user.nickname] || null;
+                if (roles[user.nickname]) return roles[user.nickname];
+                // Проверка по email (если ник сменился)
+                for (const [nick, role] of Object.entries(roles)) {
+                    const u = (() => { try { return (JSON.parse(localStorage.getItem('nexora_users')) || []).find(x => x.nickname === nick); } catch { return null; } })();
+                    if (u && u.email === user.email) return role;
+                }
+                return null;
             }
 
             // ===========================================
@@ -1835,6 +1842,7 @@
                     let roleLabel = '';
                     if (u.nickname === 'Taki') roleLabel = '<span style="color:var(--accent);font-size:10px">● Главный администратор</span>';
                     else if (u.email === 'anfajue@bk.ru') roleLabel = '<span style="color:var(--accent);font-size:10px">● Администратор</span>';
+                    else if (roles[u.nickname] === 'admin') roleLabel = '<span style="color:#ef4444;font-size:10px">● Администратор</span>';
                     else if (roles[u.nickname] === 'organizer') roleLabel = '<span style="color:#f59e0b;font-size:10px">Организатор</span>';
                     else roleLabel = '<span style="color:var(--text-muted);font-size:10px">—</span>';
                     return `
@@ -1904,13 +1912,15 @@
                     return;
                 }
                 list.innerHTML = entries.map(([nick, role]) => {
-                    let roleName = role === 'organizer' ? 'Организатор' : role;
-                    let roleColor = role === 'organizer' ? '#f59e0b' : 'var(--accent)';
+                    let roleName = role === 'admin' ? 'Администратор' : role === 'organizer' ? 'Организатор' : role;
+                    let roleColor = role === 'admin' ? '#ef4444' : role === 'organizer' ? '#f59e0b' : 'var(--accent)';
+                    let roleBg = role === 'admin' ? 'rgba(239,68,68,.1)' : 'rgba(245,158,11,.1)';
+                    let roleBorder = role === 'admin' ? 'rgba(239,68,68,.2)' : 'rgba(245,158,11,.2)';
                     return `
                         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius)">
                             <div style="display:flex;align-items:center;gap:8px">
                                 <span style="font-weight:600;font-size:13px">${esc(nick)}</span>
-                                <span style="font-size:10px;color:${roleColor};background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);padding:1px 8px;border-radius:4px">${esc(roleName)}</span>
+                                <span style="font-size:10px;color:${roleColor};background:${roleBg};border:1px solid ${roleBorder};padding:1px 8px;border-radius:4px">${esc(roleName)}</span>
                             </div>
                             <button class="btn btn--ghost admin-role-remove" data-nick="${esc(nick)}" style="color:#ef4444;font-size:11px;padding:2px 10px">Снять</button>
                         </div>
@@ -1941,11 +1951,16 @@
                     alert('Пользователь с никнеймом «' + nick + '» не найден');
                     return;
                 }
-                if (nick === 'Taki' || allUsers.find(u => u.nickname === nick)?.email === 'anfajue@bk.ru') {
-                    alert('Этот пользователь уже администратор');
+                if (nick === 'Taki') {
+                    alert('Главного администратора нельзя изменить');
                     return;
                 }
                 const role = document.getElementById('admin-role-select').value;
+                // Только главный админ (Taki) может назначать администраторов
+                if (role === 'admin' && userRole !== 'admin') {
+                    alert('Только главный администратор может назначать администраторов');
+                    return;
+                }
                 const roles = getAdminRoles();
                 roles[nick] = role;
                 saveAdminRoles(roles);

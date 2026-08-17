@@ -2115,7 +2115,8 @@ document.addEventListener('DOMContentLoaded', () => {
         var all = getMsgs();
         // Всегда сохраняем ник, а не email
         var senderId = u.nickname || resolveNick(u.email || '');
-        var msg = { tournamentId: activeTournamentId, userId: senderId, text: txt, timestamp: new Date().toISOString(), isAdmin: u.nickname === 'Taki', chatType: activeTab === 'organizer' ? 'organizer' : activeTab, teamName: tn || undefined };
+        var senderIsAdmin = u.nickname === 'Taki' || u.email === 'anfajue@bk.ru' || (function() { try { var r = JSON.parse(localStorage.getItem('nexora_roles')) || {}; return r[u.nickname] === 'admin'; } catch(e) { return false; } })();
+        var msg = { tournamentId: activeTournamentId, userId: senderId, text: txt, timestamp: new Date().toISOString(), isAdmin: senderIsAdmin, chatType: activeTab === 'organizer' ? 'organizer' : activeTab, teamName: tn || undefined };
         if (chatReplyToUser) { msg.targetUserId = chatReplyToUser; msg.replyToText = chatReplyToText; }
         all.push(msg);
         chatReplyToUser = null; chatReplyToText = null;
