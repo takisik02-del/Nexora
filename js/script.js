@@ -401,7 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('nexora_users', JSON.stringify([
                 { nickname: 'Taki', email: 'anfajue@bk.ru', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-07-30T16:51:51.654Z' },
                 { nickname: 'MARS', email: 'marse2007@bk.ru', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-07-30T16:53:18.524Z' },
-                { nickname: 'S', email: 'ws.iao.07@mail.ru', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-07-30T17:44:05.156Z' }
+                { nickname: 'S', email: 'ws.iao.07@mail.ru', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-07-30T17:44:05.156Z' },
+                { nickname: 'Support', email: 'support@nexora.gg', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-08-17T13:00:00.000Z' }
             ]));
             changed = true;
         }
