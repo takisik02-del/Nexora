@@ -1462,6 +1462,11 @@
                             let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
                             regs = regs.filter(r => r.tournamentId !== id);
                             localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                            fetch('/api/save', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ nexora_tournaments: tournaments, nexora_registrations: regs })
+                            }).catch(() => {});
                         } catch {}
                         renderTournaments();
                         updateStats();
@@ -1575,8 +1580,7 @@
                 const date = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : dateRaw;
 
                 const tournaments = getTournaments();
-                const maxId = tournaments.reduce((max, t) => Math.max(max, t.id), 0);
-                const newId = maxId + 1;
+                const newId = Date.now();
                 tournaments.push({
                     id: newId,
                     name,
@@ -1595,6 +1599,11 @@
                     let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
                     regs = regs.filter(r => r.tournamentId !== newId);
                     localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                    fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nexora_tournaments: tournaments, nexora_registrations: regs })
+                    }).catch(() => {});
                 } catch {}
                 renderTournaments();
                 updateStats();
