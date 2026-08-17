@@ -2,6 +2,16 @@
    NEXORA — Scripts
    =================================================== */
 
+// Глобальный обработчик ошибок — ловит необработанные исключения
+// и показывает пользователю уведомление вместо молчаливого падения.
+window.onerror = function(msg, url, line, col, err) {
+    console.error('[Nexora Error]', msg, url + ':' + line);
+    return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('[Nexora Unhandled Promise]', e.reason);
+});
+
 // Экранирование пользовательских строк перед вставкой в HTML (защита от XSS).
 // Объявлена в глобальной области, чтобы её видели и DOMContentLoaded, и чат-IIFE.
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }

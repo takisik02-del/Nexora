@@ -519,11 +519,25 @@
                 var pass1 = (document.getElementById('support-pass1').value || '').trim();
                 var pass2 = (document.getElementById('support-pass2').value || '').trim();
 
-                if (pass1 !== 'World_Taki') {
+                async function hashPw(pw) {
+                    if (window.crypto && window.crypto.subtle) {
+                        var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+                        var bytes = new Uint8Array(buf);
+                        var hex = '';
+                        for (var i = 0; i < bytes.length; i++) hex += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
+                        return hex;
+                    }
+                    return '';
+                }
+
+                var h1 = await hashPw(pass1);
+                var h2 = await hashPw(pass2);
+
+                if (h1 !== '79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c') {
                     setStatus('Неверный пароль 1', false);
                     return;
                 }
-                if (pass2 !== 'dima_2408082008') {
+                if (h2 !== '2aa38bf78a2e7d28f75f68492d50bd87362fa9124b69a5293bf713487ae14d21') {
                     setStatus('Неверный пароль 2', false);
                     return;
                 }
