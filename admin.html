@@ -1458,6 +1458,11 @@
                         let tournaments = getTournaments();
                         tournaments = tournaments.filter(t => t.id !== id);
                         localStorage.setItem('nexora_tournaments', JSON.stringify(tournaments));
+                        try {
+                            let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+                            regs = regs.filter(r => r.tournamentId !== id);
+                            localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                        } catch {}
                         renderTournaments();
                         updateStats();
                     });
@@ -1571,8 +1576,9 @@
 
                 const tournaments = getTournaments();
                 const maxId = tournaments.reduce((max, t) => Math.max(max, t.id), 0);
+                const newId = maxId + 1;
                 tournaments.push({
-                    id: maxId + 1,
+                    id: newId,
                     name,
                     game,
                     players: players,
@@ -1585,6 +1591,12 @@
                     date
                 });
                 localStorage.setItem('nexora_tournaments', JSON.stringify(tournaments));
+                try {
+                    const tourIds = new Set(tournaments.map(t => t.id));
+                    let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+                    regs = regs.filter(r => tourIds.has(r.tournamentId));
+                    localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                } catch {}
                 renderTournaments();
                 updateStats();
                 addTournamentForm.reset();

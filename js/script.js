@@ -445,6 +445,25 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     })();
 
+    // Миграция: удаление registrations для несуществующих турниров
+    (function migrateCleanOrphanRegistrations() {
+        try {
+            var tours = JSON.parse(localStorage.getItem('nexora_tournaments')) || [];
+            var tourIds = {};
+            tours.forEach(function(t) { tourIds[t.id] = true; });
+            var regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+            var cleaned = regs.filter(function(r) { return tourIds[r.tournamentId]; });
+            if (cleaned.length !== regs.length) {
+                localStorage.setItem('nexora_registrations', JSON.stringify(cleaned));
+            }
+            var left = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+            var cleanedLeft = left.filter(function(r) { return tourIds[r.tournamentId]; });
+            if (cleanedLeft.length !== left.length) {
+                localStorage.setItem('nexora_left_tournaments', JSON.stringify(cleanedLeft));
+            }
+        } catch(e) {}
+    })();
+
     // Nexora mail API endpoint (Vercel)
     const MAIL_API = 'https://nexora-zeta-ten.vercel.app/api/send-code';
 
