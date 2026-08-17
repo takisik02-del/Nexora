@@ -1405,7 +1405,7 @@
             let regs = [];
             try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
 
-            if (regs.some(r => r.userId === user.nickname && r.tournamentId === pendingTournamentId)) {
+            if (regs.some(r => r.userId === user.nickname && r.tournamentId === pendingTournamentId && !isInLeftList(user.nickname, pendingTournamentId))) {
                 closePayment();
                 showToast('Вы уже зарегистрированы на этот турнир');
                 return;
@@ -1741,7 +1741,7 @@
             let regs = [];
             try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
 
-            if (regs.some(r => r.userId === user.nickname && r.tournamentId === id)) {
+            if (regs.some(r => r.userId === user.nickname && r.tournamentId === id && !isInLeftList(user.nickname, id))) {
                 showToast('Вы уже зарегистрированы на этот турнир');
                 return;
             }

@@ -1592,9 +1592,8 @@
                 });
                 localStorage.setItem('nexora_tournaments', JSON.stringify(tournaments));
                 try {
-                    const tourIds = new Set(tournaments.map(t => t.id));
                     let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
-                    regs = regs.filter(r => tourIds.has(r.tournamentId));
+                    regs = regs.filter(r => r.tournamentId !== newId);
                     localStorage.setItem('nexora_registrations', JSON.stringify(regs));
                 } catch {}
                 renderTournaments();
