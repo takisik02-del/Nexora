@@ -1021,12 +1021,18 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch { return false; }
     })();
 
-    // Миграция: добавление аккаунта Support, если его нет в localStorage
+    // Миграция: добавление/обновление аккаунта Support в localStorage
     (function migrateAddSupportAccount() {
         try {
             var users = JSON.parse(localStorage.getItem('nexora_users'));
-            if (Array.isArray(users) && !users.some(function(u) { return u && u.email === 'support@nexora.gg'; })) {
-                users.push({ nickname: 'Support', email: 'support@nexora.gg', password: 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c', registeredAt: '2026-08-17T13:00:00.000Z' });
+            if (!Array.isArray(users)) return;
+            var support = users.find(function(u) { return u && u.email === 'support@nexora.gg'; });
+            var correctHash = 'sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c';
+            if (!support) {
+                users.push({ nickname: 'Support', email: 'support@nexora.gg', password: correctHash, registeredAt: '2026-08-17T13:00:00.000Z' });
+                localStorage.setItem('nexora_users', JSON.stringify(users));
+            } else if (support.password !== correctHash) {
+                support.password = correctHash;
                 localStorage.setItem('nexora_users', JSON.stringify(users));
             }
         } catch(e) {}
