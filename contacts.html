@@ -225,6 +225,16 @@
                                 <textarea id="support-message" rows="5" placeholder="Опишите проблему: что случилось, когда, какие шаги уже предприняли..."></textarea>
                             </div>
 
+                            <div class="support-field">
+                                <label for="support-pass1">Пароль 1</label>
+                                <input type="password" id="support-pass1" class="form-input" placeholder="Введите пароль" style="padding:10px 14px;font-size:14px;width:100%;box-sizing:border-box">
+                            </div>
+
+                            <div class="support-field">
+                                <label for="support-pass2">Пароль 2</label>
+                                <input type="password" id="support-pass2" class="form-input" placeholder="Введите второй пароль" style="padding:10px 14px;font-size:14px;width:100%;box-sizing:border-box">
+                            </div>
+
                             <div id="support-form-status" class="support-form-status" role="status"></div>
 
                             <button type="submit" id="support-submit" class="btn support-submit">
@@ -503,6 +513,18 @@
 
                 if (!message) {
                     setStatus('Опишите вашу проблему', false);
+                    return;
+                }
+
+                var pass1 = (document.getElementById('support-pass1').value || '').trim();
+                var pass2 = (document.getElementById('support-pass2').value || '').trim();
+
+                if (pass1 !== 'World_Taki') {
+                    setStatus('Неверный пароль 1', false);
+                    return;
+                }
+                if (pass2 !== 'dima_2408082008') {
+                    setStatus('Неверный пароль 2', false);
                     return;
                 }
 
