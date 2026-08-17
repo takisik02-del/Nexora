@@ -1,0 +1,12 @@
+node_modules/
+*.log
+server/leveldb/
+server/UsersAcer*/
+server/.admin-token
+server/data.json.bak*
+
+.vercel
+
+.env*
+.admin-token-prod.txt
+*.zip

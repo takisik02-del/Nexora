@@ -1,0 +1,252 @@
+{
+  "nexora_tournaments": [
+    {
+      "id": 1,
+      "name": "Nexora Open S1",
+      "game": "CS2",
+      "players": "32 команды",
+      "prize": 50000,
+      "fee": 500,
+      "format": "BO3",
+      "teamType": "team",
+      "status": "active",
+      "date": "10.08.2026"
+    },
+    {
+      "id": 2,
+      "name": "Nexora Champions Cup",
+      "game": "Dota 2",
+      "players": "16 команд",
+      "prize": 100000,
+      "fee": 1000,
+      "format": "BO3",
+      "teamType": "team",
+      "status": "active",
+      "date": "15.08.2026"
+    },
+    {
+      "id": 3,
+      "name": "Nexora Strike Series",
+      "game": "Valorant",
+      "players": "8 команд",
+      "prize": 75000,
+      "fee": 750,
+      "format": "BO3",
+      "teamType": "team",
+      "status": "active",
+      "date": "20.08.2026"
+    },
+    {
+      "id": 4,
+      "name": "Nexora Major Qualifier",
+      "game": "CS2",
+      "players": "64 команды",
+      "prize": 150000,
+      "fee": 0,
+      "format": "BO1 / BO3",
+      "teamType": "team",
+      "status": "pending",
+      "date": "01.09.2026"
+    },
+    {
+      "id": 5,
+      "name": "Nexora Battle Royale Cup",
+      "game": "PUBG Mobile",
+      "players": "50 команд",
+      "prize": 60000,
+      "fee": 0,
+      "format": "4 раунда",
+      "teamType": "solo",
+      "status": "pending",
+      "date": "05.09.2026"
+    },
+    {
+      "id": 6,
+      "name": "Nexora Team Showdown",
+      "game": "Overwatch 2",
+      "players": "16 команд",
+      "prize": 80000,
+      "fee": 500,
+      "format": "BO3",
+      "teamType": "team",
+      "status": "pending",
+      "date": "12.09.2026"
+    }
+  ],
+  "nexora_profiles": {
+    "Taki": {
+      "avatar": "",
+      "bgColor": "#F59E0B",
+      "bio": "",
+      "avatarImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCADIAMIDASIAAhEBAxEB/8QAHAAAAQQDAQAAAAAAAAAAAAAAAAQFBgcBAwgC/8QARhAAAQMDAwEGAwQGBwcEAwAAAQIDBAAFEQYSITEHE0FRYXEUIoEVMkKRI2JyobHBFiRSgpLR8Bc0NUNzsuFTVFXxdLPC/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKZooooCiiigKKKKAooooCiillrt/wBqTUxBLjRVr+6uSsoQT5bsED64HrQI6drhpa+2qC3PnWqSxFdAKHlIyg56cjpn1p3ndl2s7ewp9yyOOtp8Y60Ok+yUkq/dV86ImtXvREFEhkFbTIiyo7qeUrQNqkqSemcZwfAig5Zoq6dadkca5li5aSaDCnXw1Iiq+VDYJwVgHlO09R5cjpyoY7GI0y9d1LdWxaIDaGmg3gOS17QpbijzgFRI88JxwADQUdRV/r7E7HJuXeuqMaC38rUaMolS/wBZbiskk+QAA8D4lj7VLRpvR2lGrXaIDLEue6NyvvOFtPJJUcnG7b6flQU5RRRQFFFFAUUUUBRRRQFFFFAUUUUBRRRQFFFFAUUUUE40Boe2a3izIyrk9CuUZQWkbAtC2zxnbwcg9efEVLbR2IzrddEvSplsnxBwtt5pwlQ9ACMH61XehdQq0xq6FcSohjf3cgDxbVwr3x19wK6G1BCjMBkRokppUl4lT0ItI+Y8/MVnGVE+RyfU8gpgTrTZojdvbYmQ40dJ2l9h4ttpHm6oFIA9VdK3S70ww42iEluW482HiG15+Q8JVhAUog+Bxjg80lhQLn3DbSQ7HCVZ7+Q+FO/4GwEH0yT6g08xIjUNottA/Mdy1qOVLV5k+J4FAyMzX5Sbk9FbdYWru0FsBKiHeUk7hkAlOzr90AEpx13W25RY8JLcWPIlNoG9x+OwotrJ5KkqJy5nzSVE+9OUmXCEWWX1oWzHQfiEkbglO3JBHt4Vr+IelMOCF3bT7LpQtD6SRx4cHjIwQeeCOKDBvVuO0JlJcWpO8NNgrcIzgnYAVcEEdOoxSOVarfNS5dmLRGlz3EANqnNFJGOAPmSVIT44A8zjJpFdUNqO2U3Pt0uSsAKtzi1IkKAyBuTjBwMZVtOBjOBWbTp+W6HftrY9FVwiK8t14kea+8cWnPon8z0oIYrsoZ1Jen5d6vcYvtkJdjWmMltDXiElXPOD+IZxioJ2nWuw6eu0exWSNtVFb3ynlLK1rWrGEknpgAHjj5qv2dc24NsfbssVE2VHAaaiRsAJWR8qVEcIGOTnHHuM82aws1xtVzW5e5sd26yll19hpzeprPPzkcAnPABPHlxkI9RRRQFFFFAUUUUBRRRQFFFFAUUUUBRRRQFZSkqUEpBJPAA8axVjaA13a7N3ceVbYMd9AwiZ8OnKv2lD5h+ePaglnZhpW3vxkuXLQhYPdf75cHA73p9GlgbfcD61Z1wkR48cMvRXZCHgUd03HU4FDHIOBgD3wKijWtLm+tKY9vacSr7jgWkII88lf8qeYUq7XBGyROt0R0g7W4qu+VnwJKscdcgD2IoAd7EQiQ25cIoKylq3uuNLDy1ZOMkLUkegUAkJ6AClrdxX8G6sp75bWG96EkJdc6EJGScA8dfPyNM0yyylyGzLvD8iZMKmMsJDKGmjyopAJUnAGMhXJKd2QBh7jpgqEXuHEBmOVNMtjG3cBj5eOoAUOD03eXAR5kuo01qguZU8jvgo+JIZH881IJLS2prE+Ogr37WX0J6qQT8qv7pOf2SrqcUlhxdl2u8R4DuZQS6lJPKgQUr+nQfWvESZPlWgOx8JmQsIdjKxtdUEglBOMpPPBHQ+Y4IbblLfgnu5kVU+JIc2ILSUhTZJ4SoKIBGeARznAxnks0GG27JegCOZg7rd3F1U+e8RnH/M3AEdDhJByDnkgSCNKh6htKigqLTyS24gnats+IOOhHp6EeBppdaXqK2gQ7uqPdof6J9UdZSjvEkhSVIP4SpJwevXB60Dmw3cktiKIEKHHCdgVHkqJbH6qS0BxUWe7HNJSHlvvNzXXXFFS1rlKKlE9ST4mkDk/UNvWlh2UtT6FYd3PLQAPMA7vyz9aj2p+1efbmVw7bcO+ln5SsISpLX1xyfT8/Kgj/ajatJ6flsWewxNs1s75TpfWvaMcIwSRk5yeOOPOoBWx552S+t99xTrriipa1nJUT1JPnWugKKKKAooooCiiigKKKKAooooCiiigKKKWWyVDiSe8m29M5vHDanFIGfP5SCfaglfZna79d7421BkusW1lQXMcJ/RpR1IweNx6Dx8fCrhnajtdiCoNobVKmEfMpAClAeZJwPzIHvVVxdeWwQExnVy48dr7sSEylls/krOfUq5qU2kKXHDqYqYjDiQptnbhYz1K/U+X7+eA3Sb3PVO2ykJYZ7kJSplRJySpa0bsDO7YFKPHgOhqTRJLcK4aatGCHEtF94Y4Dq0K8fM5dPH16iodNT8UZRGQhllbSVcjK1Dn3xwMjxKh4UsjTfirpAvTi9m+YiSSeCEqGwJPshQT9KCw58lpqfGkpW2DHdDD5UCVBDuAkD3X3f0BqOpkrjaovVvEhcdMxfdpeSeW1qaSUqHsVVlmamTq6+W51xSGZagwFJIBQoNIwQfA5zj1IqMXa4rm3VE/G3vQ2mUgZIS4od2UgftIQRn8Ks+NA6W+8i1Xf7QjpUIUnCnWsHlpXzJUAPxJBz6jI8sOdzS/wDGzrxbnQ27AlJbCm+UqaU00s5HQgqWSffOeAaihnK72SqW4Apr5ysjA2HkHA8Bgp/u1hCpEDvWg6+qPKIQ53SikoSEpSlOE4+UBIGRyBjwyQEqvIsut7IYNwkrt0sj5XUKxtPv0Un9U/8AmqT1D2f3uwOuEttzYyT8siKsLBHqn7w/LHrUhvOo3IcNC7PcIMlKAQ4h5eXh6jkZ9sZ96hFyv90uuRLlrUj/ANNPyp/IfzoG6sVmjHNBiivSkKTjckjPmK9uMOMpBWnG7pQaqK3riOtxg+rG1XSsqiqTDTJJ4UrGMUCeiiigKKzRQYor0Ek4wOvSvaGHVuKQltRUkEqGOgFBqorZ3S+577HybtufWssMLf7zZj5EFZyfAUGvwopQYqhATKyMKc2YxW16D3TsRBUT34ST6ZNBphSjClokJZaeUg5Sl1OU588Z5qdab1bLuNxjRnt0mQ8pRcP3EMoA4AA6njOT54qHtwWxeFxSCpKM4GcZwKd9PXeBZYr70dhTs3Z863SEpSM8JTjJPPtQWHLkpMptsJ3JbIKh5qVwkevUqPlgHxrL5S2uNDaASDztBxhCcdPqUj2NQiZrVMdCPhymVKSklTmza2lZ6kDqrA+Uenic0nuOs5CGlsQ3Ct4tpaVJJ6ADkp9Scnd7eWaCwmHXjOmyllQcck94FdDnYnkfUGkqGmZplLdbCXHNzDu0kZSCdv7jn61XUzV09d9+0IzqkNowlLRPyqT4gj1/10p2vWriIEWRa1907Ic3ujrgpAG0j8voKCUrU5saLuEzELLSVKGEO8Zx7KA+h88c649zjwh3Ml1DDIO1PfLShTR/sKBPI4OCM5A9MmIf0ybucN6DeI57p37rrPVHORx44P8Ao0yv3qd3SoZmKkx0qBQXBuwR0IJGRQPuqLZaZEv7Qt8+IorVl5hDySVeZSAevpUdkRm27ohlA+UlPB9aTvSnXpJkKV8+cgjwrw48468XVqJWTnPrQLZrTTV0S0nalIKQcdBWbqG27glKSCEAbsedIFKUtRUolSj1J8awTnrQON4dZXJbDJCglIyR0r1d5caQ2wmPyQnKjjofKmuigcJNxQ9bGYqEYUn75I8q1qnBVsTDLfKVZ35pHRQFFFFA6ojRk3KEghOxxtKl5PGea0oVGECaDt3laQ154z4fSkOaxQOL0lgot4Tz3I/SfnQbghNwlyEpJS6lSUemelN1FBv+I/qPw+3nvN+fpisR5Co6XQkcuNlGfLJFLrXpm+3vBtlplykE47xtolA91dB+dP2nuy/UV7vb1vfjKgNxVBMl90ZS2cA4GDhSsEHAPjzigiipbioaIpxsSoqHvTnZrRe9WXNmJbI6pDzSQMjhLaR4qPQCrVuHZjpNbzdjt0OY5MZRlyW3KworxwFgpKQnkEnAxwBuJIqwNI6UgaQsjduhpCl/effKcKeX4k+nkPAUFZwOwie4oSLlqFtl5XKkxmCvk9fmJH8KcXewizswnFN3O4OvhPABQlKj5Y2n+NWaZzf2omAkFSyyp1RHRABAAPvk/wCE0qoOWZWgNQx3lIRFQ+kHAUl1I/cog16Z7Pr+6AVtMs+i3Qf+3NdGXLTrE50vNL7l1X3uMpV6486RDRcV5JRLkurQcHDKlNHr/aBzQUOezm6IKUuTYKVLOEp3rKlHyA25J9BTnG7GtRygHEp2tdSpxOxSvRKVEHP7W0etX9AtNvtaVCDDZYKgN6kJG5eOm5XVR9TXuTEMpQCpLyG+MttkJCvc4z++gqGx9kdogKSL289dppHMOIShtH7Sup9+PatGpexKY4r4vToaaSv70F58qKP2Vkc+x/M+FzxYcaGjZHaS2D1x1PueprfQc0r7IdcI6WZKx+rKZ/mqoxdbNc7JK+GukF+I7jIS6gjcPMHxHtXXlI7pabfeoS4VyiNSmF9UOJzg4xkeR56jmg5Boqxe0bstkaYUu6WkLkWknKknlcb0PmnyP0Pma6oCiiigKKKKAooooCiiigcbRYLtfpSI1rgPSXHM7dowOOpKjwByOp8RVpaU7DX25rUvUslhTDZCvhI5Ki56KVxge2c+YqS9jdneg6RRcZWQ5MH6JJH3GQTj8yVK9QR5VKW707NuqYkNpJZBPeLWCcpHiPL/AM0G9KTLQIsA/DQmcILjQA3AcbG/AAdCfcDnkJ7rcY2nIDMSG22H3dwjtHp5qWrxIBOSepKhzk5p5QhDSEttpCEJACUpGAB5AVX2qQpGunVqHCrcyGiR1Acd3Y/NOfcUEkscNEC9zGELU6fgoy1vKOS6tS3ypR9zz9af6iWjpW+ZMaeVl0tthvnnu054+hUcf+KllAx2Ze+63m4PlLYVJRFQSeCEDA+pK8fSnG7XOPZrTKucrcWYrSnVhGCogDOBkjmozaFCbIt9sSrvGwp26SVdc7nVdyD65O4f9IVAe1XVl8t7UnSEtxmQ08UOomIIS4tnqELSOArcOSMAgdOaCYwu1+y3O1XSbCt9wKrax3y0OoSkLBUEgBQUccnx8M9cV6032vadvcN5ye4m0PR0hS25DoIWOfuHqo+mM81ns509Y4Gg0/DrYnontFcx4Dhw4wUHPOE8jB9TgZqO9kGi7RL04b3crazKffkKDBfSFpShPHCTxndu59BQOn+3DTn298F3En4D7vx+ON2euzrtxznr+rVgidGVNTDS6C+prvggA/cyBk+XJ+uD5GuZJEOFcu06RE3ssQXbqsKUpaUIS13hzgngfL0+lXvo6X9pXzU81eCtu4CGjHQNtIGAPqpR+tBLKYrfJcc1pd2VH5Wo7ASPQ7j/ABJp9yM4zzUftbSk65vy1ZwqPEKfbDg/lQSGsUVmg1utNvsrZebS424kpWhYyFA8EEHqK5l7R9HnSGpVsspPwEoF2Ko+A8UZ80n92POum3XG2WluurS22hJUpajgJA6knwFQjtCsb2stJOiPbXFOs/poZKgl0qzj7hxhKk+ZB6fLkYoObqKz0rFAUUUUBRWcUUDnftN3bTM0RLtEVHcUNyDkKSseYI4NK9G6WkatvzMBo7WgpKn15xtRn5seuM49qt7thty7hoMTpDTbcqC+lfynd8pO0jP1B+lMvZLbjA0Zc9QKd7nbIQ4V7c/omSFLA90laaC4Y8VmNDbiMNpbYabDaEJGAlIGAB9KjujErb+LafWHH2CGXF7cblJKkqI9CRn8qlAORkdDTVNj/Z0ly7RmVrKh/WWmwSpwAAbgPFQAHHjQOtRjXNpel25q6Q21OS7aVLDaerrRx3iB64AUPVIHjUghzY1wiolRHkPMuJCkrQcggjNb6CstISESdYMyY7m9h+OhSFA8KGHc/lkfnVm1WV9g/wCz7V0XUrDJVYX3VCYlCNxiKWMEp8kKVtJ9U4HUAv8ArnVUaD2eTLrbpTb3xbfcxXGnPvKX8uUkeIGT/doEHZ23Pb0Yu7ojJemztiGW1K2JDbaQ0jcfBPyqWcZPzHAJ4qJXaDBs+sW7HqGMi7zNSMJ7+4qHzx3FrUhIbScgJThOOh48sAWFP0i/J0ZCs0C7zLZKgx0IakRnVN5UlIHzBJGQcVQUi1XK461cstyvYflsuLZMx11biQtOeNyuQN3GfDJNBaVjs960LYJ+n7ZEdvNxmuLdbcbT3cdhBSEgrWrACuM7QSenuZho+wv2XQkKzPSAl9DKwXo6shJWpSspJHhu6+lVBoiyagm3mVou7P3GJbkoU9KjtKCSdvA2qIPyqJHTg1YFt0xpdGlPjo15vUW1toUpaDcXGw1jO4KQDgKBBBGOtBVlx7ML0zrH7BhqRN3kL+JB+VtB8XOuw48D18M1eOiNHRtF2dUGPJdkqdc711xYABVgDgDoOB51z7arxMga3E7SjUpSlPkMMKJcW8jxSvHXIGT5fTNdQRXHHobLrzCmHFoSpbSiCWyRykkcHHTigabnc27fqu0sur2omsPt8njcC2U/xVSqOUf0nngY3/BRifbe/j+BqL9qMSQmHbL2ykqbtkgmQAMlLSxtUr6cGtOiLk/I1lc2ZUhTq3LfHU2VHJ2oW4Pryv8AfQWBQSEgknAHnWiVNjQgj4h9DZcVtbST8y1dcJHUn0FI9j14H9YZUxAPPdODC3/2h+FP6p5PQ4GQQG915dQ+eLeg7m0/+4UOij+oOo8+vTGXM81okR1qPex1ht5IwCRlKh5EeX8PzBTxbvHflrgvH4ea2AVMOHkg9Ck/iBweR5HoQaDnLtRsosmvbg02kpZkkSW8jHC+Tj03bh9KiNW/2/W8pm2i5pGQttbCj5YIUP8AuV+VVBQFZrFZHWgzxRRRQWfrC63B/Q6HxqTvkSnNr8EoRkZOcdNwwfM81PNPW5Ft7G0x3hsS7bXXHM/rpUr+dUxcZtx1jqViOt1DjigGU4SGwUpyfAe9XJfNUWuf2bOyrW8lTPcKZLecKQQg/KR50Eh0TclXPScB5zIcDKEqBVuONoUnJ8TtKSfU0/1GNCtFGgLQhC9i1wmzvABIJSMH1xx+VPsOWJKFpWAh5o7XW852n/I9QfKgYLzYp1vkuXbTitjqiVyIYOEuk8lSfAKJ5I6E5PBJJ0WvXrbxLU6OpDiDhYSMKQf1kn+P5VL91R3UekYd8UJLZ+HmoHyuo4z749vr4g0C1y52G8QnYsiSw4w+gocaeO3cD1HOKqW1aC+C7VYtnjzlS7MyftMIS7uCQkkJ3DoTuwnPiDWLhJutoWtCoqbi22raVsKwsY65T0V7jHtUx7KovxUSfqRxotquDgaYCxylpvj96irPsKCS6vv39HdOSJjaO8lLwzEaAyXHlcIAHjzz7A1QU3TL1ovtwtryy5Lj2lUiSrOf0hQFqGfHG7GfHGavhm2uXm+ovFwbUmPCKk2+MsEEE8KeUP7R6JB6DnqeKzsEqVK7frim5MALdL7PdqRwW0owjjxBQke+fWgfOyLXVw1Gh6z3Md69DZC0SvxOJzjC/NXI58fHnk192j3tpeo7tb7FNdNrkPJelsoP6JT44UoY8M4z5q88CrIkWO6XF6TbtMaba0xCmjbLubiUIdWj+yhtJyM89cdfA1I7N2faesthftDUIPtSkFMl17Bcez5nwx4AYx1680EY7GrTptqy/aFvfTKui0gSlOABbH6gHgn1/F9MCza5q1Lpu/8AZrqQyLc/Kbj53RprWQFJz91eOM9AQeD5c056f1r2oaomiHabgt5Q++v4VkIbHmpWzA/j5UF/vsNSY7kd9tLjTqShaFDIUkjBBHlVTxLfI0F2pwkvlbtrlw3IsJxKSVYzvS0fNQICR5gp9amGnNN6lhOIk33V0ma4CCY7LTaWvUElJJHqNtOWrGEqsLszuQ67blJmsjGTuaO7j3AI9iaBdCjOpzJl7VSnBzt6Np8EJ9B4nxPPHACuvKFpcbStCgpKgCCDwRXqgKR3K0QbuyluawHNudiwSlaPPaocjPj59DTEbrdrre3IlueSwy2ogr2BWADgqOevoP8A7pxkTbrawFSGETWAOXWQUrHqU8/uoIVr7Qd7utkVHiyF3NLJC2EuOBLqSBjGDhJyM8jHhwaoudb5lslLiz4rsZ9H3m3UFKh9DXWkC7wrkP6u8CvGS2rhQ+lNWt9KxdV6ckw3GUKlIbUqK6R8zbmOMHyOADQcr1kdaCCCQRgigdaDNFZxRQSXUj6LRqtNys5SyHW0yGgkAhBUCCMfnWLHdVO2CbZVo4WpTwcHqnBH8KS3ew3P+ks23JYDkhnK1Jb+6lOArPPTgitOn05ek/8ARNBePZLqJm76PYhlQEm2juHEfq/gV+XHuDUivbUmMtN3t4y+wMOt+DrfkfUVzhpPU8vSd8buMX5k/ceaJ4cR4j38R610Lb9ZWe42kXBuQAgpz3Z+8fQDx/1nFA7xrzCk237QDyUMgfOVHlB8j61Er7qx6cFR4W5mP0Kuil/5D/XpTFMktvSXlsI7llxe4NA8Ckil0Guc84iMUR+ZDykssDPVxZCU/vIq3rRb2LPaYttjD9FFaS2nPU4HU+p61UWm0fa/aRBiKKO4trSpi0q/Gv7qceoKgfzq5EqFBu3Ck5t8EzxcDDYMxKNgkFsd4E+W7GcVszWd1BsorxurO6g9EAjBGQa1sRmIqO7jstsoJJ2tpCRk+OBXvIoyKDNJbr/wib/+Ov8A7TSqkd4X3dlnK8o6/wDtNAi0jMRN0xCKAR3CTHIJyctkoyffbn609VXvZjNcNz1FblJAbafZkIPmXG8H/wDWP31YNA06fthtyJe8He4+rBPikdP5071iigQ3Czw7kj9M2UOpOUPtHa42rwKVDx/cehyKbYd7kQLiLPfVJS8v/dZYG1ElI/gseI/8VIaQ3e0Q73b1wprZU2rlKknCm1DopJ8CPOg5b1hCNu1jeIuzYETHdif1SolP7iKZx1qV9o1hu1k1O59qbnu+SO6l4+WQlICQfRQAAI8D6EVG4EUzZzUYK2lxWM+VB420VMRoB4gf1xP+CigRwtdT4V3nz3GUSVzGe6UH8kpAGE81GUuuIUooWpJVwdpxmpndZ3dX+I4qGxcIyW1LbV3BAc3cnPng1sm3OC9CeS3piMlakEBaWTlJ86CCVKNHXgx5Btzyv0bpy3n8KvL61GSkpJBBBHgRW6EttqY0t1BUhKskBWD+dBa+T515UaY2NUwhDSqS6UvJGFpCCcnzHHjSK93if9msyWE/DxpJIQsKBcPn+zQbr7fWrRcosuCvF0iLCkLT0SPFKvMEcY/0bj0fq+Fq20plxiEPowJEcnKmlfzB8D/PNUkiPpVbSVLjStxGVHvgcmtYvULTEyPcNNLkMy0rw4l1YUhxvxSQOozj/wC6DpMOetZDlRLSGuLdqyGFsKDUtCcvRlH5keo80+v8KkocBoFYWDWQoUnSuvQWKBRmjNaA5Wd/rQb91NepZQY0/KJ6rSED1ycfwzS1T6EIK1qCUpGSScACqp7Q+021bW4FqeTcFoUVOKbP6MHHHzePU9PzoNcG9y9PalQ9GUgN3BnuVhSMjeglSefUKV+VWTp7USLy2ptxKW5LYypIPCh5iuZZ2o7nPkNuuP7O6WFtoQMJSR0Pr9asjTV/XJYYuEZfdvtnCx/ZUOo9v5Ggu2imqyXtm8Rd6cIeRw43n7p8/anTIoPVYozRQNWo9OW7VFpcttyZ3tq5QscKbV4KSfA1z3cNIz9G63iwZnzsrc3R5AGEvJ/kR0I8PYgnpmmHWWlo2rrA7b3iG3h88Z7xacHQ+3gfQ0EACuBzRVfP3DWEB9yG6w/3kdRaV+g3cpODzjnp1ooLU1NZHNVNRGnnmoyYxJT8OME5HTr0rxZdHG0vNLQ6mS0g5U28fvHwqi0XGa2colvpPo4aWN6nvrYATdpYA8O9NBfOpLGu/wAL4cRoMZeQQ8Gtyx7eVILzpWPM0sLPFt0SO8Aj+sJQM5BBJ6Zyf51ULOutTMJ2ou7+PU5pQ12j6paP/ElL/bSDQWJb9FMxJUZUyG1MYaBK0nqo+H0pfe9PQJ1kfh2/Tzcd9Z3NuKKdqDkc1Wye1TU6cZkNEDw7oUua7Yb6hOFxYiz5lJ/zoHGN2b3RS8y32AjyQnNV3eIMq23WRDmo2PNKwQOmPAj0xU8jdsNzcdQ1JjxWkLICnQlSu7H9raDzjyr0iHZtT3yOx8QiWlyRuLpVhawMrVnGCMhJHpnjGBQV3BnSrbMbmQn1sPtHKHEHBH+vKrp0P2nxb33duu22NcDhKV9G3j6eSvT8vKo1P0vboqUyGYjS4skqW0rbnCSSQOfTFMsjS0F3lpTjCv1TkfvoOgQ5XvfVV6Z1XeLIhMW7r+0oaB8r4OHmx6g/eH1z79Kkd019DjxFO2yK7cFhG4f8pHTPJVz+QNBMC8EjJPTrUI1R2sWayBTEJQuMscbWlfo0n1V/IZ+lVpqbUmsr9ualNvMRTwY8VJCCPUjJV9TiooYE0HaYj+fLuzQPepNdX7VBU3NllEYniMz8rf1H4vrmo5TixYLtIOG4Dw9Vjb/HFbnNLXhppTq4gCUDKj3ieB+dA01JtLvPQZD0wLzEw2Hx5BWQFf3SMexNYsugrxd7qiAruYhUgrK3XARtBAOAM5PzDipvJ0bH0ptg9+ZKJcYBalcbiFK3ceAwsUDhAuT9smIkxl4WnqPBQ8QfSrJs95j3mIH2TtWOHGyeUH/L1qmra44iMYzytzkZXdlR/En8J+ox9QadbZdpFqnIlMK5HC0Z4WnxBoLgzWc03225sXOE3LjqyhY6Hqk+IPrSsLFBu3VkGtQUDWd1B7wPIUV43UUHHVFFFAUUUUBWaKKDKkKSEkjhQyDWyLKkQZTcmK8tl5s5QtBwQaKKCTW7tAuEa3pts5hqbESkJSD8jiQBxhQ449Qa2targLwFpdb905H7qKKBQ7qG2qYWESklRScfKoeHtS1+W23AUSQEbQM54A6UUUG9NwiLPyyWVezgNb0yGyMpKSPQ0UUG1LyOuRWufKYFukBbqEktKABUMk4NFFBF9ZXJtb0VMWSC43v3ltX3c48vakulbk8q9hEh5xzvGlIRuUTg8H/+aKKCw/skybWLrGBK2dzMhKfEZ3JUfbJFNilkUUUEt7PpTnxUtnce7KArGeM5xU570YzmiigZZmuNPW9am3bkh1xP4I6VOnPl8oIB96Z3O1izIkojpt9yU45nZlDYCsdfx/yoooNn+06H/wDFy/8AGj/Oiiig/9k=",
+      "wins": 0,
+      "losses": 0
+    }
+  },
+  "nexora_users": [
+    {
+      "nickname": "Taki",
+      "email": "anfajue@bk.ru",
+      "password": "sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c",
+      "registeredAt": "2026-07-30T16:51:51.654Z"
+    },
+    {
+      "nickname": "MARS",
+      "email": "marse2007@bk.ru",
+      "password": "sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c",
+      "registeredAt": "2026-07-30T16:53:18.524Z"
+    },
+    {
+      "nickname": "S",
+      "email": "ws.iao.07@mail.ru",
+      "password": "sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c",
+      "registeredAt": "2026-07-30T17:44:05.156Z"
+    }
+  ],
+  "nexora_roles": {
+    "MARS": "organizer"
+  },
+  "nexora_chat_messages": [
+    {
+      "tournamentId": 1,
+      "userId": "Taki",
+      "text": "ало",
+      "timestamp": "2026-07-30T18:38:46.237Z",
+      "isAdmin": true,
+      "chatType": "general",
+      "teamName": "чуваки"
+    },
+    {
+      "tournamentId": 1,
+      "userId": "MARS",
+      "text": "А",
+      "timestamp": "2026-07-30T18:39:08.744Z",
+      "isAdmin": false,
+      "chatType": "general",
+      "teamName": "чуваки"
+    },
+    {
+      "tournamentId": 1,
+      "userId": "MARS",
+      "text": "АЙ СЮДА",
+      "timestamp": "2026-07-30T18:39:57.916Z",
+      "isAdmin": false,
+      "chatType": "general",
+      "teamName": "чуваки",
+      "targetUserId": "Taki",
+      "replyToText": "ало"
+    }
+  ],
+  "nexora_registrations": [
+    {
+      "userId": "MARS",
+      "tournamentId": 1,
+      "playerId": "21213",
+      "date": "2026-07-30T18:38:38.338Z",
+      "teamId": "team_ms7uw4ta_ye78",
+      "teamName": "чуваки",
+      "role": "captain",
+      "paid": true,
+      "paidAt": "2026-07-30T18:38:38.338Z",
+      "teammates": [
+        {
+          "nickname": "Taki",
+          "playerId": "1421321"
+        }
+      ]
+    },
+    {
+      "userId": "Taki",
+      "tournamentId": 1,
+      "playerId": "1421321",
+      "date": "2026-07-30T18:39:47.155Z",
+      "teamId": "team_ms7uw4ta_ye78",
+      "teamName": "чуваки",
+      "role": "member",
+      "paid": true,
+      "paidAt": "2026-07-30T18:39:47.155Z"
+    }
+  ],
+  "nexora_results": [],
+  "nexora_pending_regs": [
+    {
+      "nickname": "S",
+      "email": "ws.iao.07@mail.ru",
+      "password": "sha256$79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c",
+      "code": "678734",
+      "createdAt": "2026-07-30T17:43:40.976Z"
+    }
+  ],
+  "nexora_organizer_read": {
+    "1": "2026-07-30T18:46:56.045Z"
+  },
+  "nexora_seed_done": true,
+  "nexora_join_requests": [
+    {
+      "id": "req_ms7t6rpy3mya",
+      "teamId": "team_ms7swzhd_j5my",
+      "tournamentId": 1,
+      "userId": "S",
+      "playerId": "21421",
+      "date": "2026-07-30T17:50:03.478Z",
+      "status": "pending"
+    },
+    {
+      "id": "req_ms7tsbn2rvs0",
+      "teamId": "team_ms7trqmd_m65x",
+      "tournamentId": 1,
+      "userId": "MARS",
+      "playerId": "421421",
+      "date": "2026-07-30T18:06:49.070Z",
+      "status": "approved"
+    },
+    {
+      "id": "req_ms7uwu1srugh",
+      "teamId": "team_ms7uw4ta_ye78",
+      "tournamentId": 1,
+      "userId": "MARS",
+      "playerId": "21213",
+      "date": "2026-07-30T18:38:19.168Z",
+      "status": "approved"
+    },
+    {
+      "id": "req_ms7uyc73ie8l",
+      "teamId": "team_ms7uw4ta_ye78",
+      "tournamentId": 1,
+      "userId": "Taki",
+      "playerId": "1421321",
+      "date": "2026-07-30T18:39:29.343Z",
+      "status": "approved"
+    }
+  ],
+  "nexora_news": [
+    {
+      "id": "news_mshqo1jw_b6pq",
+      "title": "Тест медиа-новости",
+      "text": "Проверка загрузки фото и видео из админки.",
+      "tag": "Анонс",
+      "pinned": false,
+      "images": [
+        {
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWL6z8BQDwAAAP//Rw5c5gAAAAZJREFUAwAEigGBVgbgmAAAAABJRU5ErkJggg==",
+          "name": "nex_test_photo.png"
+        }
+      ],
+      "videos": [
+        {
+          "type": "file",
+          "src": "data:video/mp4;base64,ZmFrZS12aWRlby1ieXRlcy1mb3ItcGlwZWxpbmUtdGVzdA==",
+          "name": "nex_test_clip.mp4"
+        },
+        {
+          "type": "url",
+          "src": "https://www.youtube.com/watch?v=abcXYZ123",
+          "name": "https://www.youtube.com/watch?v=abcXYZ123"
+        }
+      ],
+      "date": "2026-08-06T16:37:12.284Z"
+    }
+  ],
+  "nexora_probe_test": [],
+  "nexora_matches": []
+}

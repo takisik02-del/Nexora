@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexora — Турниры">
+    <title>Турниры — Nexora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="img/nexora-icon.svg">
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <style>
+        .tournament-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:0 0 40px}
+        .tournament-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg,12px);padding:20px 22px;transition:all .25s ease;position:relative;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+        .tournament-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity .25s ease}
+        .tournament-card:hover{border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
+        .tournament-card:hover::before{opacity:1}
+        .tournament-card__top{display:flex;align-items:center;gap:8px;min-width:0}
+        .tournament-card__game{font-size:10px;font-weight:700;color:var(--text);background:rgba(255,255,255,.08);border:1px solid var(--border-light);padding:3px 10px;border-radius:50px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+        .tournament-card__status{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text-muted);white-space:nowrap}
+        .tournament-card__status i{width:6px;height:6px;border-radius:50%;background:var(--text-muted)}
+        .tournament-card__status.is-active{color:#FFFFFF}
+        .tournament-card__status.is-active i{background:#22C55E;animation:dotPulse 2s ease-in-out infinite}
+        .tournament-card__status.is-pending{color:#9CA3AF}
+        .tournament-card__status.is-pending i{background:#9CA3AF}
+        .tournament-card__date{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.5px;white-space:nowrap}
+        .tournament-card__title{font-family:var(--font-heading);font-size:21px;font-weight:700;color:var(--text);margin:0;line-height:1.15;text-transform:uppercase;letter-spacing:.5px}
+        .tournament-card__info{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);flex-wrap:wrap}
+        .tournament-card__format{color:var(--accent);font-weight:600;letter-spacing:1px}
+        .tc-dot{color:var(--text-muted);opacity:.5}
+        .tournament-card__teams{font-size:11px;color:var(--text-muted);padding:0}
+        .tournament-card__teamline{font-size:11px;color:var(--accent);font-weight:600;padding:0}
+        .tournament-card__prize-row{display:flex;align-items:baseline;gap:8px;padding:2px 0}
+        .tournament-card__prize{font-family:var(--font-heading);font-size:26px;color:#FFFFFF;font-weight:700;letter-spacing:.5px;line-height:1}
+        .tournament-card__prize-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+        .tournament-card__footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border-light)}
+        .team-browser-card:hover{border-color:var(--accent)!important}
+        #chat-modal{max-width:780px!important}
+        #chat-modal .chat-content{height:65vh;min-height:400px;max-height:700px}
+        #chat-messages{background:var(--bg-chat,rgba(0,0,0,.15))}
+        .admin-golden{
+            background:var(--accent);
+            color:#0A0B0E!important;
+            font-weight:700!important;
+            font-size:12px!important;
+            padding:2px 12px!important;
+            border-radius:12px!important;
+            display:inline-flex;align-items:center;gap:4px
+        }
+        .admin-golden--sm{font-size:10px!important;padding:1px 8px!important;border-radius:10px!important}
+        .chat-tab{color:var(--text-muted);transition:color .2s}
+        .chat-tab.active{color:var(--text)!important}
+
+        /* === Фон с персонажами в секции турниров === */
+        .tournaments-section{position:relative;overflow:hidden}
+        /* ===== КАРТОЧКИ ИГР — фильтр турниров ===== */
+        .game-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px;margin:0 0 14px}
+        .game-card{position:relative;overflow:hidden;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,var(--surface),#0e0f13);height:150px;cursor:pointer;padding:0;text-align:left;font-family:var(--font-sans);box-shadow:0 4px 16px -12px rgba(0,0,0,.6);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;-webkit-tap-highlight-color:transparent;outline:none;isolation:isolate}
+        .game-card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(8,8,10,0) 40%,rgba(8,8,10,.62) 100%);opacity:.8;transition:opacity .25s ease}
+        .game-card:hover{border-color:rgba(255,255,255,.32);box-shadow:0 10px 26px -14px rgba(0,0,0,.7);transform:translateY(-2px)}
+        .game-card:hover::after{opacity:.65}
+        .game-card:active{transform:translateY(0) scale(.995)}
+        .game-card.is-active{border-color:var(--gcolor,#E8EAF0);box-shadow:inset 0 2px 0 rgba(255,255,255,.26),0 8px 22px -14px rgba(0,0,0,.7)}
+        .game-card.is-active::after{opacity:.6}
+        .game-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.94;filter:saturate(.9);transition:transform .45s ease,opacity .25s ease,filter .25s ease}
+        .game-card:hover .game-card__img{transform:scale(1.05);opacity:1;filter:saturate(1)}
+        .game-card__icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:30px;font-weight:700;letter-spacing:1px;background:linear-gradient(180deg,color-mix(in srgb,var(--gcolor,#E8EAF0) 12%,transparent),rgba(12,12,14,.96) 72%)}
+        .game-card__shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(8,8,10,0) 28%,rgba(8,8,10,.6) 70%,rgba(8,8,10,.95) 100%)}
+        .game-card__badge{position:absolute;top:10px;left:10px;z-index:2;font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 9px;border-radius:4px;color:#fff;background:rgba(10,10,12,.55);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+        .game-card.is-active .game-card__badge{background:#FFFFFF;color:#0A0B0E;border-color:transparent}
+        .game-card__name{position:absolute;left:12px;right:40px;bottom:11px;z-index:2;font-size:14px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.6px;font-family:var(--font-heading);line-height:1.25}
+        .game-card__name::after{content:"";display:block;height:2px;width:22px;margin-top:5px;border-radius:2px;background:#FFFFFF;transition:width .25s ease}
+        .game-card:hover .game-card__name::after,.game-card.is-active .game-card__name::after{width:36px}
+        .game-card__check{position:absolute;right:10px;bottom:10px;z-index:2;width:22px;height:22px;border-radius:50%;background:#FFFFFF;color:#0A0B0E;display:none;align-items:center;justify-content:center;font-size:12px;font-weight:800;transform:scale(0);transition:transform .2s cubic-bezier(.2,.8,.3,1.3)}
+        .game-card.is-active .game-card__check{display:flex;transform:scale(1)}
+        .tournament-filter-hint{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-2px 0 24px;font-size:13px;color:var(--text-muted)}
+        .tournament-filter-hint button{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-sans);transition:all .15s}
+        .tournament-filter-hint button:hover{border-color:var(--accent);color:var(--accent)}
+        .payout-note{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 0 28px;padding:13px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);font-size:13px;color:var(--text-secondary);line-height:1.6}
+        .payout-note svg{flex-shrink:0}
+        .payout-note p{margin:0}
+        .payout-note strong{color:var(--text)}
+        .payout-note a{color:var(--accent)}
+        .payout-note a:hover{text-decoration:underline}
+        @media (max-width:900px){
+            .game-cards{grid-template-columns:repeat(3,1fr);gap:10px}
+            .game-card{height:112px}
+            .game-card__name{font-size:11px;letter-spacing:.4px;left:10px;bottom:9px}
+            .game-card__badge{font-size:9px;padding:3px 7px;top:8px;left:8px}
+        }
+        @media (max-width:600px){
+            .game-cards{grid-template-columns:repeat(2,1fr)}
+            .game-card{height:104px}
+        }
+    </style>
+</head>
+<body>
+    <!-- NAV -->
+    <header class="header" id="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo">
+                <img src="img/nexora-logo.svg" alt="Nexora" class="logo__img">
+                <span class="logo__text">Nexora</span>
+            </a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Главная</a></li>
+                    <li><a href="tournaments.html" class="nav__link active">Турниры</a></li>
+                    <li><a href="rating.html" class="nav__link">Рейтинг</a></li>
+                    <li><a href="index.html#about" class="nav__link">О нас</a></li>
+                    <li><a href="news.html" class="nav__link">Новости</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <button class="btn btn--ghost" data-modal="register" id="btn-register">Регистрация</button>
+                <button class="btn btn--primary" data-modal="login" id="btn-login">Вход</button>
+                <div class="header__spacer"></div>
+                <button class="btn btn--ghost" id="btn-requests" style="display:none;position:relative">
+                    Заявки
+                    <span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-10px;background:#EF4444;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:16px">0</span>
+                </button>
+                <div class="header__profile-wrap" id="profile-wrap" style="display:none">
+                    <button class="btn btn--ghost" id="btn-profile">Профиль</button>
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-dropdown__info" id="profile-info">Пользователь</div>
+                        <button class="profile-dropdown__exit" id="btn-my-profile" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Мой профиль</button>
+                        <button class="profile-dropdown__exit" id="btn-profile-link" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Личный кабинет</button>
+                        <a href="admin.html" class="profile-dropdown__exit" id="admin-link" style="display:none">Админ-панель</a>
+                        <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
+                    </div>
+                </div>
+                <a href="contacts.html" class="btn btn--ghost header-support" title="Поддержка"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Поддержка</a>
+                <button class="header__burger" id="burger" aria-label="Меню">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- TOURNAMENTS SECTION -->
+    <section class="section tournaments-section" style="padding-top:calc(var(--header-h) + 32px)">
+        <div class="container">
+            <div class="section__header">
+                <span class="section__tag">Турниры</span>
+                <h2 class="section__title" id="section-title">Все <span>турниры</span></h2>
+                <p class="section__desc">Выбери игру, зарегистрируй команду и докажи, что вы лучшие</p>
+            </div>
+            <div class="payout-note">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                <p>Призы выплачиваются победителям в течение <strong>3 дней</strong> после завершения турнира. Подробности — в <a href="terms.html">Условиях</a>.</p>
+            </div>
+            <div class="game-cards" id="game-cards"></div>
+            <div class="tournament-filter-hint" id="tournament-filter-hint">
+                <span id="filter-hint-text">Выберите игру ниже — мы покажем только её турниры</span>
+            </div>
+            <div class="tournament-grid" id="tournament-grid"></div>
+            <div id="tournament-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--text-muted);font-size:14px">Нет активных турниров</div>
+        </div>
+    </section>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modal-overlay"></div>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="login-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Вход</h3>
+            <button class="modal__close" data-close-modal>&#10005;</button>
+        </div>
+        <form class="modal__form" id="login-form">
+            <div class="form-group">
+                <label class="form-label">Email или никнейм</label>
+                <input type="text" class="form-input" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group form-password">
+                <label class="form-label">Пароль</label>
+                <span class="form-password-wrap">
+                    <input type="password" class="form-input" id="login-pass" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle" data-toggle-pass="login-pass" aria-label="Показать пароль">
+                        <svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </span>
+            </div>
+            <div class="form-group form-group--row">
+                <label class="form-checkbox">
+                    <input type="checkbox"><span>Запомнить меня</span>
+                </label>
+                <a href="#" class="form-link" data-reset-password>Забыли пароль?</a>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full">Войти</button>
+            <div class="social-auth">
+                <div class="social-auth__sep"><span>или войдите через</span></div>
+                <div class="social-auth__row">
+                    <button type="button" class="social-btn social-btn--tg" data-social="telegram" title="Войти через Telegram">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.36 5.02c.5 0 .72-.22.98-.47l2.36-2.26 4.9 3.59c.9.5 1.55.24 1.79-.83l3.24-15.26c.3-1.33-.49-1.86-1.36-1.53L1.2 9.7c-1.28.5-1.27 1.22-.23 1.54l4.63 1.45 10.75-6.79c.51-.34.98-.15.6.19z"/></svg>
+                        <span>Telegram</span>
+                    </button>
+                    <button type="button" class="social-btn social-btn--google" data-social="google" title="Войти через Google">
+                        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.77.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        <span>Google</span>
+                    </button>
+                </div>
+                <div class="social-auth__box"></div>
+            </div>
+            <p class="form-switch">Нет аккаунта? <a href="#" data-switch-modal="register">Зарегистрироваться</a></p>
+        </form>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="register-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Регистрация</h3>
+            <button class="modal__close" data-close-modal>&#10005;</button>
+        </div>
+        <form class="modal__form" id="register-form">
+            <div class="form-group">
+                <label class="form-label">Никнейм</label>
+                <input type="text" class="form-input" placeholder="NightHawk" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group form-password">
+                <label class="form-label">Пароль</label>
+                <span class="form-password-wrap">
+                    <input type="password" class="form-input" id="reg-pass" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle" data-toggle-pass="reg-pass" aria-label="Показать пароль">
+                        <svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </span>
+            </div>
+            <div class="form-group form-password">
+                <label class="form-label">Подтвердите пароль</label>
+                <span class="form-password-wrap">
+                    <input type="password" class="form-input" id="reg-pass-confirm" placeholder="••••••••" required>
+                    <button type="button" class="password-toggle" data-toggle-pass="reg-pass-confirm" aria-label="Показать пароль">
+                        <svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </span>
+            </div>
+            <label class="form-checkbox form-agree">
+                <input type="checkbox" required><span>Я принимаю <a href="terms.html">условия использования</a> и <a href="policy.html">политику конфиденциальности</a></span>
+            </label>
+            <button type="submit" class="btn btn--primary btn--full">Создать аккаунт</button>
+            <div class="social-auth">
+                <div class="social-auth__sep"><span>или зарегистрируйтесь через</span></div>
+                <div class="social-auth__row">
+                    <button type="button" class="social-btn social-btn--tg" data-social="telegram" title="Войти через Telegram">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.36 5.02c.5 0 .72-.22.98-.47l2.36-2.26 4.9 3.59c.9.5 1.55.24 1.79-.83l3.24-15.26c.3-1.33-.49-1.86-1.36-1.53L1.2 9.7c-1.28.5-1.27 1.22-.23 1.54l4.63 1.45 10.75-6.79c.51-.34.98-.15.6.19z"/></svg>
+                        <span>Telegram</span>
+                    </button>
+                    <button type="button" class="social-btn social-btn--google" data-social="google" title="Войти через Google">
+                        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.77.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        <span>Google</span>
+                    </button>
+                </div>
+                <div class="social-auth__box"></div>
+            </div>
+            <p class="form-switch">Уже есть аккаунт? <a href="#" data-switch-modal="login">Войти</a></p>
+        </form>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div class="modal modal--wide" id="profile-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Личный кабинет</h3>
+            <button class="modal__close" data-close-modal>&#10005;</button>
+        </div>
+        <div class="modal__form" id="profile-modal-body">
+            <div style="display:flex;align-items:center;gap:16px;padding:0 0 20px 0">
+                <div style="width:52px;height:52px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border-light)">
+                    <span style="font-family:var(--font-heading);font-size:20px;color:var(--accent)" id="profile-modal-initial">—</span>
+                </div>
+                <div style="min-width:0;flex:1">
+                    <p style="font-size:16px;font-weight:600;color:var(--text)" id="profile-modal-nick">—</p>
+                    <p style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="profile-modal-email">—</p>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);text-align:right;flex-shrink:0">
+                    <div style="color:var(--accent);font-weight:600" id="profile-modal-since">—</div>
+                    <div style="font-size:10px">на платформе</div>
+                </div>
+            </div>
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-profile-tab="stats">Статистика</button>
+                <button class="profile-tab" data-profile-tab="settings">Настройки</button>
+            </div>
+            <div class="profile-content active" id="profile-content-stats" style="padding-top:20px">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+                    <div class="profile-stat-card">
+                        <span class="profile-stat-card__value" id="profile-stat-tournaments">0</span>
+                        <span class="profile-stat-card__label">Турниров</span>
+                    </div>
+                    <div class="profile-stat-card">
+                        <span class="profile-stat-card__value" id="profile-stat-best">—</span>
+                        <span class="profile-stat-card__label">Лучшее место</span>
+                    </div>
+                    <div class="profile-stat-card">
+                        <span class="profile-stat-card__value" id="profile-stat-prize">0</span>
+                        <span class="profile-stat-card__label">В топ-3</span>
+                    </div>
+                </div>
+                <p style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">История турниров</p>
+                <div id="profile-history" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;padding-right:4px"></div>
+            </div>
+            <div class="profile-content" id="profile-content-settings" style="padding-top:20px">
+                <div class="setting-section">
+                    <div class="setting-section__title">Безопасность</div>
+                    <div class="setting-card">
+                        <div id="settings-pass-success" class="setting-success" style="display:none">Пароль успешно изменён</div>
+                        <div id="settings-pass-error" class="setting-error" style="display:none"></div>
+                        <div class="setting-row">
+                            <div><div class="setting-row__label">Текущий пароль</div></div>
+                            <input type="password" class="setting-input" id="settings-old-pass" placeholder="Старый пароль" autocomplete="current-password">
+                        </div>
+                        <div class="setting-row">
+                            <div><div class="setting-row__label">Новый пароль</div></div>
+                            <input type="password" class="setting-input" id="settings-new-pass" placeholder="Новый пароль" autocomplete="new-password">
+                        </div>
+                        <div class="setting-row" style="border-bottom:none;padding-bottom:0">
+                            <div><div class="setting-row__label">Подтвердить пароль</div></div>
+                            <input type="password" class="setting-input" id="settings-confirm-pass" placeholder="Повторите пароль" autocomplete="new-password">
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;padding-top:12px">
+                            <button class="btn btn--primary btn--sm" id="btn-save-password">Сохранить пароль</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <div class="setting-section__title">Уведомления</div>
+                    <div class="setting-card">
+                        <div class="setting-row">
+                            <div><div class="setting-row__label">Новые турниры</div><div class="setting-row__desc">Уведомлять о новых турнирах на почту</div></div>
+                            <label class="setting-toggle"><input type="checkbox" data-setting="notif-new-tournament"><span class="setting-toggle__track"></span></label>
+                        </div>
+                        <div class="setting-row">
+                            <div><div class="setting-row__label">Результаты турниров</div><div class="setting-row__desc">Уведомлять о завершении турнира и вашем месте</div></div>
+                            <label class="setting-toggle"><input type="checkbox" data-setting="notif-results"><span class="setting-toggle__track"></span></label>
+                        </div>
+                        <div class="setting-row">
+                            <div><div class="setting-row__label">Старт турнира</div><div class="setting-row__desc">Напоминание за 30 минут до начала</div></div>
+                            <label class="setting-toggle"><input type="checkbox" data-setting="notif-start"><span class="setting-toggle__track"></span></label>
+                        </div>
+                        <div class="setting-row" style="border-bottom:none;padding-bottom:0">
+                            <div><div class="setting-row__label">Новости платформы</div><div class="setting-row__desc">Обновления, анонсы и акции</div></div>
+                            <label class="setting-toggle"><input type="checkbox" data-setting="notif-news"><span class="setting-toggle__track"></span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <div class="setting-section__title">Аккаунт</div>
+                    <div class="setting-card">
+                        <div class="setting-row"><div><div class="setting-row__label">Почта</div></div><span class="setting-row__value" id="settings-email">—</span></div>
+                        <div class="setting-row"><div><div class="setting-row__label">Подтверждение почты</div><div class="setting-row__desc">Почта подтверждена при регистрации</div></div><span style="font-size:11px;color:var(--accent);font-weight:600">Подтверждена</span></div>
+                        <div class="setting-row"><div><div class="setting-row__label">На платформе</div></div><span class="setting-row__value" id="settings-regdate">—</span></div>
+                        <div class="setting-row" style="border-bottom:none"><div><div class="setting-row__label">Выйти из аккаунта</div><div class="setting-row__desc">Очистить сессию на этом устройстве</div></div><button class="btn btn--outline btn--sm btn--danger" id="btn-settings-logout">Выйти</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="modal" id="payment-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Регистрация на турнир</h3>
+            <button class="modal__close" id="payment-close">&#10005;</button>
+        </div>
+        <div class="modal__form" style="padding:16px 24px">
+            <div id="payment-info"></div>
+            <div class="form-group">
+                <label class="form-label">ID для связи</label>
+                <input type="text" class="form-input" id="payment-player-id" placeholder="Ваш игровой профиль ID" maxlength="100">
+            </div>
+            <div id="team-toggle-container" style="display:none;margin-bottom:12px"></div>
+            <div id="captain-fields" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Название команды</label>
+                    <input type="text" class="form-input" id="payment-team-name" placeholder="Введите название команды" maxlength="30">
+                </div>
+            </div>
+            <div id="member-fields" style="display:none">
+                <p style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Капитан</p>
+                <div id="captain-info" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);border-radius:8px;margin-bottom:6px">
+                    <span style="font-size:13px;font-weight:700;color:var(--accent);background:rgba(255,255,255,.12);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px">C</span>
+                    <span style="flex:1;font-size:14px;font-weight:600;color:var(--text)">—</span>
+                    <span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px">Капитан</span>
+                </div>
+                <div id="teammate-fields"></div>
+            </div>
+            <!-- Шаг оплаты -->
+            <div id="payment-step" style="display:none;margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg)">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px" id="payment-mode-badge">
+                    <span style="font-size:10px;font-weight:700;color:#EAB308;background:rgba(234,179,8,.1);padding:2px 8px;border-radius:4px">ТЕСТОВЫЙ РЕЖИМ</span>
+                    <span style="font-size:11px;color:var(--text-muted)">Деньги реально не списываются</span>
+                </div>
+                <p style="font-size:12px;color:var(--text);margin-bottom:10px">Выберите способ оплаты — <span id="payment-step-amount" style="font-weight:700;color:var(--accent)"></span></p>
+                <div id="payment-promo-wrap">
+                    <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Промокод на скидку</label>
+                    <div style="display:flex;gap:6px">
+                        <input type="text" class="form-input" id="payment-promo-input" placeholder="Например NEXORA20" maxlength="40" style="text-transform:uppercase">
+                        <button class="btn btn--ghost" id="payment-promo-apply" style="font-size:11px;padding:6px 14px;flex-shrink:0">Применить</button>
+                    </div>
+                    <p style="font-size:11px;margin-top:6px;display:none" id="payment-promo-status"></p>
+                </div>
+                <div id="payment-methods" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;margin-top:10px"></div>
+                <div style="display:flex;gap:8px" id="payment-pay-row">
+                    <button class="btn btn--primary" id="payment-pay" style="font-size:12px;padding:8px 18px">Оплатить</button>
+                    <button class="btn btn--ghost" id="payment-pay-cancel" style="font-size:12px;padding:8px 18px">Назад</button>
+                </div>
+                <div id="payment-waiting" style="display:none;flex-direction:column;align-items:center;gap:10px;padding:12px 0">
+                    <div style="font-size:13px;font-weight:600;color:var(--text)">⏳ Ожидание оплаты…</div>
+                    <div style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5">Мы открыли страницу оплаты в новой вкладке.<br>Завершите платёж там — регистрация завершится автоматически.</div>
+                    <button class="btn btn--ghost" id="payment-waiting-cancel" style="font-size:11px;padding:6px 14px">Я оплатил — проверить</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px" id="payment-buttons-row">
+                <button class="btn btn--ghost" id="payment-cancel">Отмена</button>
+                <button class="btn btn--primary" id="payment-confirm">Подтвердить участие</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEAVE MODAL -->
+    <div class="modal" id="leave-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Выход из турнира</h3>
+            <button class="modal__close" id="leave-close">&#10005;</button>
+        </div>
+        <div class="modal__form" style="padding:16px 24px">
+            <p style="font-size:13px;color:var(--text);margin-bottom:16px" id="leave-modal-name"></p>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:16px">Вы уверены, что хотите покинуть турнир?</p>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn--ghost" id="leave-cancel">Отмена</button>
+                <button class="btn btn--danger" id="leave-confirm">Покинуть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRACKET MODAL -->
+    <div class="modal modal--wide" id="bracket-modal">
+        <div class="modal__header">
+            <h3 class="modal__title" id="bracket-modal-title">Сетка матчей</h3>
+            <button class="modal__close" id="bracket-close">&#10005;</button>
+        </div>
+        <div class="modal__form" style="padding:20px 24px">
+            <div id="bracket-content" style="max-height:70vh;overflow-y:auto"></div>
+        </div>
+    </div>
+
+    <!-- REQUESTS MODAL -->
+    <div class="modal modal--wide" id="requests-modal">
+        <div class="modal__header">
+            <h3 class="modal__title">Заявки в команды</h3>
+            <button class="modal__close" id="requests-close">&#10005;</button>
+        </div>
+        <div class="modal__form" style="padding:20px 24px">
+            <div id="requests-content" style="max-height:65vh;overflow-y:auto"></div>
+        </div>
+    </div>
+
+    <!-- PLAYER PROFILE VIEW MODAL -->
+    <div class="modal modal--wide" id="profile-view-modal">
+        <div class="modal__header">
+            <h3 class="modal__title" id="profile-view-title">Профиль игрока</h3>
+            <button class="modal__close" id="profile-view-close">&#10005;</button>
+        </div>
+        <div class="modal__form" style="padding:20px 24px">
+            <div id="profile-view-content" style="max-height:65vh;overflow-y:auto"></div>
+        </div>
+    </div>
+
+	    <!-- TOAST -->
+    <div id="tournament-toast" style="position:fixed;bottom:24px;right:24px;z-index:3000;background:var(--surface,#181818);border:1px solid var(--accent,#FFFFFF);border-radius:12px;padding:16px 24px;font-size:14px;color:#fff;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.5);transform:translateY(120px);opacity:0;transition:all .4s ease;pointer-events:none"></div>
+
+    <script src="js/data-sync.js?v=5"></script>
+    <script src="js/social-config.js?v=4"></script>
+    <script src="js/script.js?v=36"></script>
+    <script>
+    // ===========================================
+    // Dynamic tournament render from localStorage
+    // ===========================================
+    (function() {
+        const defaultTournaments = [
+            { id: 1, name: 'Nexora Open S1', game: 'CS2', players: '32 команды', prize: 50000, fee: 500, format: 'BO3', teamType: 'team', status: 'active', date: '10.08.2026' },
+            { id: 2, name: 'Nexora Champions Cup', game: 'Dota 2', players: '16 команд', prize: 100000, fee: 1000, format: 'BO3', teamType: 'team', status: 'active', date: '15.08.2026' },
+            { id: 3, name: 'Nexora Strike Series', game: 'Valorant', players: '8 команд', prize: 75000, fee: 0, format: 'BO5', teamType: 'team', status: 'active', date: '20.08.2026' },
+            { id: 4, name: 'Nexora Major Qualifier', game: 'CS2', players: '64 команды', prize: 150000, fee: 300, format: 'BO1', teamType: 'team', status: 'pending', date: '01.09.2026' },
+            { id: 5, name: 'Nexora Battle Royale Cup', game: 'PUBG Mobile', players: '50 команд', prize: 60000, fee: 250, format: '—', teamType: 'solo', status: 'pending', date: '05.09.2026' },
+            { id: 6, name: 'Nexora Team Showdown', game: 'Overwatch 2', players: '16 команд', prize: 80000, fee: 0, format: 'BO3', teamType: 'team', status: 'pending', date: '12.09.2026' }
+        ];
+
+        let tournaments;
+        try {
+            tournaments = JSON.parse(localStorage.getItem('nexora_tournaments'));
+        } catch {}
+        if (!tournaments) {
+            tournaments = defaultTournaments;
+            var val = JSON.stringify(tournaments);
+            try {
+                if (window.setNexoraLocal) {
+                    window.setNexoraLocal('nexora_tournaments', val);
+                } else {
+                    localStorage.setItem('nexora_tournaments', val);
+                }
+            } catch {}
+        }
+
+        // Миграция: удаление standalone «PUBG» турниров (без Mobile/Battlegrounds)
+        if (Array.isArray(tournaments)) {
+            const filtered = tournaments.filter(function(t) { return t && t.game && t.game !== 'PUBG'; });
+            if (filtered.length !== tournaments.length) {
+                tournaments = filtered;
+                try {
+                    if (window.setNexoraLocal) {
+                        window.setNexoraLocal('nexora_tournaments', JSON.stringify(tournaments));
+                    } else {
+                        localStorage.setItem('nexora_tournaments', JSON.stringify(tournaments));
+                    }
+                } catch {}
+            }
+        }
+
+        const grid = document.getElementById('tournament-grid');
+        const empty = document.getElementById('tournament-empty');
+        const currentUser = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+
+        // Карточки игр каталога — список из localStorage (nexora_game_cards),
+        // управляется в админке: раздел «Игры». Скрытые админом игры не
+        // показываются игрокам, их турниры тоже.
+        const defaultGameMeta = [
+            { game: 'CS2', label: 'CS2', img: 'img/characters/cs2.jpg', color: '#f59e0b' },
+            { game: 'Brawl Stars', label: 'Brawl Stars', img: 'img/characters/brawl-stars.webp', color: '#ffd60a' },
+            { game: 'Dota 2', label: 'Dota 2', img: 'img/characters/dota.webp', color: '#ef4444' },
+            { game: 'Valorant', label: 'Valorant', img: 'img/characters/valorant.webp', color: '#ff4655' },
+            { game: 'PUBG Battlegrounds', label: 'PUBG Battlegrounds', img: 'img/characters/pubg-battlegrounds.jpg', color: '#f0a830' },
+            { game: 'PUBG Mobile', label: 'PUBG Mobile', img: 'img/characters/pubg2.webp', color: '#f0a830' },
+            { game: 'Overwatch 2', label: 'Overwatch 2', img: 'img/characters/overwatch2.webp', color: '#f99e1a' },
+            { game: 'Mobile Legends', label: 'MLBB', img: 'img/characters/ml.jpg', color: '#a855f7' },
+            { game: 'Rust', label: 'Rust', img: 'img/characters/rust-overlay2.png', color: '#d97a3d' },
+            { game: 'Standoff 2', label: 'Standoff 2', img: 'img/characters/standoff2.png', color: '#f97316' }
+        ];
+        let gameCards;
+        try { gameCards = JSON.parse(localStorage.getItem('nexora_game_cards')); } catch {}
+        if (!Array.isArray(gameCards) || !gameCards.length) {
+            gameCards = defaultGameMeta;
+            try {
+                if (window.setNexoraLocal) {
+                    window.setNexoraLocal('nexora_game_cards', JSON.stringify(gameCards));
+                } else {
+                    localStorage.setItem('nexora_game_cards', JSON.stringify(gameCards));
+                }
+            } catch {}
+        }
+
+        // Миграция: старая игра «PUBG» разбита на «PUBG Battlegrounds» и «PUBG Mobile»
+        if (Array.isArray(gameCards) && gameCards.some(c => c && c.game === 'PUBG')) {
+            const migrated = [];
+            gameCards.forEach(function(c) {
+                if (c && c.game === 'PUBG') {
+                    migrated.push({ game: 'PUBG Battlegrounds', label: 'PUBG Battlegrounds', img: c.img || 'img/characters/pubg-battlegrounds.jpg', color: c.color || '#f0a830' });
+                    migrated.push({ game: 'PUBG Mobile', label: 'PUBG Mobile', img: c.img || 'img/characters/pubg2.webp', color: c.color || '#f0a830' });
+                } else {
+                    migrated.push(c);
+                }
+            });
+            gameCards = migrated;
+            try {
+                if (window.setNexoraLocal) {
+                    window.setNexoraLocal('nexora_game_cards', JSON.stringify(gameCards));
+                } else {
+                    localStorage.setItem('nexora_game_cards', JSON.stringify(gameCards));
+                }
+            } catch {}
+        }
+        // Миграция: «PUBG Батлграунд» → «PUBG Battlegrounds» + новая аватарка
+        if (Array.isArray(gameCards)) {
+            let needSave = false;
+            gameCards.forEach(function(c) {
+                if (!c) return;
+                const g = String(c.game || '');
+                if (g === 'PUBG Батлграунд' || g === 'PUBG PC' || g.toLowerCase() === 'pubg pc') {
+                    c.game = 'PUBG Battlegrounds';
+                    c.label = 'PUBG Battlegrounds';
+                    c.img = 'img/characters/pubg-battlegrounds.jpg';
+                    needSave = true;
+                }
+                if (g === 'Mobile Legends' || g === 'MLBB') {
+                    c.img = 'img/characters/ml.jpg';
+                    needSave = true;
+                }
+                if (g === 'Brawl Stars' && String(c.img || '').indexOf('colt') !== -1) {
+                    c.img = 'img/characters/brawl-stars.webp';
+                    needSave = true;
+                }
+                if (g === 'CS2' && String(c.img || '').indexOf('cs.webp') !== -1) {
+                    c.img = 'img/characters/cs2.jpg';
+                    needSave = true;
+                }
+                if (g === 'Standoff 2' && !c.img) {
+                    c.img = 'img/characters/standoff2.png';
+                    needSave = true;
+                }
+            });
+            if (needSave) {
+                try {
+                    if (window.setNexoraLocal) {
+                        window.setNexoraLocal('nexora_game_cards', JSON.stringify(gameCards));
+                    } else {
+                        localStorage.setItem('nexora_game_cards', JSON.stringify(gameCards));
+                    }
+                } catch {}
+            }
+        }
+
+        // Скрыта ли игра (карточка) в админке
+        function isGameHidden(game) {
+            const key = String(game || '').trim().toLowerCase();
+            if (!key) return false;
+            const m = gameCards.find(function(x) { return String(x.game || '').trim().toLowerCase() === key; });
+            return !!(m && m.hidden);
+        }
+
+        // Турниры, видимые игрокам: турниры скрытых игр тоже не показываем
+        function visibleTournaments() {
+            return tournaments.filter(function(t) { return !isGameHidden(t.game); });
+        }
+
+        if (!visibleTournaments().length) {
+            grid.style.display = 'none';
+            empty.style.display = 'block';
+            return;
+        }
+
+        const registrations = (() => { try { return JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch { return []; } })();
+        // Локальный список покинутых турниров — вышедший игрок не считается участником
+        function isInLeftList(userId, tid) {
+            try {
+                const ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+                return ll.some(x => x.userId === userId && Number(x.tournamentId) === Number(tid));
+            } catch { return false; }
+        }
+
+        // Рендер одной карточки турнира
+        function tournamentCard(t) {
+            const prize = Number(t.prize).toLocaleString();
+            const statusLabel = t.status === 'active' ? 'Активен' : t.status === 'pending' ? 'Ожидает' : 'Завершён';
+            const isRegistered = currentUser && registrations.some(r => r.userId === currentUser.nickname && r.tournamentId === t.id && !isInLeftList(currentUser.nickname, t.id));
+            // Зелёная кнопка «Сетка матчей» показывается только если у турнира есть матчи
+            const hasBracket = getNxMatchesLocal().some(m => Number(m.tournamentId) === Number(t.id));
+            // Статистика команд для карточки турнира
+            const tRegs = registrations.filter(r => r.tournamentId === t.id);
+            const tCaptains = tRegs.filter(r => r.role === 'captain');
+            const isTeamT = t.teamType && t.teamType !== 'solo';
+            const userReg = currentUser ? tRegs.find(r => r.userId === currentUser.nickname && !isInLeftList(currentUser.nickname, t.id)) : null;
+            return `
+                <div class="tournament-card" data-reveal>
+                    <div class="tournament-card__top">
+                        <span class="tournament-card__game">${escapeHtml(t.game)}</span>
+                        <span class="tournament-card__status is-${t.status || 'pending'}"><i></i>${statusLabel}</span>
+                        <span class="tournament-card__date">${t.date ? escapeHtml(t.date) : '—'}</span>
+                    </div>
+                    <h3 class="tournament-card__title">${escapeHtml(t.name)}</h3>
+                    <div class="tournament-card__info">
+                        <span>${escapeHtml(t.players) || '—'}</span>
+                        <span class="tc-dot">·</span>
+                        <span class="tournament-card__format">${t.teamType === 'solo' ? 'СОЛО' : t.teamType === 'duo' ? 'ДУО' : t.teamType === 'trio' ? 'ТРИО' : t.teamType === 'team4' ? '4 ИГРОКА' : t.teamType === 'team8' ? '8 ИГРОКОВ' : 'КОМАНДА'}</span>
+                        <span class="tc-dot">·</span>
+                        <span>${escapeHtml(t.format) || 'BO3'}</span>
+                        <span class="tc-dot">·</span>
+                        <span>${t.fee && t.fee > 0 ? 'Вход: ' + Number(t.fee).toLocaleString() + ' ₽' : 'Бесплатно'}</span>
+                    </div>
+                    ${isTeamT ? '<div class="tournament-card__teams">Команды: ' + tCaptains.length + ' · ' + (tRegs.length - tCaptains.length) + ' участников</div>' : ''}
+                    ${userReg && userReg.teamName ? '<div class="tournament-card__teamline"> «' + escapeHtml(userReg.teamName) + '» · <span style="cursor:pointer;color:var(--text);font-weight:600;border-bottom:1px dashed rgba(255,255,255,.15)" class="profile-link" data-user="' + escapeHtml(userReg.userId) + '">' + escapeHtml(userReg.userId) + '</span></div>' : ''}
+                    <div class="tournament-card__prize-row">
+                        <span class="tournament-card__prize">${prize} ₽</span>
+                        <span class="tournament-card__prize-label">призовой фонд</span>
+                    </div>
+                    <div class="tournament-card__footer">
+                        <span class="tournament-card__date">${escapeHtml(statusLabel)}${t.status === 'active' ? '' : ' · ' + escapeHtml(t.date)}</span>
+                        ${isRegistered
+                            ? '<div style="display:flex;align-items:center;gap:6px">' +
+                                '<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:50px;padding:5px 14px 5px 12px"><span style="color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.3px">Участвую</span></span>' +
+                                '<button class="tournament-chat-btn" data-tournament-id="' + t.id + '" data-tournament-name="' + escapeHtml(t.name) + '" style="width:32px;height:32px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;padding:0;border-radius:8px;font-size:11px;line-height:1" title="Чат турнира" onmouseover="this.style.background=\'rgba(255,255,255,.2)\'" onmouseout="this.style.background=\'rgba(255,255,255,.08)\'">' +
+                                '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+                                '</button>' +
+                                (hasBracket ? '<button class="tournament-bracket-btn" data-tournament-id="' + t.id + '" data-tournament-name="' + escapeHtml(t.name) + '" style="width:32px;height:32px;border:1px solid rgba(34,197,94,.25);background:rgba(34,197,94,.08);color:#22C55E;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;padding:0;border-radius:8px;font-size:11px;line-height:1" title="Сетка матчей" onmouseover="this.style.background=\'rgba(34,197,94,.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,.08)\'">' +
+                                '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
+                                '</button>' : '') +
+                                '<button class="tournament-leave-btn" data-tournament-id="' + t.id + '" data-tournament-name="' + escapeHtml(t.name) + '" style="width:32px;height:32px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.08);color:#EF4444;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;padding:0;border-radius:8px;font-size:14px;line-height:1" title="Выйти из турнира" onmouseover="this.style.background=\'rgba(239,68,68,.2)\'" onmouseout="this.style.background=\'rgba(239,68,68,.08)\'">' +
+                                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>' +
+                                '</button></div>'
+                            : '<div style="display:flex;align-items:center;gap:6px">' +
+                                '<button class="btn btn--primary tournament-join-btn" data-tournament-id="' + t.id + '" data-tournament-name="' + escapeHtml(t.name) + '" style="flex:1">Участвовать</button>' +
+                                (hasBracket ? '<button class="tournament-bracket-btn" data-tournament-id="' + t.id + '" data-tournament-name="' + escapeHtml(t.name) + '" style="width:36px;height:36px;border:1px solid rgba(34,197,94,.25);background:rgba(34,197,94,.08);color:#22C55E;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;padding:0;border-radius:8px;font-size:11px;line-height:1;flex-shrink:0" title="Сетка матчей" onmouseover="this.style.background=\'rgba(34,197,94,.2)\'" onmouseout="this.style.background=\'rgba(34,197,94,.08)\'">' +
+                                '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
+                                '</button>' : '') +
+                                '</div>'
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        grid.innerHTML = visibleTournaments().map(tournamentCard).join('');
+
+        // ===== КАРТОЧКИ ИГР — фильтр турниров по выбранной игре =====
+        // Список карточек берём из localStorage (nexora_game_cards); дефолтный
+        // набор задан выше (defaultGameMeta), скрытые админом игры пропускаем.
+        const cardWrap = document.getElementById('game-cards');
+        const filterHint = document.getElementById('tournament-filter-hint');
+        const filterHintText = document.getElementById('filter-hint-text');
+        const sectionTitle = document.getElementById('section-title');
+
+        if (cardWrap && tournaments.length) {
+            const metaByKey = {};
+            gameCards.forEach(function(m) { metaByKey[m.game.toLowerCase()] = m; });
+
+            const gameOrder = [];
+            // Видимые карточки игр; скрытые админом в каталоге не появляются
+            gameCards.forEach(function(m) { if (!m.hidden) gameOrder.push(m.game); });
+            visibleTournaments().forEach(function(t) {
+                const g = (t.game || '').trim();
+                if (g && !gameOrder.some(function(x) { return x.toLowerCase() === g.toLowerCase(); })) gameOrder.push(g);
+            });
+
+            let activeGame = '';
+
+            // Поддержка URL-параметра ?game=CS2 — открыть сразу с фильтром
+            try {
+                const urlParam = new URLSearchParams(location.search).get('game');
+                if (urlParam) {
+                    const found = gameOrder.find(function(g) { return g.toLowerCase() === urlParam.toLowerCase(); });
+                    if (found) activeGame = found;
+                }
+            } catch(e) {}
+
+            function gameCount(game) {
+                return visibleTournaments().filter(function(t) { return (t.game || '').toLowerCase() === game.toLowerCase(); }).length;
+            }
+
+            function pluralT(n) {
+                const m10 = n % 10, m100 = n % 100;
+                if (m10 === 1 && m100 !== 11) return 'турнир';
+                if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'турнира';
+                return 'турниров';
+            }
+
+            function renderGameCards() {
+                cardWrap.innerHTML = gameOrder.map(function(game) {
+                    const meta = metaByKey[game.toLowerCase()] || { label: game, img: '', color: '#E8EAF0' };
+                    const count = gameCount(game);
+                    const isActive = activeGame && activeGame.toLowerCase() === game.toLowerCase();
+                    const isComing = count === 0;
+                    const art = meta.img
+                        ? '<img class="game-card__img" src="' + meta.img + '" alt="" draggable="false" loading="lazy">'
+                        : '<div class="game-card__icon" style="color:' + meta.color + '">' + (game.length > 2 ? game.slice(0, 2).toUpperCase() : game.toUpperCase()) + '</div>';
+                    return (
+                        '<button type="button" class="game-card' + (isActive ? ' is-active' : '') + '" data-game="' + escapeHtml(game) + '" style="--gcolor:' + meta.color + '" aria-pressed="' + (isActive ? 'true' : 'false') + '">' +
+                            art +
+                            '<span class="game-card__shade"></span>' +
+                            '<span class="game-card__frame"></span>' +
+                            '<span class="game-card__badge' + (isComing ? ' is-coming' : '') + '">' + (isComing ? 'Скоро' : count + ' ' + pluralT(count)) + '</span>' +
+                            '<span class="game-card__name">' + escapeHtml(meta.label) + '</span>' +
+                            '<span class="game-card__check">&#10003;</span>' +
+                        '</button>'
+                    );
+                }).join('');
+            }
+
+            function renderTournamentGrid() {
+                const list = activeGame
+                    ? visibleTournaments().filter(function(t) { return (t.game || '').toLowerCase() === activeGame.toLowerCase(); })
+                    : visibleTournaments();
+                if (!list.length) {
+                    grid.style.display = 'none';
+                    empty.style.display = 'block';
+                    empty.textContent = 'По этой игре пока нет турниров — скоро добавим';
+                    return;
+                }
+                grid.style.display = 'grid';
+                empty.style.display = 'none';
+                empty.textContent = 'Нет активных турниров';
+                grid.innerHTML = list.map(tournamentCard).join('');
+            }
+
+            function renderFilterHint() {
+                if (sectionTitle) {
+                    sectionTitle.innerHTML = activeGame
+                        ? 'Турниры <span>по ' + escapeHtml(activeGame) + '</span>'
+                        : 'Все <span>турниры</span>';
+                }
+                if (!filterHint || !filterHintText) return;
+                if (!activeGame) {
+                    filterHintText.textContent = 'Выберите игру ниже — мы покажем только её турниры';
+                    const resetBtn = filterHint.querySelector('.filter-hint-reset');
+                    if (resetBtn) resetBtn.remove();
+                } else {
+                    filterHintText.textContent = 'Показаны турниры по «' + activeGame + '»';
+                    if (!filterHint.querySelector('.filter-hint-reset')) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'filter-hint-reset';
+                        btn.textContent = 'Сбросить';
+                        btn.addEventListener('click', function() {
+                            activeGame = '';
+                            applyFilter();
+                        });
+                        filterHint.appendChild(btn);
+                    }
+                }
+            }
+
+            function applyFilter() {
+                renderGameCards();
+                renderTournamentGrid();
+                renderFilterHint();
+            }
+
+            cardWrap.addEventListener('click', function(e) {
+                const card = e.target.closest('.game-card');
+                if (!card) return;
+                const game = card.dataset.game;
+                activeGame = (activeGame && activeGame.toLowerCase() === game.toLowerCase()) ? '' : game;
+                applyFilter();
+                grid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+
+            applyFilter();
+
+            // Живое обновление каталога — вызывается из data-sync, когда с
+            // сервера пришли свежие турниры или карточки игр (админ скрыл игру)
+            window.renderTournaments = function() {
+                try {
+                    const fresh = JSON.parse(localStorage.getItem('nexora_tournaments'));
+                    if (Array.isArray(fresh)) tournaments = fresh;
+                } catch {}
+                try {
+                    const freshCards = JSON.parse(localStorage.getItem('nexora_game_cards'));
+                    if (Array.isArray(freshCards) && freshCards.length) gameCards = freshCards;
+                } catch {}
+                const vis = visibleTournaments();
+                if (!vis.length) {
+                    grid.style.display = 'none';
+                    empty.style.display = 'block';
+                    empty.textContent = 'Пока нет активных турниров';
+                    cardWrap.innerHTML = '';
+                    return;
+                }
+                grid.style.display = 'grid';
+                empty.style.display = 'none';
+                if (activeGame && !vis.some(function(t) { return (t.game || '').toLowerCase() === activeGame.toLowerCase(); })) {
+                    activeGame = '';
+                }
+                applyFilter();
+            };
+        }
+
+        const toast = document.getElementById('tournament-toast');
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(120px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentInfo = document.getElementById('payment-info');
+        const paymentConfirm = document.getElementById('payment-confirm');
+        const paymentClose = document.getElementById('payment-close');
+        const paymentCancel = document.getElementById('payment-cancel');
+        let pendingTournamentId = null;
+        let pendingTournamentName = '';
+        let pendingHasCaptain = true;
+        let pendingMode = 'solo'; // 'solo' | 'create' | 'join'
+        let pendingSelectedTeamId = null;
+        // Состояние оплаты
+        let pendingPayment = null;       // объект платежа после «успешной» оплаты
+        let pendingPayAmount = 0;        // текущая сумма (уже со скидкой, если применили промокод)
+        let pendingPayBase = 0;          // исходный взнос до скидки — от него считается промокод
+        let pendingPayMethod = 'card';
+        let pendingPromo = null;         // применённый промокод { code, discount }
+        let realPayEnabled = false;      // реальная оплата через Fride (из настроек)
+        let fridePollTimer = null;
+        let fridePayTab = null;
+
+        function settingsRealPay() {
+            try { const s = JSON.parse(localStorage.getItem('nexora_settings')) || {}; return s.real_payments === true; } catch(e) { return false; }
+        }
+        function paymentWaitingEl() { return document.getElementById('payment-waiting'); }
+        function paymentPayRow() { return document.getElementById('payment-pay-row'); }
+        function paymentPromoWrap() { return document.getElementById('payment-promo-wrap'); }
+
+        function paymentButtonsRow() { return document.getElementById('payment-buttons-row'); }
+        function paymentStepEl() { return document.getElementById('payment-step'); }
+
+        function renderPaymentMethods() {
+            var cont = document.getElementById('payment-methods');
+            if (!cont || typeof nexoraPayment !== 'object') return;
+            var methods = nexoraPayment.methods || [];
+            var cur = pendingPayMethod;
+            cont.innerHTML = methods.map(function(m) {
+                var sel = m.id === cur;
+                var icons = {
+                    card: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+                    sbp: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+                    wallet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 12h.01"/><path d="M2 9h20"/></svg>'
+                };
+                return '<button type="button" data-pay-method="' + m.id + '" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;font-size:13px;background:' + (sel ? 'rgba(255,255,255,.08)' : 'var(--surface)') + ';border:1px solid ' + (sel ? 'var(--accent)' : 'var(--border)') + ';color:var(--text)">' +
+                    '<span style="display:flex;color:var(--accent)">' + (icons[m.id] || icons.card) + '</span>' +
+                    '<span style="flex:1"><span style="font-weight:600;display:block">' + escapeHtml(m.label) + '</span>' +
+                    '<span style="font-size:11px;color:var(--text-muted)">' + escapeHtml(m.hint || '') + '</span></span>' +
+                    '<span style="width:16px;height:16px;border-radius:50%;border:2px solid ' + (sel ? 'var(--accent)' : 'var(--border)') + ';display:flex;align-items:center;justify-content:center">' +
+                    (sel ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>' : '') + '</span></button>';
+            }).join('');
+            cont.querySelectorAll('[data-pay-method]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    pendingPayMethod = this.dataset.payMethod;
+                    renderPaymentMethods();
+                });
+            });
+        }
+
+        function showPaymentStep(fee) {
+            realPayEnabled = settingsRealPay();
+            pendingPayAmount = fee;
+            pendingPayBase = fee;
+            pendingPromo = null;
+            document.getElementById('payment-step-amount').textContent = Number(fee).toLocaleString() + ' ₽';
+            const promoInput = document.getElementById('payment-promo-input');
+            if (promoInput) promoInput.value = '';
+            const promoStatus = document.getElementById('payment-promo-status');
+            if (promoStatus) { promoStatus.style.display = 'none'; promoStatus.textContent = ''; }
+            if (paymentPromoWrap()) paymentPromoWrap().style.display = fee > 0 ? '' : 'none';
+            const badge = document.getElementById('payment-mode-badge');
+            if (badge) {
+                if (realPayEnabled) {
+                    badge.innerHTML = '<span style="font-size:10px;font-weight:700;color:#22C55E;background:rgba(34,197,94,.12);padding:2px 8px;border-radius:4px">РЕАЛЬНАЯ ОПЛАТА</span>' +
+                        '<span style="font-size:11px;color:var(--text-muted)">Карта / СБП через Fride</span>';
+                } else {
+                    badge.innerHTML = '<span style="font-size:10px;font-weight:700;color:#EAB308;background:rgba(234,179,8,.1);padding:2px 8px;border-radius:4px">ТЕСТОВЫЙ РЕЖИМ</span>' +
+                        '<span style="font-size:11px;color:var(--text-muted)">Деньги реально не списываются</span>';
+                }
+            }
+            renderPaymentMethods();
+            if (paymentWaitingEl()) paymentWaitingEl().style.display = 'none';
+            paymentPayRow().style.display = 'flex';
+            paymentButtonsRow().style.display = 'none';
+            paymentStepEl().style.display = '';
+        }
+        function hidePaymentStep() {
+            paymentStepEl().style.display = 'none';
+            paymentButtonsRow().style.display = 'flex';
+        }
+
+        function getGamePlaceholder(game) {
+            var lower = (game || '').toLowerCase();
+            if (lower.indexOf('pubg') !== -1) return 'Ваш игровой ID';
+            if (lower.indexOf('cs') !== -1 || lower.indexOf('counter') !== -1) return 'Ваш Steam ID';
+            return 'Ваш игровой профиль ID';
+        }
+
+        function openPayment(tournament) {
+            pendingTournamentId = tournament.id;
+            pendingTournamentName = tournament.name;
+            pendingHasCaptain = tournament.hasCaptain !== false;
+            pendingPayment = null;
+            pendingPayMethod = 'card';
+            pendingPromo = null;
+            if (fridePollTimer) { clearInterval(fridePollTimer); fridePollTimer = null; }
+            if (paymentWaitingEl()) paymentWaitingEl().style.display = 'none';
+            hidePaymentStep();
+            const playerIdInput = document.getElementById('payment-player-id');
+            if (playerIdInput) { playerIdInput.value = ''; playerIdInput.placeholder = getGamePlaceholder(tournament.game); }
+            const teamNameInput = document.getElementById('payment-team-name');
+            if (teamNameInput) teamNameInput.value = '';
+            const fee = Number(tournament.fee) || 0;
+
+            const captainFields = document.getElementById('captain-fields');
+            const memberFields = document.getElementById('member-fields');
+            const teammateContainer = document.getElementById('teammate-fields');
+            // Старые турниры без teamType считаем командными (соло всегда задаётся явно)
+            const teamType = tournament.teamType || (tournament.hasCaptain === false ? 'solo' : 'team');
+
+            if (teamType === 'solo') {
+                captainFields.style.display = 'none';
+                memberFields.style.display = 'none';
+                document.getElementById('team-toggle-container').style.display = 'none';
+            } else {
+                const hasCaptain = tournament.hasCaptain !== false;
+                const memberCount = teamType === 'duo' ? 2 : teamType === 'trio' ? 3 : teamType === 'team4' ? 4 : teamType === 'team8' ? 8 : 5;
+
+                if (!hasCaptain) {
+                    // Без капитана — название команды показываем, тиммейтов нет
+                    captainFields.style.display = 'block';
+                    memberFields.style.display = 'none';
+                    document.getElementById('team-toggle-container').style.display = 'none';
+                } else {
+                    // Режим с капитаном — 3 вкладки: За себя / Создать / Присоединиться
+                    pendingMode = 'solo';
+                    pendingSelectedTeamId = null;
+
+                    var toggleContainer = document.getElementById('team-toggle-container');
+                    toggleContainer.style.display = 'block';
+                    toggleContainer.innerHTML =
+                        '<div style="display:flex;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">' +
+                            '<button type="button" class="team-tab active" data-mode="solo" style="flex:1;padding:8px 12px;border:none;background:var(--accent);color:#0A0B0E;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font-sans)">За себя</button>' +
+                            '<button type="button" class="team-tab" data-mode="create" style="flex:1;padding:8px 12px;border:none;background:transparent;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:var(--font-sans)">Капитан</button>' +
+                            '<button type="button" class="team-tab" data-mode="join" style="flex:1;padding:8px 12px;border:none;background:transparent;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:var(--font-sans)">Присоединиться</button>' +
+                        '</div>';
+
+                    // Название команды показываем всегда
+                    captainFields.style.display = 'block';
+                    memberFields.style.display = 'none';
+
+                    // ===== Функция рендера списка команд (асинхронная) =====
+                    function renderTeamBrowser() {
+                        var placeholderId = 'tbr-' + Date.now();
+                        // Показываем загрузку сразу
+                        var loadingHtml = '<div id="' + placeholderId + '" style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Загрузка...</div>';
+                        // Асинхронно загружаем данные
+                        setTimeout(function() {
+                            fetch('/api/load?_cb=' + Date.now() + '_' + Math.random(), { cache: 'no-store' })
+                            .then(function(r) { return r.json(); })
+                            .then(function(d) {
+                                var freshRegs = d.nexora_registrations || [];
+                                var freshReqs = d.nexora_join_requests || [];
+                                var freshTourn = (d.nexora_tournaments || []).find(function(t) { return t.id == pendingTournamentId; }) || null;
+                                var mc = 5;
+                                if (freshTourn && freshTourn.teamType) {
+                                    var tt = freshTourn.teamType;
+                                    mc = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5;
+                                }
+                                var captains = freshRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
+                                var curUserR = (function() { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch(e) { return null; } })();
+                                var html = '';
+                                var found = false;
+                                captains.forEach(function(cap) {
+                                    var members = freshRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member'; });
+                                    var total = 1 + members.length;
+                                    if (total >= mc) return;
+                                    found = true;
+                                    var spaces = mc - total;
+                                    var capName = escapeHtml(cap.teamName || '');
+                                    var hasPendingReq = curUserR && freshReqs.some(function(rr) { return rr.teamId === cap.teamId && rr.userId === curUserR.nickname && rr.status === 'pending'; });
+                                    html += '<div class="team-browser-card" data-team-id="' + cap.teamId + '" data-team-name="' + capName + '" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--surface)' + (hasPendingReq ? ';opacity:.5;pointer-events:none' : '') + '">' +
+                                        '<div style="display:flex;justify-content:space-between;align-items:center">' +
+                                            '<div>' +
+                                                '<div style="font-size:16px;font-weight:700;color:var(--text);margin:0;line-height:1.3">' + escapeHtml(cap.teamName) + (hasPendingReq ? ' <span style="font-size:10px;color:#F59E0B;font-weight:600">Заявка отправлена</span>' : '') + '</div>' +
+                                                '<div style="font-size:15px;color:var(--accent);margin-top:4px;font-weight:600">' + escapeHtml(cap.userId) + ' <span style="font-size:9px;color:#F59E0B;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);padding:1px 6px;border-radius:4px;font-weight:600;vertical-align:middle">Капитан</span></div>' +
+                                            '</div>' +
+                                            '<div style="text-align:right">' +
+                                                '<div style="font-size:13px;font-weight:600;color:var(--accent)">' + total + '/' + mc + '</div>' +
+                                                '<div style="font-size:10px;color:var(--text-muted)">свободно ' + spaces + '</div>' +
+                                            '</div>' +
+                                        '</div>'
+                                    members.forEach(function(m) {
+                                        html += '<span style="font-size:10px;background:rgba(255,255,255,.05);color:var(--text-secondary);padding:2px 8px;border-radius:4px;cursor:pointer" class="profile-link" data-user="' + escapeHtml(m.userId) + '">' + escapeHtml(m.userId) + '</span>';
+                                    });
+                                    html += '</div></div>';
+                                });
+                                if (!found) {
+                                    html = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Нет доступных команд для присоединения</div>';
+                                }
+                                var el = document.getElementById(placeholderId);
+                                if (el) el.innerHTML = html;
+                                // Обработчик выбора команды
+                                if (el) {
+                                    el.querySelectorAll('.team-browser-card:not([style*="opacity"])').forEach(function(card) {
+                                        card.addEventListener('click', function() {
+                                            pendingSelectedTeamId = card.dataset.teamId;
+                                            pendingSelectedTeamName = card.dataset.teamName;
+                                            el.querySelectorAll('.team-browser-card').forEach(function(c) { c.style.borderColor = 'var(--border)'; c.style.borderWidth = '1px'; });
+                                            card.style.borderColor = 'var(--accent)';
+                                            card.style.borderWidth = '2px';
+                                        });
+                                    });
+                                }
+                            })
+                            .catch(function(err) {
+                                // Fallback на localStorage если fetch не сработал
+                                try {
+                                    var lsRegs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+                                    var lsTourns = JSON.parse(localStorage.getItem('nexora_tournaments')) || [];
+                                    var ft = lsTourns.find(function(t) { return t.id == pendingTournamentId; }) || null;
+                                    var mc = 5;
+                                    if (ft && ft.teamType) { var tt = ft.teamType; mc = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5; }
+                                    var caps = lsRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
+                                    var h = '';
+                                    caps.forEach(function(cap) {
+                                        var members = lsRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member'; });
+                                        var total = 1 + members.length;
+                                        if (total >= mc) return;
+                                        var capName = escapeHtml(cap.teamName || '');
+                                        h += '<div class="team-browser-card" data-team-id="' + cap.teamId + '" data-team-name="' + capName + '" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--surface)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:16px;font-weight:700;color:var(--text);margin:0;line-height:1.3">' + escapeHtml(cap.teamName) + '</div><div style="font-size:15px;color:var(--accent);margin-top:4px;font-weight:600">' + escapeHtml(cap.userId) + '</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:600;color:var(--accent)">' + total + '/' + mc + '</div><div style="font-size:10px;color:var(--text-muted)">свободно ' + (mc - total) + '</div></div></div></div>';
+                                    });
+                                    var el = document.getElementById(placeholderId);
+                                    if (el) el.innerHTML = h || '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Нет доступных команд</div>';
+                                    if (el) {
+                                        el.querySelectorAll('.team-browser-card').forEach(function(card) {
+                                            card.addEventListener('click', function() {
+                                                pendingSelectedTeamId = card.dataset.teamId;
+                                                pendingSelectedTeamName = card.dataset.teamName;
+                                                el.querySelectorAll('.team-browser-card').forEach(function(c) { c.style.borderColor = 'var(--border)'; c.style.borderWidth = '1px'; });
+                                                card.style.borderColor = 'var(--accent)';
+                                                card.style.borderWidth = '2px';
+                                            });
+                                        });
+                                    }
+                                } catch(e) {
+                                    var el = document.getElementById(placeholderId);
+                                    if (el) el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Нет доступных команд</div>';
+                                }
+                            });
+                        }, 10);
+                        return loadingHtml;
+                    }
+
+                    // ===== Функция переключения вкладки =====
+                    function switchTeamMode(mode) {
+                        pendingMode = mode;
+                        pendingSelectedTeamId = null;
+                        var capInfo = document.getElementById('captain-info');
+                        var teammateFields = document.getElementById('teammate-fields');
+
+                        if (mode === 'solo') {
+                            memberFields.style.display = 'none';
+                            captainFields.style.display = 'block';
+                        } else if (mode === 'create') {
+                            memberFields.style.display = 'block';
+                            captainFields.style.display = 'block';
+                            if (capInfo) { capInfo.style.display = 'flex'; }
+
+                            // Проверяем, есть ли уже команда у этого игрока
+                            var curUser2 = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+                            var allRegs2 = [];
+                            try { allRegs2 = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+                            var existingTeam2 = curUser2 ? allRegs2.find(function(r) {
+                                return r.userId === curUser2.nickname && r.tournamentId === pendingTournamentId && r.role === 'captain';
+                            }) : null;
+
+                            if (existingTeam2) {
+                                // Уже есть команда — показываем кнопку Заявки в шапке
+                                var memsHtml = '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;border:1px solid var(--border);border-radius:8px">' +
+                                    'Вы капитан команды «' + escapeHtml(existingTeam2.teamName) + '».<br>' +
+                                    'Управляйте заявками через кнопку <strong style="color:var(--accent)">«Заявки»</strong> в шапке сайта.</div>';
+                                teammateFields.innerHTML = memsHtml;
+                            } else {
+                                // Создание новой команды — поля тиммейтов
+                                var tmCount = memberCount - 1;
+                                var thtml = '<p style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Заполните участников (' + tmCount + '):</p>';
+                                for (var ti = 1; ti <= tmCount; ti++) {
+                                    thtml += '<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">' +
+                                        '<div style="flex:1"><input type="text" class="form-input tm-nick" placeholder="Никнейм тиммейта" maxlength="30" data-idx="' + ti + '" style="padding:6px 10px;font-size:13px"></div>' +
+                                        '<div style="flex:1"><input type="text" class="form-input tm-id" placeholder="ID игрока" maxlength="100" data-idx="' + ti + '" style="padding:6px 10px;font-size:13px"></div></div>';
+                                }
+                                teammateFields.innerHTML = thtml;
+                            }
+                        } else if (mode === 'join') {
+                            memberFields.style.display = 'block';
+                            captainFields.style.display = 'none';
+                            if (capInfo) { capInfo.style.display = 'none'; }
+                            teammateFields.innerHTML = '<p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Выберите команду для вступления:</p>' +
+                                renderTeamBrowser();
+                            // Обработчики на карточки
+                            teammateFields.querySelectorAll('.team-browser-card').forEach(function(card) {
+                                card.addEventListener('click', function() {
+                                    teammateFields.querySelectorAll('.team-browser-card').forEach(function(c) {
+                                        c.style.borderColor = '';
+                                        c.style.background = 'var(--surface)';
+                                    });
+                                    this.style.borderColor = 'var(--accent)';
+                                    this.style.background = 'rgba(255,255,255,.04)';
+                                    pendingSelectedTeamId = this.dataset.teamId;
+                                    var inp = document.getElementById('payment-team-name');
+                                    if (inp) inp.value = this.dataset.teamName;
+                                });
+                            });
+                        }
+
+                        // Обновляем цену и кнопку
+                        var info = document.getElementById('payment-info');
+                        if (mode === 'join') {
+                            var feeHtml2 = '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)"><span>Заявка</span><span style="color:var(--accent);font-weight:600">Бесплатно</span></div>';
+                            info.querySelector('.team-fee-info').innerHTML = feeHtml2;
+                            document.getElementById('payment-confirm').textContent = 'Отправить заявку';
+                        } else {
+                            var mc = mode === 'create' ? memberCount : 1;
+                            var tf2 = fee * mc;
+                            var feeLabel2 = mc > 1 ? 'Взнос (' + mc + ' игрока)' : 'Взнос';
+                            var feeHtml2 = fee > 0 ?
+                                '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);padding-bottom:4px">' +
+                                    '<span>' + feeLabel2 + '</span>' +
+                                    '<span style="color:var(--text);font-weight:600">' + Number(tf2).toLocaleString() + ' ₽</span>' +
+                                '</div>' :
+                                '<p style="font-size:12px;color:var(--accent);font-weight:600">Бесплатный турнир</p>';
+                            info.querySelector('.team-fee-info').innerHTML = feeHtml2;
+                            document.getElementById('payment-confirm').textContent = tf2 > 0 ? 'Оплатить ' + Number(tf2).toLocaleString() + ' ₽' : 'Подтвердить участие';
+                        }
+                    }
+
+                    // Инициализация caption-info
+                    var capInfoInit = document.getElementById('captain-info');
+                    var curUserInit = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+                    var nickInit = curUserInit ? curUserInit.nickname : '—';
+                    capInfoInit.style.display = 'flex';
+                    capInfoInit.innerHTML = '<span style="font-size:13px;font-weight:700;color:var(--accent);background:rgba(255,255,255,.12);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px">C</span>' +
+                        '<span style="flex:1;font-size:14px;font-weight:600;color:var(--text)">' + escapeHtml(nickInit) + '</span>' +
+                        '<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px">Капитан</span>';
+
+                    // Подготавливаем teammate-fields (пусто)
+                    document.getElementById('teammate-fields').innerHTML = '';
+                    memberFields.style.display = 'none'; // по умолчанию solo — скрыто
+
+                    // Обработчики на табы
+                    toggleContainer.querySelectorAll('.team-tab').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            var m = this.dataset.mode;
+                            toggleContainer.querySelectorAll('.team-tab').forEach(function(b) {
+                                b.style.background = 'transparent';
+                                b.style.color = 'var(--text)';
+                                b.style.fontWeight = '500';
+                            });
+                            this.style.background = 'var(--accent)';
+                            this.style.color = '#fff';
+                            this.style.fontWeight = '600';
+                            switchTeamMode(m);
+                        });
+                    });
+
+                }
+            }
+
+            paymentInfo.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border)">
+                    <p style="font-size:13px;font-weight:600">${escapeHtml(tournament.name)}</p>
+                    <span style="font-family:var(--font-heading);font-size:14px;color:var(--accent)">${fee > 0 ? Number(fee).toLocaleString() + ' ₽' : 'Бесплатно'}</span>
+                </div>
+                <div class="team-fee-info">
+                ${fee > 0 ? `
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary)">
+                    <span>Взнос</span>
+                    <span style="color:var(--text);font-weight:600">${Number(fee).toLocaleString()} ₽</span>
+                </div>
+                ` : '<p style="font-size:12px;color:var(--accent);font-weight:600">Бесплатный турнир</p>'}
+                </div>
+            `;
+            paymentConfirm.textContent = fee > 0 ? 'Оплатить ' + Number(fee).toLocaleString() + ' ₽' : 'Подтвердить участие';
+
+            // Инициализация переключателя (после рендера paymentInfo)
+            var teamToggleCont = document.getElementById('team-toggle-container');
+            if (teamToggleCont.style.display !== 'none' && teamToggleCont.querySelector('.team-toggle-btn[data-mode="solo"]')) {
+                pendingHasCaptain = false;
+            }
+
+            document.getElementById('modal-overlay').classList.add('active');
+            paymentModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            const user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+            if (user && teamType !== 'solo' && pendingHasCaptain) {
+                const idField = document.querySelector('.tm-id[data-idx="1"]');
+                const pidField = document.getElementById('payment-player-id');
+                if (pidField && idField) {
+                    idField.value = pidField.value || '';
+                }
+            }
+        }
+
+        // ===== Система заявок на вступление в команду =====
+        function getTeamMemberCount(teamId) {
+            if (!teamId) return 0;
+            var rRegs = [];
+            try { rRegs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+            return rRegs.filter(function(r) { return r.teamId === teamId; }).length;
+        }
+
+        function loadPendingRequests(teamId, containerId) {
+            var container = document.getElementById(containerId || 'pending-requests-container');
+            if (!container) return;
+            var reqs = [];
+            try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+            var pending = reqs.filter(function(r) {
+                return r.teamId === teamId && r.tournamentId === pendingTournamentId && r.status === 'pending';
+            });
+            if (pending.length === 0) {
+                container.innerHTML = '<p style="font-size:11px;color:var(--text-muted)">Нет ожидающих заявок</p>';
+                return;
+            }
+            var html = '<p style="font-size:11px;font-weight:600;color:var(--text);margin:6px 0 4px">Заявки на вступление:</p>';
+            pending.forEach(function(req) {
+                html += '<div class="join-request" data-req-id="' + req.id + '" style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:4px">' +
+                    '<span style="flex:1;font-size:13px;color:var(--text);font-weight:500">' + escapeHtml(req.userId) + '</span>' +
+                    '<span style="font-size:10px;color:var(--text-muted)">ID: ' + escapeHtml(req.playerId) + '</span>' +
+                    '<button class="req-approve" data-req-id="' + req.id + '" style="padding:4px 10px;border:none;border-radius:4px;background:var(--accent);color:#0A0B0E;font-size:11px;cursor:pointer;font-weight:600">Принять</button>' +
+                    '<button class="req-reject" data-req-id="' + req.id + '" style="padding:4px 10px;border:none;border-radius:4px;background:#EF4444;color:#fff;font-size:11px;cursor:pointer;font-weight:600">Нет</button></div>';
+            });
+            container.innerHTML = html;
+            // Обработчики
+            container.querySelectorAll('.req-approve').forEach(function(btn) {
+                btn.addEventListener('click', function() { approveJoinRequest(this.dataset.reqId); });
+            });
+            container.querySelectorAll('.req-reject').forEach(function(btn) {
+                btn.addEventListener('click', function() { rejectJoinRequest(this.dataset.reqId); });
+            });
+        }
+
+        function approveJoinRequest(reqId) {
+            var reqs = [];
+            try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+            var req = reqs.find(function(r) { return r.id === reqId; });
+            if (!req || req.status !== 'pending') return;
+            req.status = 'approved';
+            var regs = [];
+            try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+            var captainReg = regs.find(function(r) { return r.teamId === req.teamId && r.role === 'captain'; });
+            if (captainReg) {
+                if (!captainReg.teammates) captainReg.teammates = [];
+                if (!captainReg.teammates.some(function(t) { return t.nickname === req.userId; })) {
+                    captainReg.teammates.push({ nickname: req.userId, playerId: req.playerId });
+                }
+                // Создаём отдельную регистрацию для участника
+                if (!regs.some(function(r) { return r.userId === req.userId && r.tournamentId === req.tournamentId; })) {
+                    // Определяем взнос турнира для пометки оплаты
+                    var feeTs = [];
+                    try { feeTs = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+                    var feeT = feeTs.find(function(x) { return x.id === req.tournamentId; });
+                    var feePaid = feeT ? Number(feeT.fee) > 0 : false;
+                    regs.push({
+                        userId: req.userId,
+                        tournamentId: req.tournamentId,
+                        playerId: req.playerId,
+                        date: new Date().toISOString(),
+                        teamId: req.teamId,
+                        teamName: captainReg.teamName,
+                        role: 'member',
+                        paid: feePaid,
+                        paidAt: feePaid ? new Date().toISOString() : undefined
+                    });
+                }
+                localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+            }
+            localStorage.setItem('nexora_join_requests', JSON.stringify(reqs));
+            showToast('Заявка одобрена, игрок добавлен в команду');
+        }
+        window.approveJoinRequest = approveJoinRequest;
+
+        function rejectJoinRequest(reqId) {
+            var reqs = [];
+            try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+            var req = reqs.find(function(r) { return r.id === reqId; });
+            if (!req) return;
+            req.status = 'rejected';
+            localStorage.setItem('nexora_join_requests', JSON.stringify(reqs));
+            showToast('Заявка отклонена');
+        }
+        window.rejectJoinRequest = rejectJoinRequest;
+
+        function closePayment() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            paymentModal.classList.remove('active');
+            document.body.style.overflow = '';
+            pendingTournamentId = null;
+            pendingTournamentName = '';
+            pendingHasCaptain = true;
+            pendingMode = 'solo';
+            pendingSelectedTeamId = null;
+            pendingPayment = null;
+            pendingPromo = null;
+            pendingPayBase = 0;
+            hidePaymentStep();
+            document.getElementById('captain-fields').style.display = 'none';
+            document.getElementById('member-fields').style.display = 'none';
+            document.getElementById('teammate-fields').innerHTML = '';
+            document.getElementById('team-toggle-container').style.display = 'none';
+            document.getElementById('team-toggle-container').innerHTML = '';
+            document.getElementById('captain-info').innerHTML = '';
+            document.getElementById('payment-team-name').value = '';
+        }
+
+        paymentClose.addEventListener('click', closePayment);
+        paymentCancel.addEventListener('click', closePayment);
+        document.getElementById('modal-overlay').addEventListener('click', function(e) {
+            if (paymentModal.classList.contains('active')) closePayment();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && paymentModal.classList.contains('active')) closePayment();
+        });
+
+        // Регистрация на турнир. Платёжный шаг вызывается повторно
+        // этой же функцией после «успешной» тестовой оплаты (pendingPayment уже задан).
+        function handlePaymentConfirm() {
+            if (!pendingTournamentId) return;
+            const user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+            if (!user) { closePayment(); return; }
+
+            let regs = [];
+            try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+
+            if (regs.some(r => r.userId === user.nickname && r.tournamentId === pendingTournamentId)) {
+                closePayment();
+                showToast('Вы уже зарегистрированы на этот турнир');
+                return;
+            }
+
+            const playerId = (document.getElementById('payment-player-id')?.value || '').trim();
+            // Общая проверка ID — для всех режимов
+            if (!playerId) {
+                showToast('Введите ваш игровой ID');
+                return;
+            }
+            const captainFields = document.getElementById('captain-fields');
+            const memberFields = document.getElementById('member-fields');
+            let teamName = '';
+            let teamId = null;
+            let role = null;
+            let collectedTeammates = null;
+
+            // ===== JOIN MODE — отправка заявки (выполняется ВНЕ captainFields, т.к. они скрыты в join) =====
+            if (pendingMode === 'join') {
+                if (!pendingSelectedTeamId) {
+                    showToast('Выберите команду из списка');
+                    return;
+                }
+                // Проверяем, не полна ли команда и существует ли
+                var curRegs = [];
+                try { curRegs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+                var captainReg = curRegs.find(function(r) { return r.teamId === pendingSelectedTeamId && r.role === 'captain'; });
+                if (!captainReg) {
+                    showToast('Команда больше не существует');
+                    pendingSelectedTeamId = null;
+                    return;
+                }
+                var curMemberCount = curRegs.filter(function(r) { return r.teamId === pendingSelectedTeamId; }).length;
+                var maxSlots = 2;
+                var allTourns = [];
+                try { allTourns = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+                var curTourn = allTourns.find(function(t) { return t.id === pendingTournamentId; });
+                if (curTourn) {
+                    var teamType2 = curTourn.teamType || 'solo';
+                    maxSlots = teamType2 === 'duo' ? 2 : teamType2 === 'trio' ? 3 : teamType2 === 'team4' ? 4 : teamType2 === 'team8' ? 8 : 5;
+                }
+                if (curMemberCount >= maxSlots) {
+                    showToast('В команде больше нет мест');
+                    pendingSelectedTeamId = null;
+                    closePayment();
+                    return;
+                }
+                // Сохраняем заявку — не создаём регистрацию
+                var joinReqs = [];
+                try { joinReqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+                if (joinReqs.some(function(r) { return r.teamId === pendingSelectedTeamId && r.userId === user.nickname && r.status === 'pending'; })) {
+                    showToast('Вы уже отправляли заявку в эту команду');
+                    return;
+                }
+                joinReqs.push({
+                    id: 'req_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+                    teamId: pendingSelectedTeamId,
+                    tournamentId: pendingTournamentId,
+                    userId: user.nickname,
+                    playerId: playerId,
+                    date: new Date().toISOString(),
+                    status: 'pending'
+                });
+                localStorage.setItem('nexora_join_requests', JSON.stringify(joinReqs));
+                var savedName2 = pendingTournamentName;
+                closePayment();
+                showToast('Заявка отправлена капитану команды');
+                setTimeout(function() { location.reload(); }, 1200);
+                return;
+            }
+
+            // Название команды — для всех не-соло (captain-fields показано)
+            if (captainFields.style.display !== 'none') {
+                teamName = (document.getElementById('payment-team-name')?.value || '').trim();
+                if (!teamName) {
+                    showToast('Введите название команды');
+                    return;
+                }
+
+                if (pendingMode === 'create') {
+                    // Создание команды — проверяем уникальность названия
+                    if (regs.some(r => r.tournamentId === pendingTournamentId && r.teamName === teamName && r.role === 'captain')) {
+                        showToast('Команда с таким названием уже существует');
+                        return;
+                    }
+                    teamId = 'team_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4);
+                    role = 'captain';
+                    // Собираем тиммейтов из полей
+                    collectedTeammates = [];
+                    if (user.nickname) collectedTeammates.push({ nickname: user.nickname, playerId: playerId });
+                    document.querySelectorAll('.tm-nick').forEach(function(inp) {
+                        var nick = inp.value.trim();
+                        var idx = inp.dataset.idx;
+                        var idInp = document.querySelector('.tm-id[data-idx="' + idx + '"]');
+                        var pid = idInp ? idInp.value.trim() : '';
+                        if (nick) collectedTeammates.push({ nickname: nick, playerId: pid });
+                    });
+                    if (collectedTeammates.length < 2) {
+                        showToast('Заполните хотя бы одного тиммейта');
+                        return;
+                    }
+                } else {
+                    // За себя — проверяем уникальность названия команды во всех регистрациях турнира
+                    if (teamName && regs.some(r => r.tournamentId === pendingTournamentId && r.teamName === teamName)) {
+                        showToast('Команда с таким названием уже существует');
+                        return;
+                    }
+                    // Если игрок ввёл название команды — создаём её как капитан
+                    if (teamName) {
+                        role = 'captain';
+                        teamId = 'team_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4);
+                    } else {
+                        role = null;
+                        teamId = null;
+                    }
+                }
+            }
+
+            // Определяем взнос турнира
+            var allTourns3 = [];
+            try { allTourns3 = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+            var curTourn3 = allTourns3.find(function(t) { return t.id === pendingTournamentId; });
+            var feeAmount = curTourn3 ? Number(curTourn3.fee) || 0 : 0;
+
+            // Платёжный шаг: платные турниры сначала проходят тестовую оплату.
+            // Для командной регистрации сумма = взнос × число игроков (как в отображении).
+            var teamTypeP = curTourn3 ? (curTourn3.teamType || 'solo') : 'solo';
+            var memberCountP = teamTypeP === 'duo' ? 2 : teamTypeP === 'trio' ? 3 : teamTypeP === 'team4' ? 4 : teamTypeP === 'team8' ? 8 : 5;
+            var payTotal = feeAmount * (pendingMode === 'create' ? memberCountP : 1);
+
+            // Страховка: если платёж «прошёл» с ошибкой — не регистрируем
+            if (feeAmount > 0 && pendingPayment && pendingPayment.status !== 'paid') {
+                showToast('Оплата не завершена');
+                pendingPayment = null;
+                return;
+            }
+
+            if (feeAmount > 0 && !pendingPayment) {
+                showPaymentStep(payTotal);
+                return;
+            }
+
+            const registration = {
+                userId: user.nickname,
+                tournamentId: pendingTournamentId,
+                playerId: playerId,
+                date: new Date().toISOString(),
+                teamName: teamName || undefined,
+                teamId: teamId || undefined,
+                role: role || undefined,
+                teammates: collectedTeammates || undefined,
+                // Бесплатные турниры — сразу оплачено; платные — только после успешной оплаты
+                paid: feeAmount > 0 ? (!!pendingPayment && pendingPayment.status === 'paid') : true,
+                paidAt: feeAmount > 0 ? new Date().toISOString() : undefined,
+                payment: pendingPayment ? {
+                    id: pendingPayment.id,
+                    amount: pendingPayment.amount,
+                    method: pendingPayment.method,
+                    status: pendingPayment.status,
+                    test: !!pendingPayment.test,
+                    date: pendingPayment.date
+                } : undefined
+            };
+            regs.push(registration);
+            localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+
+            // Учитываем использование промокода (если оплачивали с ним)
+            if (pendingPromo && pendingPromo.code) {
+                try {
+                    let promos = JSON.parse(localStorage.getItem('nexora_promocodes')) || [];
+                    promos = promos.map(x => {
+                        if (String(x.code || '').trim().toUpperCase() === String(pendingPromo.code).toUpperCase()) {
+                            x.uses = Number(x.uses || 0) + 1;
+                        }
+                        return x;
+                    });
+                    localStorage.setItem('nexora_promocodes', JSON.stringify(promos));
+                } catch(e) {}
+            }
+
+            // Игрок снова в турнире — снимаем метку «покинутый», чтобы чат открылся снова
+            try {
+                let ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+                ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(pendingTournamentId)));
+                localStorage.setItem('nexora_left_tournaments', JSON.stringify(ll));
+            } catch(e) {}
+
+            // Email-уведомление о регистрации
+            if (user && user.email && typeof nexoraSendNotify === 'function' && typeof nexoraEmailBody === 'function') {
+                const tournName = pendingTournamentName || 'турнир';
+                const feeTxt = feeAmount > 0 ? feeAmount.toLocaleString('ru-RU') + ' ₽' : 'бесплатно';
+                const dateTxt = curTourn3 && curTourn3.date ? escapeHtml(curTourn3.date) : 'уточняется';
+                nexoraSendNotify(user.email, 'Ты записан на турнир — Nexora', nexoraEmailBody('Ты в игре!', [
+                    'Ты успешно записан на турнир <b>' + escapeHtml(tournName) + '</b>.',
+                    'Дата старта: ' + dateTxt + '.',
+                    'Взнос: ' + feeTxt + '.',
+                    'Расписание матчей и результаты появятся на сайте и в новостях Nexora.'
+                ]));
+            }
+
+            const savedName = pendingTournamentName;
+            paymentConfirm.textContent = '⏳ Обработка...';
+            paymentConfirm.disabled = true;
+            setTimeout(function() {
+                closePayment();
+                showToast('Вы зарегистрированы на "' + savedName + '"');
+                setTimeout(() => location.reload(), 1200);
+            }, 800);
+        }
+        paymentConfirm.addEventListener('click', handlePaymentConfirm);
+
+        // ===== Кнопки шага оплаты (реальная / тестовая) =====
+        document.getElementById('payment-pay').addEventListener('click', function() {
+            if (typeof nexoraPayment !== 'object' || typeof nexoraPayment.createPayment !== 'function') {
+                showToast('Платёжный модуль недоступен');
+                return;
+            }
+            var btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Обработка...';
+            var userPay = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+            // Реальная оплата — сразу показываем «ожидание», вкладка откроется в createPayment
+            if (realPayEnabled) {
+                const waiting = paymentWaitingEl();
+                if (waiting) waiting.style.display = 'flex';
+                paymentPayRow().style.display = 'none';
+            }
+            nexoraPayment.createPayment({
+                amount: pendingPayAmount,
+                method: pendingPayMethod,
+                tournamentId: pendingTournamentId,
+                userId: userPay ? userPay.nickname : null,
+                promo: pendingPromo
+            }).then(function(p) {
+                pendingPayment = p;
+                btn.disabled = false;
+                btn.textContent = 'Оплатить';
+                if (p.status !== 'paid') {
+                    // Платёж не прошёл — возвращаемся к выбору способа
+                    const waiting = paymentWaitingEl();
+                    if (waiting) waiting.style.display = 'none';
+                    paymentPayRow().style.display = 'flex';
+                    showToast('Оплата не завершена');
+                    return;
+                }
+                // Реальный режим включён, но Fride не настроен — предупреждаем, что деньги не списаны
+                if (p.test && p.fallback) {
+                    showToast('Fride не настроен, оплата тестовая');
+                }
+                hidePaymentStep();
+                handlePaymentConfirm(); // повторный проход: оплата уже прошла
+            });
+        });
+        document.getElementById('payment-pay-cancel').addEventListener('click', function() {
+            if (fridePollTimer) { clearInterval(fridePollTimer); fridePollTimer = null; }
+            const waiting = paymentWaitingEl();
+            if (waiting) waiting.style.display = 'none';
+            hidePaymentStep();
+        });
+
+        // ===== Промокод на скидку =====
+        document.getElementById('payment-promo-apply').addEventListener('click', function() {
+            const promoInput = document.getElementById('payment-promo-input');
+            const promoStatus = document.getElementById('payment-promo-status');
+            if (!promoInput || !promoStatus) return;
+            const code = (promoInput.value || '').trim().toUpperCase();
+            if (!code) {
+                promoStatus.style.display = 'block';
+                promoStatus.style.color = '#EF4444';
+                promoStatus.textContent = 'Введите промокод';
+                return;
+            }
+            let promos = [];
+            try { promos = JSON.parse(localStorage.getItem('nexora_promocodes')) || []; } catch {}
+            const pc = promos.find(x => String(x.code || '').trim().toUpperCase() === code);
+            if (!pc || !pc.active) {
+                promoStatus.style.display = 'block';
+                promoStatus.style.color = '#EF4444';
+                promoStatus.textContent = 'Промокод не найден';
+                return;
+            }
+            if (Number(pc.uses || 0) >= Number(pc.maxUses || 0)) {
+                promoStatus.style.display = 'block';
+                promoStatus.style.color = '#EF4444';
+                promoStatus.textContent = 'Промокод уже использован';
+                return;
+            }
+            const discount = Number(pc.discount) || 0;
+            // Скидка всегда от исходной суммы, чтобы промокоды не складывались
+            const newAmount = Math.round((pendingPayBase || pendingPayAmount) * (100 - discount) / 100);
+            pendingPayAmount = newAmount;
+            pendingPromo = { code: code, discount: discount };
+            document.getElementById('payment-step-amount').textContent = newAmount.toLocaleString() + ' ₽';
+            promoStatus.style.display = 'block';
+            promoStatus.style.color = '#22C55E';
+            promoStatus.textContent = 'Промокод применён: −' + discount + '% → ' + newAmount.toLocaleString() + ' ₽';
+        });
+
+        // ===== «Я оплатил — проверить» (реальная оплата) =====
+        document.getElementById('payment-waiting-cancel').addEventListener('click', function() {
+            if (typeof nexoraPayment === 'object' && typeof nexoraPayment.forceCheck === 'function') {
+                const btn = this;
+                btn.disabled = true;
+                nexoraPayment.forceCheck().then(function(r) {
+                    btn.disabled = false;
+                    if (!r || !r.paid) {
+                        showToast('Платёж ещё не подтверждён');
+                    }
+                    // если paid — createPayment уже зарезолвил свой промис, регистрация продолжится
+                });
+            } else {
+                showToast('Платёж ещё не подтверждён');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.tournament-join-btn');
+            if (!btn) return;
+            e.preventDefault();
+
+            const user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+
+            if (!user) {
+                const registerBtn = document.querySelector('[data-modal="register"]');
+                if (registerBtn) registerBtn.click();
+                return;
+            }
+
+            const id = Number(btn.dataset.tournamentId);
+            const name = btn.dataset.tournamentName || 'турнир';
+
+            let regs = [];
+            try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+
+            if (regs.some(r => r.userId === user.nickname && r.tournamentId === id)) {
+                showToast('Вы уже зарегистрированы на этот турнир');
+                return;
+            }
+
+            const tournaments = (() => { try { return JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch { return []; } })();
+            const t = tournaments.find(x => x.id === id);
+            if (t) openPayment(t);
+        });
+
+        const leaveModal = document.getElementById('leave-modal');
+        const leaveConfirm = document.getElementById('leave-confirm');
+        const leaveCancel = document.getElementById('leave-cancel');
+        const leaveClose = document.getElementById('leave-close');
+        const leaveModalName = document.getElementById('leave-modal-name');
+        let pendingLeaveId = null;
+
+        function openLeave(tournamentId, tournamentName) {
+            pendingLeaveId = tournamentId;
+            leaveModalName.textContent = 'Вы собираетесь покинуть «' + tournamentName + '»';
+            document.getElementById('modal-overlay').classList.add('active');
+            leaveModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLeave() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            leaveModal.classList.remove('active');
+            document.body.style.overflow = '';
+            pendingLeaveId = null;
+        }
+
+        leaveClose.addEventListener('click', closeLeave);
+        leaveCancel.addEventListener('click', closeLeave);
+
+        leaveConfirm.addEventListener('click', function() {
+            if (!pendingLeaveId) return;
+            const user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+            if (!user) { closeLeave(); return; }
+
+            let regs = [];
+            try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+
+            const idx = regs.findIndex(r => r.userId === user.nickname && r.tournamentId === pendingLeaveId);
+            if (idx === -1) { closeLeave(); return; }
+
+            const leavingUser = regs[idx];
+            // Убираем только уходящего игрока, команда остаётся
+            regs.splice(idx, 1);
+            // Если капитан ушёл и в команде кто-то остался — назначаем нового капитана
+            if (leavingUser.role === 'captain' && leavingUser.teamId) {
+                var remaining = regs.filter(function(r) { return r.teamId === leavingUser.teamId && r.tournamentId === pendingLeaveId; });
+                if (remaining.length > 0) {
+                    remaining[0].role = 'captain';
+                    // Убедимся что teamId есть
+                    if (!remaining[0].teamId) remaining[0].teamId = leavingUser.teamId;
+                }
+            }
+            localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+            // Помечаем турнир как покинутый — чат и кнопка чата станут недоступны,
+            // даже если регистрация вернётся с сервера при синхронизации
+            try {
+                let ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+                ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(pendingLeaveId)));
+                ll.push({ userId: user.nickname, tournamentId: Number(pendingLeaveId) });
+                localStorage.setItem('nexora_left_tournaments', JSON.stringify(ll));
+            } catch(e) {}
+            closeLeave();
+            // Закрываем чат, чтобы после выхода не осталось доступа к переписке турнира
+            if (typeof window.closeChat === 'function') window.closeChat();
+            showToast('Вы вышли из турнира');
+            // Дожидаемся удаления регистрации на сервере (с таймаутом), чтобы
+            // после перезагрузки страницы заявка не вернулась при синхронизации
+            (async function() {
+                try {
+                    const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                    const t = ctrl ? setTimeout(() => ctrl.abort(), 1500) : null;
+                    await fetch('/api/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: 'nexora_registrations', filters: { userId: user.nickname, tournamentId: pendingLeaveId } }),
+                        keepalive: true,
+                        signal: ctrl ? ctrl.signal : undefined
+                    });
+                    if (t) clearTimeout(t);
+                } catch(e) {}
+                setTimeout(() => location.reload(), 400);
+            })();
+        });
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.tournament-leave-btn');
+            if (!btn) return;
+            e.preventDefault();
+
+            const user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+            if (!user) return;
+
+            const id = Number(btn.dataset.tournamentId);
+            const name = btn.dataset.tournamentName || 'турнир';
+
+            let regs = [];
+            try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+
+            if (!regs.some(r => r.userId === user.nickname && r.tournamentId === id)) return;
+
+            openLeave(id, name);
+        });
+    })();
+
+    // === CHAT button on tournament cards ===
+    document.addEventListener("click", function(e) {
+        var btn = e.target.closest(".tournament-chat-btn");
+        if (!btn) return;
+        e.preventDefault();
+        var id = Number(btn.dataset.tournamentId);
+        var name = btn.dataset.tournamentName || "Чат";
+        window.openChat(id, name);
+    });
+
+    // === BRACKET (сетка) button on tournament cards ===
+    document.addEventListener("click", function(e) {
+        var btn = e.target.closest(".tournament-bracket-btn");
+        if (!btn) return;
+        e.preventDefault();
+        var id = Number(btn.dataset.tournamentId);
+        var name = btn.dataset.tournamentName || "Сетка матчей";
+        openBracket(id, name);
+    });
+
+    function getNxMatchesLocal() {
+        try { return JSON.parse(localStorage.getItem('nexora_matches')) || []; } catch (e) { return []; }
+    }
+
+    function matchWinner(m) {
+        if (!m) return null;
+        if (m.status === 'bye') return m.teamA || m.teamB;
+        if (m.winner) return m.winner;
+        if (m.status === 'finished' && m.scoreA != null && m.scoreB != null) {
+            if (Number(m.scoreA) > Number(m.scoreB)) return m.teamA;
+            if (Number(m.scoreB) > Number(m.scoreA)) return m.teamB;
+        }
+        return null;
+    }
+
+    function derivedTeamLabel(m, side) {
+        if (!m) return null;
+        var ref = side === 'A' ? m.aRef : m.bRef;
+        if (ref) {
+            var all = getNxMatchesLocal();
+            var w = matchWinner(all.find(function(x) { return x.id === ref; }));
+            return w || '—';
+        }
+        return side === 'A' ? m.teamA : m.teamB;
+    }
+
+    function renderBracketMatch(m) {
+        var aLabel = derivedTeamLabel(m, 'A');
+        var bLabel = derivedTeamLabel(m, 'B');
+        var w = matchWinner(m);
+        var aWin = m.status === 'finished' && w && w === m.teamA;
+        var bWin = m.status === 'finished' && w && w === m.teamB;
+        var statusTxt = m.status === 'bye'
+            ? '<span style="font-size:10px;color:var(--text-muted)">тех. победа</span>'
+            : m.status === 'finished'
+                ? '<span style="font-size:10px;color:var(--text-success)">завершён</span>'
+                : m.status === 'draw'
+                    ? '<span style="font-size:10px;color:#F59E0B">ничья</span>'
+                    : '<span style="font-size:10px;color:var(--text-muted)">ожидает</span>';
+        var scoreHtml = (m.scoreA != null && m.scoreB != null)
+            ? '<span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--accent)">' + Number(m.scoreA) + ' : ' + Number(m.scoreB) + '</span>'
+            : '<span style="font-size:10px;color:var(--text-muted)">— : —</span>';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);flex-wrap:wrap">' +
+            '<span style="flex:1;font-size:12px;font-weight:' + (aWin ? '700' : '500') + ';color:' + (aWin ? 'var(--text-success)' : 'var(--text)') + '">' + escapeHtml(aLabel || '—') + '</span>' +
+            scoreHtml +
+            '<span style="flex:1;text-align:right;font-size:12px;font-weight:' + (bWin ? '700' : '500') + ';color:' + (bWin ? 'var(--text-success)' : 'var(--text)') + '">' + escapeHtml(bLabel || '—') + '</span>' +
+            statusTxt +
+        '</div>';
+    }
+
+    function openBracket(tournamentId, name) {
+        var modal = document.getElementById('bracket-modal');
+        var content = document.getElementById('bracket-content');
+        var title = document.getElementById('bracket-modal-title');
+        if (!modal || !content) return;
+        if (title) title.textContent = 'Сетка матчей — ' + (name || 'турнир');
+
+        var ms = getNxMatchesLocal().filter(function(m) { return Number(m.tournamentId) === Number(tournamentId); });
+
+        if (!ms.length) {
+            content.innerHTML = '<div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:13px">' +
+                'Сетка пока не сформирована.<br>Организатор создаст её после того, как участники подтвердят оплату.</div>';
+        } else {
+            var byRound = {};
+            ms.forEach(function(m) { (byRound[m.round] = byRound[m.round] || []).push(m); });
+            var rounds = Object.keys(byRound).sort(function(a, b) { return Number(a) - Number(b); });
+
+            var html = rounds.map(function(rn) {
+                var items = byRound[rn].map(function(m) {
+                    return renderBracketMatch(m);
+                }).join('');
+                var isFinal = Number(rn) === Number(rounds[rounds.length - 1]);
+                return '<div style="margin-bottom:14px">' +
+                    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:6px">Раунд ' + rn + (isFinal ? ' · Финал' : '') + '</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:6px">' + items + '</div></div>';
+            }).join('');
+
+            var finalMatch = byRound[rounds[rounds.length - 1]][0];
+            var champ = finalMatch ? matchWinner(finalMatch) : null;
+            var champHtml = champ
+                ? '<div style="margin-top:16px;padding:14px 16px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);border-radius:10px;text-align:center;font-size:14px;font-weight:700;color:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>' + escapeHtml(champ) + ' — победитель турнира</div>'
+                : '<div style="margin-top:16px;text-align:center;font-size:12px;color:var(--text-muted)">Победитель определится после финального матча</div>';
+
+            content.innerHTML = html + champHtml;
+        }
+
+        document.getElementById('modal-overlay').classList.add('active');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeBracket() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('bracket-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    var bracketCloseBtn = document.getElementById('bracket-close');
+    if (bracketCloseBtn) bracketCloseBtn.addEventListener('click', closeBracket);
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        var bm = document.getElementById('bracket-modal');
+        if (!bm || !bm.classList.contains('active')) return;
+        if (bm.contains(e.target)) return;
+        closeBracket();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            var bm = document.getElementById('bracket-modal');
+            if (bm && bm.classList.contains('active')) closeBracket();
+        }
+    });
+
+// ===== Отдельное меню заявок для капитанов =====
+    function updateRequestsBadge() {
+        var user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+        var badge = document.getElementById('requests-badge');
+        var btn = document.getElementById('btn-requests');
+        if (!btn || !badge) return;
+        if (!user) { btn.style.display = 'none'; return; }
+        btn.style.display = '';
+        var reqs = []; try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+        var regs = []; try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+        var myTeams = regs.filter(function(r) { return r.userId === user.nickname && r.role === 'captain'; });
+        var teamIds = myTeams.map(function(t) { return t.teamId; });
+        var pendingCount = reqs.filter(function(r) { return teamIds.indexOf(r.teamId) !== -1 && r.status === 'pending'; }).length;
+        badge.style.display = pendingCount > 0 ? 'flex' : 'none';
+        badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+    }
+
+    function openRequestsModal() {
+        var user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+        if (!user) return;
+        refreshRequestsList();
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById('requests-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function renderPendingRequests(teamId, tournamentId, reqs, tns) {
+        var pending = reqs.filter(function(r) { return r.teamId === teamId && r.tournamentId === tournamentId && r.status === 'pending'; });
+        if (pending.length === 0) {
+            return '<p style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted)">Нет ожидающих заявок</p>';
+        }
+        var html = '';
+        pending.forEach(function(req) {
+            html += '<div class="join-request" data-req-id="' + req.id + '" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">' +
+                '<div style="flex:1;min-width:0">' +
+                    '<div style="font-size:15px;font-weight:600;color:var(--text);cursor:pointer" class="profile-link" data-user="' + escapeHtml(req.userId) + '">' + escapeHtml(req.userId) + '</div>' +
+                    '<div style="font-size:12px;color:var(--text-muted);margin-top:1px">ID: ' + escapeHtml(req.playerId || '—') + '</div>' +
+                '</div>' +
+                '<button class="req-approve" data-req-id="' + req.id + '" style="padding:8px 20px;border:none;border-radius:6px;background:var(--accent);color:#0A0B0E;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">Принять</button>' +
+                '<button class="req-reject" data-req-id="' + req.id + '" style="padding:8px 14px;border:none;border-radius:6px;background:#EF4444;color:#fff;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">Нет</button></div>';
+        });
+        return html;
+    }
+
+    function refreshRequestsList() {
+        var user = (() => { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch { return null; } })();
+        if (!user) return;
+        var regs = []; try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+        var reqs = []; try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+        var tns = []; try { tns = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+        var myTeams = regs.filter(function(r) { return r.userId === user.nickname && r.role === 'captain'; });
+        var content = document.getElementById('requests-content');
+        if (myTeams.length === 0) {
+            content.innerHTML = '<p style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:14px">Нет команд, в которых вы капитан</p>';
+        } else {
+            var html = '';
+            myTeams.forEach(function(team) {
+                var tn = tns.find(function(t) { return t.id === team.tournamentId; });
+                var tournName = tn ? tn.name : 'Турнир';
+                var memberCount = (function() {
+                    if (!tn) return 5;
+                    var tt = tn.teamType || 'solo';
+                    return tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5;
+                })();
+                var teamMembers = regs.filter(function(r) { return r.teamId === team.teamId; });
+                html += '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--surface)">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
+                        '<div>' +
+                            '<div style="font-size:16px;font-weight:700;color:var(--text)">' + escapeHtml(tournName) + '</div>' +
+                            '<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:3px">«' + escapeHtml(team.teamName) + '» · ' + teamMembers.length + '/' + memberCount + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div data-team-id="' + team.teamId + '" data-tournament-id="' + team.tournamentId + '">' +
+                        renderPendingRequests(team.teamId, team.tournamentId, reqs, tns) +
+                    '</div></div>';
+            });
+            content.innerHTML = html;
+        }
+    }
+
+    function closeRequestsModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('requests-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('requests-close').addEventListener('click', closeRequestsModal);
+    document.getElementById('requests-content').addEventListener('click', function(e) {
+        var target = e.target;
+        // Approve
+        var approveBtn = target.closest('.req-approve');
+        if (approveBtn) {
+            approveJoinRequest(approveBtn.dataset.reqId);
+            updateRequestsBadge();
+            refreshRequestsList();
+            return;
+        }
+        // Reject
+        var rejectBtn = target.closest('.req-reject');
+        if (rejectBtn) {
+            rejectJoinRequest(rejectBtn.dataset.reqId);
+            updateRequestsBadge();
+            refreshRequestsList();
+            return;
+        }
+    });
+    document.getElementById('btn-requests').addEventListener('click', function() {
+        openRequestsModal();
+    });
+
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        var rm = document.getElementById('requests-modal');
+        if (rm && rm.classList.contains('active')) closeRequestsModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        var rm = document.getElementById('requests-modal');
+        if (e.key === 'Escape' && rm && rm.classList.contains('active')) closeRequestsModal();
+    });
+
+    updateRequestsBadge();
+    setInterval(updateRequestsBadge, 5000);
+
+    // ===========================================
+    // ХЕЛПЕР ОТОБРАЖЕНИЯ — убирает почту из ника
+    // ===========================================
+    function displayName(userId) {
+        if (!userId) return '';
+        // Если userId выглядит как email — показываем только часть до @
+        var at = userId.indexOf('@');
+        if (at > 0) return userId.substring(0, at);
+        return userId;
+    }
+
+    // ===========================================
+    // СИСТЕМА ПРОФИЛЕЙ ИГРОКОВ
+    // ===========================================
+    var PROFILE_COLORS = ['#6366F1','#14B8A6','#EC4899','#0EA5E9','#EF4444','#8B5CF6','#10B981','#F97316','#84CC16','#64748B'];
+
+    function getProfile(nickname) {
+        if (!nickname) return createDefaultProfile();
+        try {
+            var all = JSON.parse(localStorage.getItem('nexora_profiles'));
+            if (all && all[nickname]) return all[nickname];
+            // Если nickname похож на email — ищем пользователя с таким email и берём его профиль
+            var at = nickname.indexOf('@');
+            if (at > 0) {
+                var users = JSON.parse(localStorage.getItem('nexora_users')) || [];
+                var found = users.find(function(u) { return u.email === nickname; });
+                if (found && found.nickname && all && all[found.nickname]) return all[found.nickname];
+            }
+        } catch(e) {}
+        return createDefaultProfile(nickname);
+    }
+
+    function createDefaultProfile(nickname) {
+        if (!nickname) return { avatar: '', bgColor: '#3A3F4B', bio: '', avatarImage: null, wins: 0, losses: 0 };
+        var hash = 0;
+        for (var i = 0; i < nickname.length; i++) { hash = nickname.charCodeAt(i) + ((hash << 5) - hash); }
+        var profile = {
+            avatar: '',
+            bgColor: PROFILE_COLORS[Math.abs(hash) % PROFILE_COLORS.length],
+            bio: '',
+            avatarImage: null,
+            wins: 0,
+            losses: 0
+        };
+        try {
+            var all = JSON.parse(localStorage.getItem('nexora_profiles')) || {};
+            all[nickname] = profile;
+            localStorage.setItem('nexora_profiles', JSON.stringify(all));
+        } catch(e) {}
+        return profile;
+    }
+
+    function saveProfile(nickname, data) {
+        if (!nickname) return;
+        try {
+            var all = JSON.parse(localStorage.getItem('nexora_profiles')) || {};
+            all[nickname] = data;
+            localStorage.setItem('nexora_profiles', JSON.stringify(all));
+        } catch(e) {}
+    }
+
+    function calcTournamentsPlayed(nickname) {
+        try {
+            var regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+            var tns = JSON.parse(localStorage.getItem('nexora_tournaments')) || [];
+            var count = 0;
+            regs.forEach(function(r) {
+                if (r.userId === nickname) {
+                    var tn = tns.find(function(t) { return t.id === r.tournamentId; });
+                    if (tn && (tn.status === 'completed' || tn.status === 'active')) count++;
+                }
+            });
+            return count;
+        } catch(e) { return 0; }
+    }
+
+    function getCurrentUser() {
+        try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch(e) { return null; }
+    }
+
+    function renderAvatar(profile, size) {
+        size = size || 80;
+        if (profile.avatarImage) {
+            return '<img src="' + escapeHtml(profile.avatarImage) + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover;display:block;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.3)">';
+        }
+        return '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + escapeHtml(profile.bgColor) + ';margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.3)"></div>';
+    }
+
+    function openProfile(nickname) {
+        if (!nickname) return;
+        var content = document.getElementById('profile-view-content');
+        if (!content) return;
+        var profile = getProfile(nickname);
+        if (!profile) return;
+        var tournamentsPlayed = calcTournamentsPlayed(nickname);
+        var currentUser = getCurrentUser();
+        var isOwn = currentUser && currentUser.nickname === nickname;
+
+        content.innerHTML =
+            '<div style="text-align:center;padding:8px 0 16px">' +
+                renderAvatar(profile, 90) +
+                '<h2 style="font-size:20px;font-weight:700;color:var(--text);margin:14px 0 4px">' + escapeHtml(nickname) + '</h2>' +
+                (profile.bio ? '<p style="font-size:13px;color:var(--text-muted);margin:4px auto 0;max-width:280px">' + escapeHtml(profile.bio) + '</p>' : '') +
+            '</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">' +
+                '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                    '<div style="font-size:22px;font-weight:700;color:var(--accent)">' + tournamentsPlayed + '</div>' +
+                    '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Турниров</div>' +
+                '</div>' +
+                '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                    '<div style="font-size:22px;font-weight:700;color:#FFFFFF">' + (profile.wins || 0) + '</div>' +
+                    '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Побед</div>' +
+                '</div>' +
+                '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                    '<div style="font-size:22px;font-weight:700;color:#EF4444">' + (profile.losses || 0) + '</div>' +
+                    '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Поражений</div>' +
+                '</div>' +
+            '</div>';
+
+        if (isOwn) {
+            content.innerHTML +=
+                '<button id="profile-edit-btn" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font-sans);transition:all .15s">Редактировать профиль</button>';
+        }
+
+        document.getElementById('profile-view-title').textContent = 'Профиль — ' + nickname;
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById('profile-view-modal').classList.add('active');
+        document.getElementById('profile-view-modal').style.zIndex = '2101';
+        document.body.style.overflow = 'hidden';
+
+        if (isOwn) {
+            setTimeout(function() {
+                var btn = document.getElementById('profile-edit-btn');
+                if (btn) btn.addEventListener('click', function() { openProfileEdit(nickname); });
+            }, 50);
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function openProfileEdit(nickname) {
+        var profile = getProfile(nickname);
+        if (!profile) return;
+        var content = document.getElementById('profile-view-content');
+        if (!content) return;
+
+        var colorHtml = '';
+        PROFILE_COLORS.forEach(function(c) {
+            var selected = profile.bgColor === c;
+            colorHtml += '<span class="pv-color" data-color="' + c + '" style="display:inline-flex;width:32px;height:32px;border-radius:50%;cursor:pointer;background:' + c + ';border:3px solid ' + (selected ? '#fff' : 'transparent') + ';outline:' + (selected ? '2px solid ' + c : 'none') + '"></span>';
+        });
+
+        // Превью аватара
+        var avatarPreview = profile.avatarImage
+            ? '<img src="' + escapeHtml(profile.avatarImage) + '" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;box-shadow:0 4px 16px rgba(0,0,0,.3)">'
+            : '<div style="width:80px;height:80px;border-radius:50%;background:' + escapeHtml(profile.bgColor) + ';margin:0 auto 12px;box-shadow:0 4px 16px rgba(0,0,0,.3)"></div>';
+
+        content.innerHTML =
+            '<div style="margin-bottom:16px">' +
+                // Превью
+                '<div style="text-align:center;margin-bottom:16px">' +
+                    '<div id="pv-avatar-preview">' + avatarPreview + '</div>' +
+                '</div>' +
+                // Загрузка фото
+                '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Фото профиля</label>' +
+                '<div style="display:flex;gap:8px;margin-bottom:16px">' +
+                    '<button id="pv-upload-btn" style="flex:1;padding:8px;border:1px dashed var(--border);background:var(--surface);color:var(--text);border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-sans)">Загрузить фото</button>' +
+                    (profile.avatarImage ? '<button id="pv-remove-photo" style="padding:8px 12px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-sans)">Удалить</button>' : '') +
+                '</div>' +
+                '<input type="file" id="pv-file-input" accept="image/*" style="display:none">' +
+                // Цвет фона
+                '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Цвет фона</label>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' + colorHtml + '</div>' +
+                // О себе
+                '<label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">О себе</label>' +
+                '<textarea id="pv-bio" maxlength="200" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;resize:none;height:60px;font-family:var(--font-sans);margin-bottom:16px;outline:none">' + escapeHtml(profile.bio || '') + '</textarea>' +
+                // Кнопки
+                '<button id="pv-save" style="width:100%;padding:10px;border:none;background:var(--accent);color:#0A0B0E;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-sans)">Сохранить</button>' +
+                '<button id="pv-cancel" style="width:100%;padding:8px;margin-top:6px;border:none;background:none;color:var(--text-muted);border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-sans)">Отмена</button>' +
+            '</div>';
+
+        document.getElementById('profile-view-title').textContent = 'Редактирование профиля';
+
+        // ===== Загрузка фото =====
+        var fileInput = document.getElementById('pv-file-input');
+        var uploadBtn = document.getElementById('pv-upload-btn');
+
+        uploadBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function() {
+            var file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Файл слишком большой. Максимум 5 МБ');
+                fileInput.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var maxSize = 200;
+                    var w = img.width, h = img.height;
+                    if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+                    else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+                    canvas.width = Math.round(w);
+                    canvas.height = Math.round(h);
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, Math.round(w), Math.round(h));
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                    profile.avatarImage = dataUrl;
+
+                    var preview = document.getElementById('pv-avatar-preview');
+                    if (preview) {
+                        preview.innerHTML = '<img src="' + dataUrl + '" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:block;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.3)">';
+                    }
+
+                    var removeBtn = document.getElementById('pv-remove-photo');
+                    if (!removeBtn) {
+                        var btnsRow = uploadBtn.parentNode;
+                        var remBtn = document.createElement('button');
+                        remBtn.id = 'pv-remove-photo';
+                        remBtn.style.cssText = 'padding:8px 12px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#EF4444;border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-sans)';
+                        remBtn.textContent = 'Удалить';
+                        btnsRow.appendChild(remBtn);
+                        remBtn.addEventListener('click', removePhotoHandler);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            fileInput.value = '';
+        });
+
+        // ===== Кнопка удалить фото =====
+        function removePhotoHandler() {
+            profile.avatarImage = null;
+            var preview = document.getElementById('pv-avatar-preview');
+            if (preview) {
+                preview.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:' + escapeHtml(profile.bgColor) + ';margin:0 auto 12px;box-shadow:0 4px 16px rgba(0,0,0,.3)"></div>';
+            }
+            var remBtn = document.getElementById('pv-remove-photo');
+            if (remBtn) remBtn.remove();
+        }
+
+        var removePhotoBtn = document.getElementById('pv-remove-photo');
+        if (removePhotoBtn) {
+            removePhotoBtn.addEventListener('click', removePhotoHandler);
+        }
+
+        // ===== Выбор цвета =====
+        content.querySelectorAll('.pv-color').forEach(function(el) {
+            el.addEventListener('click', function() {
+                content.querySelectorAll('.pv-color').forEach(function(e) { e.style.borderColor = 'transparent'; e.style.outline = 'none'; });
+                this.style.borderColor = '#fff';
+                this.style.outline = '2px solid ' + this.dataset.color;
+                var prev = document.getElementById('pv-avatar-preview');
+                if (prev) {
+                    var inner = prev.querySelector('div');
+                    if (inner) inner.style.background = this.dataset.color;
+                }
+            });
+        });
+
+        // ===== Сохранить =====
+        document.getElementById('pv-save').addEventListener('click', function() {
+            var selColor = content.querySelector('.pv-color[style*="#fff"]');
+            if (selColor) profile.bgColor = selColor.dataset.color;
+            profile.bio = (document.getElementById('pv-bio') || {}).value || '';
+            profile.wins = profile.wins || 0;
+            profile.losses = profile.losses || 0;
+            saveProfile(nickname, profile);
+            openProfile(nickname);
+        });
+
+        document.getElementById('pv-cancel').addEventListener('click', function() {
+            openProfile(nickname);
+        });
+    }
+
+    function closeProfileView() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('profile-view-modal').classList.remove('active');
+        document.getElementById('profile-view-modal').style.zIndex = '';
+        document.body.style.overflow = '';
+    }
+
+    // ===== УПРАВЛЕНИЕ МОДАЛКОЙ =====
+
+    // Закрытие по крестику
+    var pvClose = document.getElementById('profile-view-close');
+    if (pvClose) pvClose.addEventListener('click', closeProfileView);
+
+    // Закрытие по оверлею
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        var pm = document.getElementById('profile-view-modal');
+        if (pm && pm.classList.contains('active')) closeProfileView();
+    });
+
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        var pm = document.getElementById('profile-view-modal');
+        if (pm && pm.classList.contains('active')) closeProfileView();
+    });
+
+    // ===== КЛИК ПО НИКАМ =====
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('.profile-link');
+        if (link && link.dataset && link.dataset.user) {
+            e.preventDefault();
+            e.stopPropagation();
+            openProfile(link.dataset.user);
+            return false;
+        }
+    });
+
+    // ===== ПРОВЕРКА ПРИ ЗАГРУЗКЕ =====
+    // Если в localStorage уже есть nexora_profiles — всё готово
+    // Если нет — создастся при первом клике
+    try {
+        var existing = localStorage.getItem('nexora_profiles');
+        if (!existing) {
+            localStorage.setItem('nexora_profiles', '{}');
+        }
+    } catch(e) {}
+
+    // ===== КНОПКА «МОЙ ПРОФИЛЬ» В ДРОПДАУНЕ =====
+    var myProfileBtn = document.getElementById('btn-my-profile');
+    if (myProfileBtn) {
+        myProfileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var cu = getCurrentUser();
+            if (cu && cu.nickname) {
+                // Закрываем дропдаун
+                var dd = document.getElementById('profile-dropdown');
+                if (dd) dd.classList.remove('open');
+                openProfile(cu.nickname);
+            }
+        });
+    }
+
+    console.log('[Nexora] Profile system loaded');
+    </script>
+
+    <script src="js/sparkles.js"></script>
+    <script src="js/ux.js"></script>
+</body>
+</html>

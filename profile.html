@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexora — Личный кабинет: ваши турниры, команды и платежи">
+    <title>Личный кабинет — Nexora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="img/nexora-icon.svg">
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <style>
+        .static-page{padding:64px 0 80px;min-height:calc(100vh - var(--header-h))}
+        .page-head{margin-bottom:36px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+        .page-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-dim);padding:4px 14px;border-radius:50px;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+        .page-title{font-family:var(--font-heading);font-size:clamp(24px,4vw,34px);font-weight:400;color:var(--text);margin:0 0 10px}
+        .page-desc{color:var(--text-secondary);font-size:14px;max-width:640px;line-height:1.7;margin:0}
+        .pc-guest{max-width:460px;text-align:center;margin:40px auto;padding:44px 28px;background:var(--surface,#181818);border:1px solid var(--border,#222);border-radius:16px}
+        .pc-guest h2{font-family:var(--font-heading);font-size:20px;color:var(--text);margin:0 0 8px}
+        .pc-guest p{font-size:13px;color:var(--text-muted);line-height:1.6;margin:0 0 18px}
+        .pc-card{display:flex;align-items:center;gap:18px;padding:22px 24px;background:var(--surface,#181818);border:1px solid var(--border,#222);border-radius:16px;margin-bottom:18px}
+        .pc-avatar{flex-shrink:0;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#22C55E);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:28px;color:#fff;font-weight:400}
+        .pc-nick{font-size:20px;font-weight:700;color:var(--text);line-height:1.3}
+        .pc-email{font-size:13px;color:var(--text-muted);margin-top:2px;word-break:break-all}
+        .pc-since{font-size:12px;color:var(--text-secondary);margin-top:6px}
+        .pc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:26px}
+        .pc-stat{background:var(--surface,#181818);border:1px solid var(--border,#222);border-radius:14px;padding:18px;text-align:center}
+        .pc-stat b{display:block;font-size:24px;color:var(--accent);font-family:var(--font-heading);font-weight:400}
+        .pc-stat span{font-size:12px;color:var(--text-muted)}
+        .pc-section-title{font-family:var(--font-heading);font-size:18px;font-weight:400;color:var(--text);margin:26px 0 12px}
+        .pc-list{display:flex;flex-direction:column;gap:10px}
+        .pc-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--surface,#181818);border:1px solid var(--border,#222);border-radius:12px;flex-wrap:wrap}
+        .pc-item__main{flex:1;min-width:180px}
+        .pc-item__name{font-size:14px;font-weight:600;color:var(--text)}
+        .pc-item__meta{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.5}
+        .pc-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap}
+        .pc-badge--ok{color:#22C55E;background:rgba(34,197,94,.12)}
+        .pc-badge--wait{color:#EAB308;background:rgba(234,179,8,.1)}
+        .pc-badge--role{color:var(--accent);background:var(--accent-dim)}
+        .pc-badge--test{color:#EAB308;background:rgba(234,179,8,.1)}
+        .pc-empty{padding:34px 20px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface,#181818);border:1px dashed var(--border,#222);border-radius:12px}
+        .pc-refresh{margin-top:26px;text-align:right}
+    </style>
+</head>
+<body>
+    <!-- NAV -->
+    <header class="header" id="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo">
+                <img src="img/nexora-logo.svg" alt="Nexora" class="logo__img">
+                <span class="logo__text">Nexora</span>
+            </a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Главная</a></li>
+                    <li><a href="tournaments.html" class="nav__link">Турниры</a></li>
+                    <li><a href="rating.html" class="nav__link">Рейтинг</a></li>
+                    <li><a href="index.html#about" class="nav__link">О нас</a></li>
+                    <li><a href="news.html" class="nav__link">Новости</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <button class="btn btn--ghost" id="btn-register">Регистрация</button>
+                <button class="btn btn--primary" id="btn-login">Вход</button>
+                <div class="header__spacer"></div>
+                <div class="header__profile-wrap" id="profile-wrap" style="display:none">
+                    <button class="btn btn--ghost" id="btn-profile">Профиль</button>
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-dropdown__info" id="profile-info">Пользователь</div>
+                        <button class="profile-dropdown__exit" id="btn-profile-link" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Личный кабинет</button>
+                        <a href="admin.html" class="profile-dropdown__exit" id="admin-link" style="display:none">Админ-панель</a>
+                        <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
+                    </div>
+                </div>
+                <a href="contacts.html" class="btn btn--ghost header-support" title="Поддержка"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Поддержка</a>
+                <button class="header__burger" id="burger" aria-label="Меню">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="static-page">
+        <div class="container">
+            <div class="page-head">
+                <div>
+                    <span class="page-tag">Личный кабинет</span>
+                    <h1 class="page-title">Личный кабинет</h1>
+                    <p class="page-desc">Ваши турниры, команды и платежи в одном месте.</p>
+                </div>
+            </div>
+
+            <!-- Не залогинен -->
+            <div class="pc-guest" id="pc-guest" style="display:none">
+                <h2>Войдите в аккаунт</h2>
+                <p>Чтобы увидеть свои турниры, команды и платежи, войдите или зарегистрируйтесь.</p>
+                <a href="index.html?auth=login" class="btn btn--primary">Войти</a>
+                <a href="index.html?auth=register" class="btn btn--ghost" style="margin-left:8px">Регистрация</a>
+            </div>
+
+            <!-- Залогинен -->
+            <div id="pc-body" style="display:none">
+                <div class="pc-card">
+                    <div class="pc-avatar" id="pc-avatar">—</div>
+                    <div style="flex:1;min-width:0">
+                        <div class="pc-nick" id="pc-nick">—</div>
+                        <div class="pc-email" id="pc-email">—</div>
+                        <div class="pc-since" id="pc-since">—</div>
+                    </div>
+                </div>
+
+                <div class="pc-stats">
+                    <div class="pc-stat"><b id="st-tours">0</b><span>Турниров</span></div>
+                    <div class="pc-stat"><b id="st-teams">0</b><span>Команд</span></div>
+                    <div class="pc-stat"><b id="st-paid">0</b><span>Оплачено</span></div>
+                    <div class="pc-stat"><b id="st-places">0</b><span>Призовых мест</span></div>
+                </div>
+
+                <h2 class="pc-section-title">Мои турниры</h2>
+                <div class="pc-list" id="pc-regs"></div>
+
+                <h2 class="pc-section-title">Мои команды</h2>
+                <div class="pc-list" id="pc-teams"></div>
+
+                <h2 class="pc-section-title">Мои платежи</h2>
+                <div class="pc-list" id="pc-pays"></div>
+
+                <div class="pc-refresh">
+                    <button class="btn btn--ghost" id="pc-refresh">Обновить</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__top">
+                <div class="footer__brand">
+                    <a href="index.html" class="logo">
+                        <img src="img/nexora-logo.svg" alt="Nexora" class="logo__img">
+                        <span class="logo__text">Nexora</span>
+                    </a>
+                    <p class="footer__desc">Премиальная платформа киберспортивных турниров. Соревнуйтесь, побеждайте, становитесь легендой.</p>
+                    <div class="footer__social">
+                        <a href="https://t.me/NexoraWINN" class="social-link" aria-label="Telegram" target="_blank" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        </a>
+                        <a href="https://discord.gg/nexora" class="social-link" aria-label="Discord" target="_blank" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Навигация</h4>
+                    <ul class="footer__links">
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="tournaments.html">Турниры</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="news.html">Новости</a></li>
+                    </ul>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Игрокам</h4>
+                    <ul class="footer__links">
+                        <li><a href="rating.html">Рейтинг</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Поддержка</h4>
+                    <ul class="footer__links">
+                        <li><a href="contacts.html">Контакты</a></li>
+                        <li><a href="policy.html">Политика</a></li>
+                        <li><a href="terms.html">Условия</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <span>© 2026 Nexora. Все права защищены.</span>
+                <span>Сделано для сообщества.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data-sync.js"></script>
+    <script src="js/auth-ui.js"></script>
+    <script src="js/sparkles.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            // Бургер
+            var burger = document.getElementById('burger');
+            var nav = document.getElementById('nav');
+            if (burger && nav) {
+                burger.addEventListener('click', function() {
+                    burger.classList.toggle('active');
+                    nav.classList.toggle('open');
+                });
+            }
+
+            function esc(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                });
+            }
+
+            function getLS(key, def) {
+                try {
+                    var v = JSON.parse(localStorage.getItem(key));
+                    return v == null ? def : v;
+                } catch (e) { return def; }
+            }
+
+            function currentUser() {
+                return getLS('nexora_current_user', null);
+            }
+
+            var METHOD_LABELS = { card: 'Банковская карта', sbp: 'СБП', wallet: 'Кошелёк Nexora' };
+
+            function fmtDate(s, opts) {
+                if (!s) return '';
+                var d = new Date(s);
+                if (isNaN(d.getTime())) return '';
+                return d.toLocaleDateString('ru-RU', opts || { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+
+            function render() {
+                var guestEl = document.getElementById('pc-guest');
+                var bodyEl = document.getElementById('pc-body');
+                var user = currentUser();
+                if (!user) {
+                    guestEl.style.display = 'block';
+                    bodyEl.style.display = 'none';
+                    return;
+                }
+                guestEl.style.display = 'none';
+                bodyEl.style.display = 'block';
+
+                var nickname = user.nickname || user.email || '';
+                document.getElementById('pc-nick').textContent = nickname;
+                document.getElementById('pc-email').textContent = user.email || '';
+                document.getElementById('pc-avatar').textContent = nickname.length ? nickname[0].toUpperCase() : '—';
+                document.getElementById('pc-since').textContent = user.registeredAt
+                    ? 'В Nexora с ' + fmtDate(user.registeredAt, { day: 'numeric', month: 'long', year: 'numeric' })
+                    : '';
+
+                var tours = getLS('nexora_tournaments', []);
+                var regs = getLS('nexora_registrations', []);
+                var pays = getLS('nexora_payments', []);
+                var results = getLS('nexora_results', []);
+
+                var myRegs = regs.filter(function(r) { return r.userId === nickname || r.userId === user.email; });
+                var myPays = pays.filter(function(p) { return p.userId === nickname || p.userId === user.email; });
+
+                function tourName(id) {
+                    var t = tours.find(function(x) { return String(x.id) === String(id); });
+                    return t ? t.name : ('Турнир #' + id);
+                }
+
+                // ===== Статистика =====
+                document.getElementById('st-tours').textContent = myRegs.length;
+                var teamIds = {};
+                myRegs.forEach(function(r) { if (r.teamId) teamIds[r.teamId] = true; });
+                document.getElementById('st-teams').textContent = Object.keys(teamIds).length;
+                document.getElementById('st-paid').textContent = myRegs.filter(function(r) { return r.paid; }).length;
+                var prizePlaces = 0;
+                myRegs.forEach(function(r) {
+                    var res = results.find(function(x) {
+                        return String(x.tournamentId) === String(r.tournamentId) && (x.userId === r.userId || x.teamId === r.teamId);
+                    });
+                    if (res && res.place && Number(res.place) <= 3) prizePlaces++;
+                });
+                document.getElementById('st-places').textContent = prizePlaces;
+
+                // ===== Регистрации =====
+                var regsEl = document.getElementById('pc-regs');
+                if (!myRegs.length) {
+                    regsEl.innerHTML = '<div class="pc-empty">Вы пока не участвовали в турнирах. <a href="tournaments.html" style="color:var(--accent)">Выбрать турнир →</a></div>';
+                } else {
+                    var sorted = myRegs.slice().sort(function(a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+                    regsEl.innerHTML = sorted.map(function(r) {
+                        var res = results.find(function(x) {
+                            return String(x.tournamentId) === String(r.tournamentId) && (x.userId === r.userId || x.teamId === r.teamId);
+                        });
+                        var place = res && res.place ? '<span class="pc-badge pc-badge--role" style="margin-left:6px">' + esc(res.place) + ' место</span>' : '';
+                        var role = r.role === 'captain' ? ' · Капитан' : (r.role === 'member' ? ' · Участник' : '');
+                        var team = r.teamName ? ' · «' + esc(r.teamName) + '»' : '';
+                        var payBadge = r.paid
+                            ? '<span class="pc-badge pc-badge--ok">✓ Оплачено</span>'
+                            : '<span class="pc-badge pc-badge--wait">⏳ Ожидает оплаты</span>';
+                        return '<div class="pc-item">' +
+                            '<div class="pc-item__main">' +
+                                '<div class="pc-item__name">' + esc(tourName(r.tournamentId)) + place + '</div>' +
+                                '<div class="pc-item__meta">' + fmtDate(r.date) + role + team + (r.playerId ? ' · ID: ' + esc(r.playerId) : '') + '</div>' +
+                            '</div>' + payBadge +
+                        '</div>';
+                    }).join('');
+                }
+
+                // ===== Команды =====
+                var teamsEl = document.getElementById('pc-teams');
+                var teams = {};
+                myRegs.forEach(function(r) {
+                    if (!r.teamId) return;
+                    if (!teams[r.teamId]) {
+                        teams[r.teamId] = { name: r.teamName || 'Команда ' + r.teamId.slice(0, 8), tournamentId: r.tournamentId, members: [] };
+                    }
+                    teams[r.teamId].members.push(r);
+                });
+                var teamKeys = Object.keys(teams);
+                if (!teamKeys.length) {
+                    teamsEl.innerHTML = '<div class="pc-empty">Вы ещё не в командах.</div>';
+                } else {
+                    teamsEl.innerHTML = teamKeys.map(function(tid) {
+                        var tm = teams[tid];
+                        var all = regs.filter(function(r) { return r.teamId === tid && String(r.tournamentId) === String(tm.tournamentId); });
+                        var memberNames = all.map(function(m) { return esc(m.userId); }).join(', ') || '—';
+                        var captain = all.find(function(m) { return m.role === 'captain'; });
+                        var paidCount = all.filter(function(m) { return m.paid; }).length;
+                        return '<div class="pc-item">' +
+                            '<div class="pc-item__main">' +
+                                '<div class="pc-item__name">«' + esc(tm.name) + '» <span class="pc-badge pc-badge--role" style="margin-left:6px">' + esc(tourName(tm.tournamentId)) + '</span></div>' +
+                                '<div class="pc-item__meta">Состав (' + all.length + '): ' + memberNames + (captain ? ' · Капитан: ' + esc(captain.userId) : '') + '</div>' +
+                            '</div>' +
+                            '<span class="pc-badge ' + (all.length && paidCount === all.length ? 'pc-badge--ok' : 'pc-badge--wait') + '">' + paidCount + '/' + all.length + ' оплачено</span>' +
+                        '</div>';
+                    }).join('');
+                }
+
+                // ===== Платежи =====
+                var paysEl = document.getElementById('pc-pays');
+                if (!myPays.length) {
+                    paysEl.innerHTML = '<div class="pc-empty">Платежей пока нет.</div>';
+                } else {
+                    var psorted = myPays.slice().sort(function(a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+                    paysEl.innerHTML = psorted.map(function(p) {
+                        var test = p.test
+                            ? '<span class="pc-badge pc-badge--test">тест</span>'
+                            : '<span class="pc-badge pc-badge--ok">реальный</span>';
+                        return '<div class="pc-item">' +
+                            '<div class="pc-item__main">' +
+                                '<div class="pc-item__name">' + Number(p.amount || 0).toLocaleString('ru-RU') + ' ₽ ' + test + '</div>' +
+                                '<div class="pc-item__meta">' + (METHOD_LABELS[p.method] || p.method || '—') + ' · ' +
+                                    fmtDate(p.date, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) +
+                                    (p.tournamentId != null ? ' · ' + esc(tourName(p.tournamentId)) : '') + '</div>' +
+                            '</div>' +
+                            '<span class="pc-badge pc-badge--ok">' + esc(p.status || 'paid') + '</span>' +
+                        '</div>';
+                    }).join('');
+                }
+            }
+
+            var refreshBtn = document.getElementById('pc-refresh');
+            if (refreshBtn) refreshBtn.addEventListener('click', render);
+            document.addEventListener('nexora:auth', render);
+            document.addEventListener('DOMContentLoaded', render);
+            window.addEventListener('load', render);
+        })();
+    </script>
+    <script src="js/ux.js"></script>
+</body>
+</html>

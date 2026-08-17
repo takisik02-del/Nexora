@@ -1,0 +1,173 @@
+============================================================
+NEXORA — ПЛАН ПРОДОЛЖЕНИЯ РАБОТЫ
+Создано: 2026-08-06 (поздний вечер, перед сном)
+============================================================
+Напиши Claude: «продолжаем Nexora» — и он продолжит с этого места.
+
+Сайт: https://nexora-zeta-ten.vercel.app  (Vercel, проект "nexora")
+Локальный сервер: папка "Nexora новый", запуск: node server/server.js (порт 3001)
+Деплой: cd "Nexora новый" && vercel --prod --yes
+
+------------------------------------------------------------
+КОНТАКТЫ / КЛЮЧИ (нужны завтра)
+------------------------------------------------------------
+• Админ-ключ ПРОДАКШН (вставить в админку → Настройки → Ключ доступа):
+  nx_62929115addc7664c486af3002a0cc97b7f1ff685d6132d7
+• Админ-ключ ЛОКАЛЬНЫЙ:
+  nx_28f193b8eda207671a5e8e1e248a4aba5e289f3a46c14e92
+• Токен Telegram-бота (@Nexora1s_bot):
+  8835168766:AAFSVqB4nmdhXaOR4MTZMYaz_LHH8j2haKk
+  (в коде есть как запасной в api/save.js, api/tg-test.js, server/server.js)
+• Узнать свой Telegram chat_id: написать боту любое сообщение или /id — бот ответит.
+  Вставить в админку → Настройки → Chat ID.
+
+------------------------------------------------------------
+ЧТО УЖЕ СДЕЛАНО (не переделывать!)
+------------------------------------------------------------
+[✔] #9  Уведомления организатору в Telegram — ГОТОВО:
+     api/save.js (прод) + server/server.js (локально) шлют при новых
+     заявках/оплатах/тикетах/заявках в команду. Chat ID из настроек.
+     Тестовая кнопка в админке (Настройки → «Проверить»).
+[✔] #14 Бэкап — ГОТОВО: ежедневный снапшот nexora/backups/state-<дата>.json
+     (храним 10 шт.) + кнопки Экспорт/Импорт в админке (Настройки).
+[✔] #15 Статистика в админке — ГОТОВО: карточки, топ турниров, оплаты по дням.
+[✔] #12 Промокоды — АДМИНКА готова: раздел «Промокоды» (код, скидка, лимит,
+     вкл/выкл, удаление). Хранятся в nexora_promocodes: [{code,discount,
+     active,maxUses,uses}].
+[✔] #13 Сетка матчей — АДМИНКА готова: раздел «Матчи» (генерация сетки по
+     турниру, ввод счёта, 👑-кнопки победителя, чемпион пишется в
+     nexora_results). Данные в nexora_matches.
+[✔] #10 ЧАСТИЧНО: в tournaments.html уже вставлен новый HTML платёжного шага:
+     • payment-mode-badge (РЕАЛЬНАЯ ОПЛАТА / ТЕСТОВЫЙ РЕЖИМ)
+     • payment-promo-wrap (input+кнопка+статус промокода)
+     • payment-waiting (состояние «ожидание оплаты» + кнопка
+       «Я оплатил — проверить»)
+     Переменные уже добавлены (строки ~744-750):
+     pendingPromo, realPayEnabled, fridePollTimer, fridePayTab
+     + хелперы settingsRealPay(), paymentWaitingEl(), paymentPayRow(),
+       paymentPromoWrap().
+     showPaymentStep(fee) и openPayment() уже переписаны (badge, промо,
+     сброс таймера). renderPaymentMethods() работает.
+
+------------------------------------------------------------
+ЧТО ОСТАЛОСЬ ДОДЕЛАТЬ (по порядку)
+------------------------------------------------------------
+===== #10 РЕАЛЬНАЯ ОПЛАТА FRIDE — ГЛАВНОЕ =====
+
+ДИЗАЙН ПОТОКА (решение уже принято, не менять):
+ 1. Клиент генерирует id платежа pay_<ts>_<rand>.
+ 2. POST /api/fride/create → сервер (Vercel) создаёт счёт во Fride,
+    возвращает payment_url. Сервер НЕ хранит ничего в blob — статус
+    берём ЖИВЬЁМ из Fride через invoice/getInfo. (Почему: api/save.js
+    перезаписывает nexora_payments целиком, без слияния — нельзя
+    хранить там серверные записи.)
+ 3. Клиент открывает payment_url в новой вкладке, поллит
+    GET /api/fride/status?id=<id> каждые 3 сек (таймер fridePollTimer),
+    пока не paid / failed / timeout.
+ 4. webhook /api/fride/webhook — опционально, только для Telegram-
+    уведомления об оплате. На статус-поллинг не влияет.
+ 5. Если FRIDE не настроен (нет ключей) → сервер отвечает
+    {success:false, error:'FRIDE_NOT_CONFIGURED'} → клиент падает в
+    тестовый режим с тостом «Fride не настроен, оплата тестовая».
+
+ФАЙЛЫ КОТОРЫЕ НАДО СОЗДАТЬ:
+ a) api/fride/create.js (Vercel, POST):
+    - тело: {order_id, amount, currency:'RUB', method, comment, success_url, fail_url}
+    - env: FRIDE_MERCHANT_ID, FRIDE_API_KEY; если нет → {error:'FRIDE_NOT_CONFIGURED'}
+    - Fride: POST https://api.fride.io/invoices/create
+      headers: X-Api-Key: <API_KEY>
+      body: {merchant_id, order_id, amount: <float>, currency, comment?, success_url?, fail_url?}
+    - ВАЖНО: имя поля с ссылкой на оплату неизвестно — парсить защищённо
+      из любых вариантов: payment_url, url, link, invoice_url, pay_url,
+      redirect_url, data.payment_url и т.п.
+    - ответ: {success:true, payment_url, id: order_id}
+ b) api/fride/status.js (Vercel, GET):
+    - GET ?id=<order_id>
+    - Fride: GET https://api.fride.io/invoice/getInfo?merchant_id=<MID>&order_id=<id>
+      headers: X-Api-Key
+    - маппинг статуса: 'paid' → 'paid'; остальные вернуть как есть.
+    - ответ: {success:true, status}
+ c) api/fride/webhook.js (Vercel, POST):
+    - подпись: HMAC-SHA256 hex от ksort'нутого JSON верхнего уровня
+      (кастомные поля кастуются в объект), encode JSON_UNESCAPED_UNICODE
+      | UNESCAPED_SLASHES; ключ = FRIDE_API_KEY (секрет мерчанта).
+      Заголовок подписи проверять среди: x-signature, signature, x-hmac-sha256.
+      Если не совпало → 403. Не ронять на ошибках парсинга.
+    - при status=paid → отправить Telegram-уведомление «💳 Оплата <сумма> ₽»
+      организатору (chat_id из nexora_settings в blob, токен из env или запасной).
+    - ВСЕГДА отвечать 200 быстро, даже если что-то упало.
+
+ФАЙЛЫ КОТОРЫЕ НАДО ПРАВИТЬ:
+ d) js/script.js — переписать nexoraPayment (строки ~164-213):
+    - добавить isRealEnabled() (читает nexora_settings.real_payments)
+    - createPayment(opts): если real → создать счёт, открыть вкладку
+      (window.open('','_blank') СИНХРОННО, до await!), поллить статус,
+      resolve {status:'paid', id, amount, method, test:false, date} при
+      успехе / {status:'cancelled'|'failed'} иначе; записать в
+      nexora_payments при оплате; экспорт forceCheck() для кнопки
+      «Я оплатил — проверить».
+    - если НЕ real (или FRIDE_NOT_CONFIGURED) → тест как сейчас (900мс).
+    - методы card/sbp/wallet оставить.
+ e) tournaments.html — обработчик payment-pay (строки ~1450-1470):
+    - передать promo: pendingPromo в createPayment
+    - если realPayEnabled → показать payment-waiting, скрыть pay-row
+    - .then: если p.status!=='paid' → сброс (waiting скрыть, pay-row
+      показать), тост «Оплата не завершена»; если paid → hidePaymentStep()
+      + handlePaymentConfirm()
+ f) tournaments.html — НОВЫЙ обработчик payment-promo-apply:
+    - валидация против nexora_promocodes (localStorage, код в верхнем
+      регистре), проверка active и uses<maxUses
+    - скидка: pendingPayAmount = round(текущая сумма*(100-discount)/100),
+      обновить #payment-step-amount, pendingPromo={code,discount},
+      зелёный/красный статус в #payment-promo-status
+ g) tournaments.html — НОВЫЙ обработчик payment-waiting-cancel:
+    - вызвать nexoraPayment.forceCheck(); если не оплачено → тост
+      «Платёж ещё не подтверждён»
+ h) tournaments.html — handlePaymentConfirm (строка ~1250):
+    - ДОБАВИТЬ guard: if (feeAmount>0 && pendingPayment &&
+      pendingPayment.status!=='paid') { showToast('Оплата не завершена');
+      pendingPayment=null; return; }
+    - ИСПРАВИТЬ БАГ бесплатных турниров:
+      paid: feeAmount>0 ? (pendingPayment && pendingPayment.status==='paid') : true
+      (сейчас paid: feeAmount>0 → на бесплатных турнирах paid=false и
+      чат/сетка не открываются!)
+    - при оплате с промо → increment uses в nexora_promocodes
+
+===== #11 ЛИЧНЫЙ КАБИНЕТ ИГРОКА =====
+- создать profile.html: вход по nexora_current_user, показать его
+  регистрации (из nexora_registrations), платежи, команды, статус оплаты.
+- в index.html в модалке профиля добавить/проверить ссылку btn-profile-link
+  на profile.html.
+
+===== #13 СЕТКА — сторона ИГРОКА =====
+- в tournaments.html на карточке турнира кнопка «Сетка» → модалка,
+  рендер из nexora_matches (формат уже создаёт админка: матчи, bye,
+  derivedTeamLabel, matchWinner, champion в nexora_results place:1).
+
+===== #16 VK-ВХОД — ИНСТРУКЦИЯ =====
+- создать VK_настройка_входа.txt: пошагово (создать приложение VK,
+  ID приложения, Client Secret, куда вставить в js/social-config.js,
+  redirect URI). В social-config.js сейчас пустой clientId VK.
+
+===== ФИНАЛ =====
+- Деплой: cd "Nexora новый" && vercel --prod --yes
+- В Vercel (Dashboard → nexora → Settings → Environment Variables):
+  добавить FRIDE_MERCHANT_ID, FRIDE_API_KEY (пустые/свои), при желании
+  TELEGRAM_BOT_TOKEN. Проверить BLOB_READ_WRITE_TOKEN есть во всех средах.
+- Проверить прод: все страницы 200, оплата (тест или Fride), промокод,
+  сетка, статистика, Telegram.
+- Обновить Nexora_итог_<дата>.txt и память Claude.
+
+------------------------------------------------------------
+ВАЖНЫЕ НЮАНСЫ (уже выяснены)
+------------------------------------------------------------
+• Vercel Blob: get() требует {access:'private', useCache:false};
+  put() требует allowOverwrite:true; cacheControlMaxAge:60 — иначе CDN
+  держит месяц.
+• Файл:// демо-режим работает без сервера (localStorage).
+• api/save.js мержит только registrations/join_requests/support_tickets;
+  остальные ключи перезаписывает целиком. nexora_payments НЕ мержится.
+• Админ-токен (nexora_admin_token) НИКОГДА не синкается на сервер —
+  только localStorage.
+• Бот Telegram: @Nexora1s_bot, токен выше. Chat ID бот отвечает на /id.
+• В админке нет showToast — там alert()/confirm().

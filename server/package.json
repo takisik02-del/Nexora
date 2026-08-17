@@ -1,0 +1,15 @@
+{
+  "name": "nexora-mail",
+  "version": "1.0.0",
+  "description": "Nexora email sender — отправка кодов подтверждения",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "level": "^10.0.0",
+    "nodemailer": "^6.9.7"
+  }
+}

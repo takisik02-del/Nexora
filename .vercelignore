@@ -1,0 +1,11 @@
+# Локальные данные и сервер — не попадают на Vercel
+server/
+node_modules/
+Nexora_backup_*.zip
+open_site.bat
+test_render.js
+_sec_test.js
+.env*
+.admin-token*
+Nexora_итог_*.txt
+*.log

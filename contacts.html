@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexora — Поддержка: отправить обращение, вопросы по турнирам, оплате и призовым">
+    <title>Поддержка — Nexora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="img/nexora-icon.svg">
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <style>
+        .static-page{padding:64px 0 80px;min-height:calc(100vh - var(--header-h))}
+
+        /* ---- Hero ---- */
+        .support-hero{max-width:760px;margin:0 auto 36px;text-align:center}
+        .page-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-dim);padding:5px 16px;border-radius:50px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
+        .page-title{font-family:var(--font-heading);font-size:clamp(26px,4.5vw,40px);font-weight:400;color:var(--text);margin:0 0 12px;letter-spacing:.5px}
+        .page-desc{color:var(--text-secondary);font-size:14px;max-width:600px;margin:0 auto;line-height:1.75}
+
+        /* ---- Layout: форма слева, контакты справа ---- */
+        .support-layout{display:grid;grid-template-columns:1fr 330px;gap:20px;align-items:start}
+        .support-form-col{display:flex;flex-direction:column;gap:20px;min-width:0}
+        .support-contacts-col{display:flex;flex-direction:column;gap:16px}
+
+        /* ---- Карточка ---- */
+        .support-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px}
+        .support-card__head{display:flex;align-items:flex-start;gap:14px;margin-bottom:6px}
+        .support-card__icon{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--accent-glow)}
+        .support-card__title{font-family:var(--font-heading);font-size:18px;font-weight:400;letter-spacing:.5px;color:var(--text);line-height:1.3}
+        .support-card__sub{font-size:13px;color:var(--text-muted);margin-top:2px;line-height:1.6}
+
+        /* ---- Карточка формы ---- */
+        .support-form-card{position:relative;border-color:var(--border-light);overflow:hidden}
+        .support-form-card::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,var(--accent),transparent 70%);
+        }
+        .support-form-card form{margin-top:6px}
+
+        /* ---- Чипы тем ---- */
+        .support-topics{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 20px}
+        .topic-chip{
+            display:inline-flex;align-items:center;gap:7px;
+            padding:8px 14px;border-radius:50px;
+            border:1px solid var(--border-light);background:var(--bg);
+            color:var(--text-secondary);font-size:12px;font-weight:600;letter-spacing:.3px;
+            transition:all var(--transition);cursor:pointer
+        }
+        .topic-chip svg{flex-shrink:0;opacity:.7;transition:opacity var(--transition)}
+        .topic-chip:hover{border-color:var(--accent);color:var(--text);background:var(--accent-dim)}
+        .topic-chip.active{background:var(--accent);border-color:var(--accent);color:#0A0B0E}
+        .topic-chip.active svg{opacity:1}
+
+        /* ---- Поля ---- */
+        .support-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .support-field{margin-bottom:16px}
+        .support-field label{
+            display:block;font-size:11px;font-weight:700;letter-spacing:1px;
+            text-transform:uppercase;color:var(--text-muted);margin-bottom:7px
+        }
+        .support-field input,.support-field textarea{
+            width:100%;padding:12px 14px;background:var(--bg);
+            border:1px solid var(--border);border-radius:10px;
+            color:var(--text);font-size:14px;font-family:var(--font-sans);
+            outline:none;transition:all var(--transition)
+        }
+        .support-field input::placeholder,.support-field textarea::placeholder{color:var(--text-muted);opacity:.6}
+        .support-field input:focus,.support-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+        .support-field textarea{resize:vertical;min-height:120px;line-height:1.6}
+
+        /* ---- Статус формы ---- */
+        .support-form-status{display:none;font-size:13px;line-height:1.5;padding:11px 14px;border-radius:10px;margin-bottom:14px}
+        .support-form-status.ok{display:block;color:#4ADE80;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2)}
+        .support-form-status.err{display:block;color:#F87171;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+
+        /* ---- Кнопка отправки ---- */
+        .support-submit{
+            width:100%;padding:15px;border-radius:10px;
+            background:linear-gradient(135deg,var(--accent),var(--accent-hover));
+            box-shadow:0 10px 26px var(--accent-glow);
+            font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+            color:#fff;transition:all var(--transition)
+        }
+        .support-submit:hover{transform:translateY(-2px);box-shadow:0 14px 34px var(--accent-glow);filter:brightness(1.1)}
+        .support-submit:active{transform:translateY(0)}
+
+        /* ---- Сайдбар: быстрые контакты ---- */
+        .support-side-list{display:flex;flex-direction:column;margin-top:12px}
+        .support-side-item{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:10px;border:1px solid transparent;transition:all var(--transition)}
+        .support-side-item:hover{background:var(--bg-alt);border-color:var(--border-light)}
+        .support-side-item__icon{
+            flex-shrink:0;width:38px;height:38px;border-radius:10px;
+            background:var(--bg-alt);border:1px solid var(--border);
+            color:var(--text-secondary);display:flex;align-items:center;justify-content:center;
+            transition:all var(--transition)
+        }
+        .support-side-item:hover .support-side-item__icon{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-dim)}
+        .support-side-item__name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+        .support-side-item__value{font-size:13px;font-weight:600;color:var(--text);word-break:break-all;margin-top:1px}
+
+        /* ---- Плашка «время ответа» ---- */
+        .support-response-card{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 20px;border-color:var(--border-light);background:linear-gradient(180deg,var(--bg-alt),var(--surface))}
+        .support-response__icon{width:42px;height:42px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center}
+        .support-response__time{font-family:var(--font-heading);font-size:22px;letter-spacing:1px;color:var(--accent)}
+        .support-response__hint{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+        /* ---- Мои обращения ---- */
+        .ticket{padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;margin-top:12px;transition:border-color var(--transition)}
+        .ticket:hover{border-color:var(--border-light)}
+        .ticket__head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+        .ticket__topic{font-size:14px;font-weight:700;color:var(--text)}
+        .ticket__meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+        .ticket__body{font-size:13px;color:var(--text-secondary);line-height:1.65;white-space:pre-line}
+        .ticket__reply{border-top:1px dashed var(--border);padding-top:10px;margin-top:10px;font-size:12px;color:#4ADE80;line-height:1.6;white-space:pre-line}
+        .ticket__chat{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+        .ticket__msg{max-width:88%;padding:10px 14px;border-radius:12px;font-size:12.5px;line-height:1.55;white-space:pre-line}
+        .ticket__msg--user{align-self:flex-end;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--text);border-bottom-right-radius:4px}
+        .ticket__msg--admin{align-self:flex-start;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);color:var(--text);border-bottom-left-radius:4px}
+        .ticket__msg-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+        .ticket__msg-who{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+        .ticket__msg--user .ticket__msg-who{color:#60A5FA}
+        .ticket__msg--admin .ticket__msg-who{color:#4ADE80}
+        .ticket__msg-time{font-size:10px;color:var(--text-muted);margin-left:auto;text-transform:none;letter-spacing:normal}
+        .ticket__msg-text{color:var(--text-secondary)}
+        .ticket__answer{margin-top:12px;border-top:1px dashed var(--border);padding-top:12px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+        .ticket__answer-box{width:100%;display:flex;flex-direction:column;gap:8px}
+        .ticket__answer-input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-sans);font-size:13px;line-height:1.5;resize:vertical;min-height:52px}
+        .ticket__answer-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+        .ticket__answer-actions{display:flex;gap:8px}
+        .ticket__closed-note{font-size:11px;color:var(--text-muted);margin-top:10px}
+        .ticket-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+        .ticket-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+        .ticket-badge--open{background:rgba(255,255,255,.14);color:#60A5FA}
+        .ticket-badge--answered{background:rgba(34,197,94,.14);color:#4ADE80}
+        .ticket-badge--closed{background:rgba(107,114,128,.16);color:#9CA3AF}
+        .support-empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:26px 16px;color:var(--text-muted);font-size:13px}
+
+        /* ---- Адаптив ---- */
+        @media (max-width:920px){
+            .support-layout{grid-template-columns:1fr}
+            .support-contacts-col{order:2}
+            .support-form-col{order:1}
+        }
+        @media (max-width:560px){
+            .support-fields{grid-template-columns:1fr}
+            .support-card{padding:20px}
+        }
+    </style>
+</head>
+<body>
+    <!-- NAV -->
+    <header class="header" id="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo">
+                <img src="img/nexora-logo.svg" alt="Nexora" class="logo__img">
+                <span class="logo__text">Nexora</span>
+            </a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Главная</a></li>
+                    <li><a href="tournaments.html" class="nav__link">Турниры</a></li>
+                    <li><a href="rating.html" class="nav__link">Рейтинг</a></li>
+                    <li><a href="index.html#about" class="nav__link">О нас</a></li>
+                    <li><a href="news.html" class="nav__link">Новости</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <button class="btn btn--ghost" id="btn-register">Регистрация</button>
+                <button class="btn btn--primary" id="btn-login">Вход</button>
+                <div class="header__spacer"></div>
+                <div class="header__profile-wrap" id="profile-wrap" style="display:none">
+                    <button class="btn btn--ghost" id="btn-profile">Профиль</button>
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-dropdown__info" id="profile-info">Пользователь</div>
+                        <button class="profile-dropdown__exit" id="btn-profile-link" style="gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Личный кабинет</button>
+                        <a href="admin.html" class="profile-dropdown__exit" id="admin-link" style="display:none">Админ-панель</a>
+                        <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
+                    </div>
+                </div>
+                <a href="contacts.html" class="btn btn--ghost header-support" title="Поддержка"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Поддержка</a>
+                <button class="header__burger" id="burger" aria-label="Меню">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="static-page">
+        <div class="container">
+            <div class="support-hero">
+                <span class="page-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>Поддержка</span>
+                <h1 class="page-title">Как мы можем помочь?</h1>
+                <p class="page-desc">Опишите проблему — ответим на email в течение 24 часов. Или свяжитесь с нами напрямую через Telegram.</p>
+            </div>
+
+            <div class="support-layout">
+                <!-- Колонка: форма + мои обращения -->
+                <div class="support-form-col">
+                    <div class="support-card support-form-card" id="support-form-block">
+                        <div class="support-card__head">
+                            <div class="support-card__icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="support-card__title">Отправьте обращение</h2>
+                                <p class="support-card__sub">Выберите тему, опишите ситуацию — мы разберёмся.</p>
+                            </div>
+                        </div>
+
+                        <form id="support-form">
+                            <div class="support-topics" id="support-topics">
+                                <button type="button" class="topic-chip active" data-topic="Проблема с турниром"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Турнир</button>
+                                <button type="button" class="topic-chip" data-topic="Регистрация / вход"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a1 1 0 0 1 1 1v4"/><path d="M19 17v4a1 1 0 0 1-1 1h-4"/><path d="M9 3H5a1 1 0 0 0-1 1v4"/><path d="M5 17v4a1 1 0 0 0 1 1h4"/><circle cx="12" cy="12" r="3"/></svg>Регистрация / вход</button>
+                                <button type="button" class="topic-chip" data-topic="Оплата"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Оплата</button>
+                                <button type="button" class="topic-chip" data-topic="Призовые / выплаты"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>Призовые</button>
+                                <button type="button" class="topic-chip" data-topic="Техническая проблема"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Техническая</button>
+                                <button type="button" class="topic-chip" data-topic="Другое"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Другое</button>
+                            </div>
+
+                            <div class="support-field">
+                                <label for="support-message">Сообщение</label>
+                                <textarea id="support-message" rows="5" placeholder="Опишите проблему: что случилось, когда, какие шаги уже предприняли..."></textarea>
+                            </div>
+
+                            <div id="support-form-status" class="support-form-status" role="status"></div>
+
+                            <button type="submit" id="support-submit" class="btn support-submit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                Отправить обращение
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="support-card" id="support-tickets-block" style="display:none">
+                        <div class="support-card__head">
+                            <div class="support-card__icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="support-card__title">Мои обращения</h2>
+                                <p class="support-card__sub">Статус ваших запросов в поддержку.</p>
+                            </div>
+                        </div>
+                        <div id="support-tickets-list"></div>
+                    </div>
+                </div>
+
+                <!-- Сайдбар: быстрые контакты -->
+                <aside class="support-contacts-col">
+                    <div class="support-card">
+                        <div class="support-card__head">
+                            <div class="support-card__icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="support-card__title">Быстрые контакты</h2>
+                                <p class="support-card__sub">Прямая связь с командой.</p>
+                            </div>
+                        </div>
+                        <div class="support-side-list">
+                            <a class="support-side-item" href="mailto:marse2007@bk.ru">
+                                <div class="support-side-item__icon">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                </div>
+                                <div>
+                                    <div class="support-side-item__name">Почта</div>
+                                    <div class="support-side-item__value">marse2007@bk.ru</div>
+                                </div>
+                            </a>
+                            <a class="support-side-item" href="https://t.me/NexoraWINN" target="_blank" rel="noopener">
+                                <div class="support-side-item__icon">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="support-side-item__name">Telegram</div>
+                                    <div class="support-side-item__value">@NexoraWINN</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="support-card support-response-card">
+                        <div class="support-response__icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div class="support-response__time">до 24 часов</div>
+                        <div class="support-response__hint">Быстрее всего отвечаем в Telegram</div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__top">
+                <div class="footer__brand">
+                    <a href="index.html" class="logo">
+                        <img src="img/nexora-logo.svg" alt="Nexora" class="logo__img">
+                        <span class="logo__text">Nexora</span>
+                    </a>
+                    <p class="footer__desc">Премиальная платформа киберспортивных турниров. Соревнуйтесь, побеждайте, становитесь легендой.</p>
+                    <div class="footer__social">
+                        <a href="https://t.me/NexoraWINN" class="social-link" aria-label="Telegram" target="_blank" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        </a>
+                        <a href="https://discord.gg/nexora" class="social-link" aria-label="Discord" target="_blank" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Навигация</h4>
+                    <ul class="footer__links">
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="tournaments.html">Турниры</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="news.html">Новости</a></li>
+                    </ul>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Игрокам</h4>
+                    <ul class="footer__links">
+                        <li><a href="rating.html">Рейтинг</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__title">Поддержка</h4>
+                    <ul class="footer__links">
+                        <li><a href="contacts.html">Поддержка</a></li>
+                        <li><a href="policy.html">Политика</a></li>
+                        <li><a href="terms.html">Условия</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <span>© 2026 Nexora. Все права защищены.</span>
+                <span>Сделано для сообщества.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function(){
+            var burger = document.getElementById('burger');
+            var nav = document.getElementById('nav');
+            if (burger && nav) {
+                burger.addEventListener('click', function(){
+                    burger.classList.toggle('active');
+                    nav.classList.toggle('open');
+                });
+            }
+        })();
+    </script>
+
+    <script>
+        // ===== Поддержка (тикеты) =====
+        (function(){
+            var TICKETS_KEY = 'nexora_support_tickets';
+
+            function getTickets() {
+                try { return JSON.parse(localStorage.getItem(TICKETS_KEY)) || []; }
+                catch (e) { return []; }
+            }
+            function saveTickets(list) {
+                localStorage.setItem(TICKETS_KEY, JSON.stringify(list));
+            }
+            function esc(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+                    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+                });
+            }
+            function fmtDate(d) {
+                if (!d) return '—';
+                var dt = new Date(d);
+                if (isNaN(dt.getTime())) return String(d);
+                return dt.toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' });
+            }
+            function statusBadge(s) {
+                if (s === 'open')    return '<span class="ticket-badge ticket-badge--open">Ожидает ответа</span>';
+                if (s === 'answered') return '<span class="ticket-badge ticket-badge--answered">Ответ получен</span>';
+                return '<span class="ticket-badge ticket-badge--closed">Закрыто</span>';
+            }
+            function fmtTime(d) {
+                if (!d) return '';
+                var dt = new Date(d);
+                if (isNaN(dt.getTime())) return '';
+                return dt.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }) + ', ' +
+                    dt.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+            }
+            function msgBlock(m) {
+                var isUser = m.from !== 'admin';
+                return '<div class="ticket__msg ' + (isUser ? 'ticket__msg--user' : 'ticket__msg--admin') + '">' +
+                    '<div class="ticket__msg-head"><span class="ticket__msg-who">' + (isUser ? 'Вы' : 'Nexora') + '</span><span class="ticket__msg-time">' + fmtTime(m.at) + '</span></div>' +
+                    '<div class="ticket__msg-text">' + esc(m.text) + '</div></div>';
+            }
+            function ticketChat(t) {
+                var msgs = Array.isArray(t.messages) && t.messages.length ? t.messages : null;
+                var out = '';
+                if (msgs) {
+                    out = msgs.map(function(m){ return msgBlock(m); }).join('');
+                } else {
+                    // старый формат тикета (первичное сообщение + ответ)
+                    out = '<div class="ticket__msg ticket__msg--user">' +
+                        '<div class="ticket__msg-head"><span class="ticket__msg-who">Вы</span><span class="ticket__msg-time">' + fmtTime(t.createdAt) + '</span></div>' +
+                        '<div class="ticket__msg-text">' + esc(t.message) + '</div></div>';
+                    if (t.reply) {
+                        out += '<div class="ticket__msg ticket__msg--admin">' +
+                            '<div class="ticket__msg-head"><span class="ticket__msg-who">Nexora</span><span class="ticket__msg-time">' + fmtTime(t.repliedAt) + '</span></div>' +
+                            '<div class="ticket__msg-text">' + esc(t.reply) + '</div></div>';
+                    }
+                }
+                return out;
+            }
+
+            // ---- Выбор темы чипами ----
+            var selectedTopic = 'Проблема с турниром';
+            var topics = document.querySelectorAll('.topic-chip');
+            topics.forEach(function(chip){
+                chip.addEventListener('click', function(){
+                    topics.forEach(function(c){ c.classList.remove('active'); });
+                    chip.classList.add('active');
+                    selectedTopic = chip.getAttribute('data-topic');
+                });
+            });
+
+            var currentUser = null;
+            try { currentUser = JSON.parse(localStorage.getItem('nexora_current_user')); } catch (e) {}
+
+            function myTickets() {
+                if (!currentUser) return [];
+                var all = getTickets();
+                var my = all.filter(function(t){
+                    if (t.userId === currentUser.nickname) return true;
+                    if (t.email && currentUser.email &&
+                        t.email.toLowerCase() === currentUser.email.toLowerCase()) return true;
+                    return false;
+                });
+                return my;
+            }
+
+            function renderMyTickets() {
+                var block = document.getElementById('support-tickets-block');
+                var list = document.getElementById('support-tickets-list');
+                if (!block || !list) return;
+                var my = myTickets();
+                if (!my.length) { block.style.display = 'none'; return; }
+                block.style.display = '';
+                my.sort(function(a,b){ return new Date(b.createdAt||0) - new Date(a.createdAt||0); });
+                list.innerHTML = my.map(function(t){
+                    var answer = '';
+                    if (t.status === 'closed') {
+                        answer = '<div class="ticket__closed-note">Обращение закрыто. Если вопрос остался — создайте новое.</div>';
+                    } else {
+                        answer = '<div class="ticket__answer">' +
+                            '<button type="button" class="btn btn--ghost ticket__answer-toggle">Ответить</button>' +
+                            '<div class="ticket__answer-box" style="display:none">' +
+                                '<textarea class="ticket__answer-input" rows="2" placeholder="Ваш ответ..."></textarea>' +
+                                '<div class="ticket__answer-actions">' +
+                                    '<button type="button" class="btn btn--primary ticket__answer-send">Отправить</button>' +
+                                    '<button type="button" class="btn btn--ghost ticket__answer-cancel">Отмена</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    }
+                    return '<div class="ticket" data-ticket-id="' + esc(t.id) + '">' +
+                        '<div class="ticket__head">' +
+                            '<div>' +
+                                '<div class="ticket__topic">' + esc(t.topic || 'Обращение') + '</div>' +
+                                '<div class="ticket__meta">' + fmtDate(t.createdAt) + (t.email ? ' · ' + esc(t.email) : '') + '</div>' +
+                            '</div>' +
+                            statusBadge(t.status) +
+                        '</div>' +
+                        '<div class="ticket__chat">' + ticketChat(t) + '</div>' +
+                        answer +
+                    '</div>';
+                }).join('');
+            }
+
+            function setStatus(msg, ok) {
+                var el = document.getElementById('support-form-status');
+                if (!el) return;
+                el.className = 'support-form-status ' + (ok ? 'ok' : 'err');
+                el.textContent = msg;
+                if (ok) {
+                    setTimeout(function(){
+                        el.className = 'support-form-status';
+                        el.textContent = '';
+                    }, 6000);
+                }
+            }
+
+            var form = document.getElementById('support-form');
+            if (form) form.addEventListener('submit', function(e){
+                e.preventDefault();
+                var msgEl = document.getElementById('support-message');
+                var message = (msgEl.value || '').trim();
+
+                if (!message) {
+                    setStatus('Опишите вашу проблему', false);
+                    return;
+                }
+
+                // Ник и почту берём из профиля автоматически (если пользователь авторизован)
+                var nick = currentUser && currentUser.nickname ? currentUser.nickname : 'Гость';
+                var email = currentUser && currentUser.email ? currentUser.email : '';
+
+                var list = getTickets();
+                list.push({
+                    id: 'ticket_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4),
+                    userId: nick,
+                    email: email,
+                    topic: selectedTopic,
+                    message: message,
+                    status: 'open',
+                    createdAt: new Date().toISOString(),
+                    reply: null,
+                    repliedAt: null,
+                    messages: [{ from: 'user', text: message, at: new Date().toISOString() }]
+                });
+                saveTickets(list);
+
+                // Пытаемся сразу отправить тикеты на локальный сервер (Express).
+                // Если сервер недоступен — тикет останется в localStorage и
+                // синхронизируется при следующем визите любой страницы сайта.
+                try {
+                    fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nexora_support_tickets: getTickets() })
+                    }).catch(function(){});
+                } catch (e) {}
+
+                form.reset();
+                setStatus(email ? 'Обращение отправлено! Ответим на ' + email + ' в течение 24 часов.'
+                                : 'Обращение отправлено! Ответим в течение 24 часов.', true);
+                renderMyTickets();
+            });
+
+            // Ответ игрока на сообщение организатора
+            var ticketsList = document.getElementById('support-tickets-list');
+            if (ticketsList) ticketsList.addEventListener('click', function(e){
+                var toggle = e.target.closest('.ticket__answer-toggle');
+                if (toggle) {
+                    var box = toggle.closest('.ticket').querySelector('.ticket__answer-box');
+                    if (box) box.style.display = box.style.display === 'none' ? '' : 'none';
+                    return;
+                }
+                var cancel = e.target.closest('.ticket__answer-cancel');
+                if (cancel) {
+                    var box2 = cancel.closest('.ticket__answer-box');
+                    if (box2) box2.style.display = 'none';
+                    return;
+                }
+                var send = e.target.closest('.ticket__answer-send');
+                if (send) {
+                    var ticketEl = send.closest('.ticket');
+                    var input = ticketEl ? ticketEl.querySelector('.ticket__answer-input') : null;
+                    var text = input ? input.value.trim() : '';
+                    if (!text) return;
+                    var id = ticketEl ? ticketEl.getAttribute('data-ticket-id') : '';
+                    var all = getTickets();
+                    var t = all.filter(function(x){ return x.id === id; })[0];
+                    if (!t) return;
+                    if (!Array.isArray(t.messages)) t.messages = [];
+                    t.messages.push({ from: 'user', text: text, at: new Date().toISOString() });
+                    t.status = 'open';
+                    saveTickets(all);
+                    setStatus('Ответ отправлен!', true);
+                    renderMyTickets();
+                }
+            });
+
+            renderMyTickets();
+            // Отдаём наружу для data-sync.js, чтобы переписка обновлялась
+            // на странице, когда с сервера приходят новые сообщения.
+            window.renderMyTickets = renderMyTickets;
+        })();
+    </script>
+    <script src="js/data-sync.js?v=5"></script>
+    <script src="js/auth-ui.js"></script>
+    <script src="js/sparkles.js"></script>
+    <script src="js/ux.js"></script>
+</body>
+</html>
