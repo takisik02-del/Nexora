@@ -1,5 +1,4 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
@@ -457,89 +456,84 @@ app.get('/api/load', (req, res) => {
 });
 
 // SMTP transport для отправки писем
-// Отправитель по умолчанию — justxirrez@inbox.ru (рабочий пароль приложения SMS Light).
-// Чтобы слать от marse2007@bk.ru, задайте SMTP_USER/SMTP_FROM и поменяйте SMTP_PASSWORD
-// на пароль приложения этого ящика (Настройки → Безопасность → Пароли для внешних приложений).
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.mail.ru',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.SMTP_USER || 'justxirrez@inbox.ru',
-        pass: process.env.SMTP_PASSWORD
-    }
-});
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-// POST /send-code — отправка кода подтверждения
+// POST /send-code — отправка кода подтверждения через Resend
 app.post('/send-code', async (req, res) => {
     try {
         const { to_email, to_name, code } = req.body;
-
         if (!to_email || !to_name || !code) {
             return res.status(400).json({ success: false, error: 'Missing fields' });
         }
+        if (!RESEND_API_KEY) {
+            return res.status(500).json({ success: false, error: 'RESEND_API_KEY not set' });
+        }
 
-        await transporter.sendMail({
-            from: '"Nexora" <' + (process.env.SMTP_FROM || 'justxirrez@inbox.ru') + '>',
-            to: to_email,
-            subject: 'Код подтверждения регистрации Nexora',
-            html: `
-                <div style="background:#0a0a0a;color:#fff;font-family:Arial,sans-serif;padding:32px;max-width:480px;margin:0 auto;border:1px solid #222;border-radius:12px">
-                    <div style="text-align:center;margin-bottom:24px">
-                        <span style="display:inline-block;background:#0A0B0E;color:#FFFFFF;width:32px;height:32px;line-height:30px;border-radius:8px;border:1px solid #D7DAE0;font-weight:700;font-size:14px">N</span>
+        const resp = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                from: 'Nexora <onboarding@resend.dev>',
+                to: [to_email],
+                subject: 'Код подтверждения регистрации Nexora',
+                html: `
+                    <div style="background:#0a0a0a;color:#fff;font-family:Arial,sans-serif;padding:32px;max-width:480px;margin:0 auto;border:1px solid #222;border-radius:12px">
+                        <div style="text-align:center;margin-bottom:24px">
+                            <span style="display:inline-block;background:#0A0B0E;color:#FFFFFF;width:32px;height:32px;line-height:30px;border-radius:8px;border:1px solid #D7DAE0;font-weight:700;font-size:14px">N</span>
+                        </div>
+                        <h1 style="color:#fff;font-size:18px;margin:0 0 8px">Привет, ${to_name}!</h1>
+                        <p style="color:#a0a0a0;font-size:14px;margin:0 0 20px">Твой код для регистрации на Nexora:</p>
+                        <div style="background:#111;border:1px solid #D7DAE0;border-radius:8px;padding:16px;text-align:center;margin-bottom:20px">
+                            <span style="font-size:32px;font-weight:700;color:#fff;letter-spacing:6px;font-family:monospace">${code}</span>
+                        </div>
+                        <p style="color:#666;font-size:11px;margin:0">Код действителен до завершения регистрации. Если ты не запрашивал код, просто проигнорируй это письмо.</p>
+                        <hr style="border:none;border-top:1px solid #222;margin:20px 0">
+                        <p style="color:#666;font-size:10px;text-align:center;margin:0">Nexora — Турнир где рождаются легенды</p>
                     </div>
-                    <h1 style="color:#fff;font-size:18px;margin:0 0 8px">Привет, ${to_name}!</h1>
-                    <p style="color:#a0a0a0;font-size:14px;margin:0 0 20px">Твой код для регистрации на Nexora:</p>
-                    <div style="background:#111;border:1px solid #D7DAE0;border-radius:8px;padding:16px;text-align:center;margin-bottom:20px">
-                        <span style="font-size:32px;font-weight:700;color:#0A0B0E;letter-spacing:6px;font-family:monospace">${code}</span>
-                    </div>
-                    <p style="color:#666;font-size:11px;margin:0">Код действителен до завершения регистрации. Если ты не запрашивал код, просто проигнорируй это письмо.</p>
-                    <hr style="border:none;border-top:1px solid #222;margin:20px 0">
-                    <p style="color:#666;font-size:10px;text-align:center;margin:0">Nexora — Турнир где рождаются легенды</p>
-                </div>
-            `
+                `
+            })
         });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.message || JSON.stringify(data));
 
-        console.log(`Code sent to ${to_email}`);
         res.json({ success: true });
-
     } catch (err) {
         console.error('Send error:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// POST /send-notify — email-уведомления участникам (одно/много писем)
+// POST /send-notify — email-уведомления через Resend
 app.post('/send-notify', async (req, res) => {
     try {
         const { to_email, to_emails, subject, html } = req.body || {};
+        if (!RESEND_API_KEY) {
+            return res.status(500).json({ success: false, error: 'RESEND_API_KEY not set' });
+        }
+
         let emails = Array.isArray(to_emails) ? to_emails.slice() : [];
         if (to_email && emails.indexOf(to_email) === -1) emails.push(to_email);
         emails = emails.filter(e => typeof e === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()));
         const unique = [];
         emails.forEach(e => { const t = e.trim(); if (unique.indexOf(t) === -1) unique.push(t); });
 
-        if (!unique.length) {
-            return res.status(400).json({ success: false, error: 'No valid recipients' });
-        }
-        if (!subject || !html) {
-            return res.status(400).json({ success: false, error: 'Missing subject/html' });
-        }
+        if (!unique.length) return res.status(400).json({ success: false, error: 'No valid recipients' });
+        if (!subject || !html) return res.status(400).json({ success: false, error: 'Missing subject/html' });
 
         let sent = 0;
         for (const email of unique) {
-            await transporter.sendMail({
-                from: '"Nexora" <' + (process.env.SMTP_FROM || 'justxirrez@inbox.ru') + '>',
-                to: email,
-                subject,
-                html
-            });
-            sent++;
+            try {
+                const resp = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ from: 'Nexora <onboarding@resend.dev>', to: [email], subject, html })
+                });
+                if (resp.ok) sent++;
+            } catch (e) {}
         }
-        console.log(`[Nexora] Notification sent to ${sent} recipient(s)`);
         res.json({ success: true, sent });
     } catch (err) {
-        console.error('[Nexora] Notify error:', err);
+        console.error('Notify error:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
