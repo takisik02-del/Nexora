@@ -104,80 +104,61 @@
         pushTimer = setTimeout(pushToServer, 50);
     }
 
-    // ===== PULL (синхронный XHR с повторной попыткой) =====
-    function pullFromServer() {
+    // ===== PULL (асинхронный fetch с повторной попыткой) =====
+    async function pullFromServer() {
         if (IS_FILE) return false;
         for (var attempt = 0; attempt < 3; attempt++) {
             try {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', LOAD_URL, false);
-                xhr.timeout = 8000;
-                xhr.send(null);
-                if (xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
+                var resp = await fetch(LOAD_URL, { cache: 'no-store' });
+                if (resp.ok) {
+                    var data = await resp.json();
                     if (data && typeof data === 'object' && Object.keys(data).length > 0) {
                         Storage.prototype.setItem = origSetItem;
                         var count = setAllSilent(data);
                         Storage.prototype.setItem = syncedSetItem;
-                        if (count > 0) console.log('[Nexora] loaded ' + count + ' keys from server');
                         return count > 0;
                     }
                 }
             } catch(e) {
-                console.warn('[Nexora] pull attempt ' + (attempt+1) + ' failed:', e.message);
-                if (attempt < 2) {
-                    // Wait a bit before retrying
-                    var waitStart = Date.now();
-                    while (Date.now() - waitStart < 500) {}
-                }
+                if (attempt < 2) await new Promise(function(r) { setTimeout(r, 500); });
             }
         }
         return false;
     }
 
-    // ===== ПОЛЛИНГ (новие данные с других браузеров) =====
+    // ===== ПОЛЛИНГ (асинхронный fetch) =====
     function startPolling() {
         if (IS_FILE) return;
-        setInterval(function() {
+        setInterval(async function() {
             try {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', LOAD_URL, false);
-                xhr.timeout = 3000;
-                xhr.send(null);
-                if (xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    if (data && typeof data === 'object') {
-                        var localKeys = {};
-                        for (var i = 0; i < localStorage.length; i++) {
-                            var k = localStorage.key(i);
-                            if (k && k.indexOf(PREFIX) === 0) localKeys[k] = true;
-                        }
-                        var newData = {};
-                        for (var k in data) {
-                            if (data.hasOwnProperty(k) && k.indexOf(PREFIX) === 0 && data[k] !== null && !EXCLUDED_KEYS[k]) {
-                                try {
-                                    // Локально только что изменили — ждём подтверждения пуша.
-                                    // Если пуш так и не подтвердился за 15с (ошибка сети и т.п.),
-                                    // отдаём приоритет серверу, иначе ключ «завис» бы в грязном виде навсегда.
-                                    if (dirtyKeys[k] && (Date.now() - dirtyKeys[k]) < 15000) continue;
-                                    var localVal = localStorage.getItem(k);
-                                    var serverVal = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
-                                    if (localVal !== serverVal) newData[k] = data[k];
-                                } catch(e) {}
-                            }
-                        }
-                        if (Object.keys(newData).length > 0) {
-                            Storage.prototype.setItem = origSetItem;
-                            setAllSilent(newData);
-                            Storage.prototype.setItem = syncedSetItem;
-                            console.log('[Nexora] polling: updated ' + Object.keys(newData).length + ' keys');
-                            rerenderDynamic();
+                var resp = await fetch(LOAD_URL, { cache: 'no-store' });
+                if (!resp.ok) return;
+                var data = await resp.json();
+                if (data && typeof data === 'object') {
+                    var localKeys = {};
+                    for (var i = 0; i < localStorage.length; i++) {
+                        var k = localStorage.key(i);
+                        if (k && k.indexOf(PREFIX) === 0) localKeys[k] = true;
+                    }
+                    var newData = {};
+                    for (var k in data) {
+                        if (data.hasOwnProperty(k) && k.indexOf(PREFIX) === 0 && data[k] !== null && !EXCLUDED_KEYS[k]) {
+                            try {
+                                if (dirtyKeys[k] && (Date.now() - dirtyKeys[k]) < 15000) continue;
+                                var localVal = localStorage.getItem(k);
+                                var serverVal = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
+                                if (localVal !== serverVal) newData[k] = data[k];
+                            } catch(e) {}
                         }
                     }
+                    if (Object.keys(newData).length > 0) {
+                        Storage.prototype.setItem = origSetItem;
+                        setAllSilent(newData);
+                        Storage.prototype.setItem = syncedSetItem;
+                        rerenderDynamic();
+                    }
                 }
-            } catch(e) {
-                // polling error — игнорируем
-            }
+            } catch(e) {}
         }, POLL_INTERVAL);
     }
 
@@ -218,7 +199,6 @@
             if (k && k.indexOf(PREFIX) === 0) keysToRemove.push(k);
         }
         keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
-        console.log('[Nexora] force-sync: cleared ' + keysToRemove.length + ' local keys');
         var cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
         window.location.replace(cleanUrl);
         return;
@@ -226,21 +206,17 @@
 
     // ===== ИНИЦИАЛИЗАЦИЯ =====
 
-    // 1. Тянем свежие данные с сервера
-    pullFromServer();
-
-    // 2. Ставим хук setItem
+    // 1. Ставим хук setItem (сразу, чтобы не терять локальные изменения)
     Storage.prototype.setItem = syncedSetItem;
 
-    // Если страница уже отрисовала что-то из localStorage — обновляем
-    // DOM свежими данными, которые только что пришли с сервера.
-    rerenderDynamic();
-
-    // 3. Пушим текущее состояние на сервер
-    pushToServer();
-
-    // 4. Запускаем поллинг
-    startPolling();
+    // 2. Тянем свежие данные с сервера (асинхронно, не блокируя страницу)
+    pullFromServer().then(function() {
+        rerenderDynamic();
+        // 3. Пушим текущее состояние на сервер
+        pushToServer();
+        // 4. Запускаем поллинг
+        startPolling();
+    });
 
     // 5. При закрытии — сохраняем
     window.addEventListener('beforeunload', function() {

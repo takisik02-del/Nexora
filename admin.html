@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="img/nexora-icon.svg">
+    <link rel="apple-touch-icon" href="img/nexora-icon.svg">
     <link rel="stylesheet" href="css/style.css?v=2">
     <style>
         /* ADMIN DASHBOARD */
@@ -622,7 +623,7 @@
             <div class="admin-section" id="section-tickets">
                 <div class="admin-header">
                     <h1 class="admin-header__title"><span>Тикеты</span> поддержки</h1>
-                    <span style="font-size:12px;color:var(--text-muted)">Обращения игроков с формы на странице «Контакты»</span>
+                    <span style="font-size:12px;color:var(--text-muted)">Обращения игроков с формы на странице «Поддержка»</span>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="tickets-filters">
                     <button class="btn btn--ghost active" data-ticket-filter="all" style="font-size:11px;padding:6px 14px">Все</button>
@@ -3830,7 +3831,7 @@
                         nexoraSendNotify(t.email, 'Ответ на обращение — Nexora', nexoraEmailBody('Тебе ответили!', [
                             'По твоему обращению «' + (t.topic || 'поддержка') + '» организатор Nexora ответил:',
                             '«' + reply + '»',
-                            'Открыть обращение можно на странице «Контакты» — блок «Мои обращения».'
+                            'Открыть обращение можно на странице «Поддержка» — блок «Мои обращения».'
                         ]));
                     }
                     return;
@@ -3949,8 +3950,6 @@
                     }, 100);
                 });
             }
-
-            console.log('Nexora Admin Panel loaded');
         });
     </script>
     <script src="js/sparkles.js"></script>

@@ -383,8 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     'use strict';
 
-    console.log('[Nexora] script.js v23 — новая версия (чат по турнирам, оплата, выход, автономный file://)');
-
     // ===========================================
     // Автономный режим file:// — если браузер открыл страницу файлом
     // и в localStorage пусто, подставляем демо-данные (те же, что на сервере),
@@ -431,7 +429,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('nexora_roles', JSON.stringify({ MARS: 'organizer' }));
             changed = true;
         }
-        if (changed) console.log('[Nexora] file:// режим: демо-данные загружены');
     }
     seedFileMode();
 
@@ -1816,8 +1813,6 @@ document.addEventListener('DOMContentLoaded', () => {
         for (var i = 0; i < nickname.length; i++) hash = nickname.charCodeAt(i) + ((hash << 5) - hash);
         return PROFILE_COLORS[Math.abs(hash) % PROFILE_COLORS.length];
     };
-
-    console.log('Nexora v4 loaded');
 
 });
 
