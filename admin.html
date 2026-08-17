@@ -359,6 +359,19 @@
                     </div>
                     <div id="admin-roles-list" style="display:flex;flex-direction:column;gap:6px"></div>
                 </div>
+                <div class="admin-card" style="margin-bottom:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                        <span style="font-size:13px;font-weight:600">Добавить пользователя</span>
+                        <span style="font-size:11px;color:var(--text-muted)">Создайте аккаунт вручную</span>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <input type="text" id="admin-new-nick" class="form-input" placeholder="Никнейм" style="flex:1;min-width:120px;padding:6px 10px;font-size:12px">
+                        <input type="email" id="admin-new-email" class="form-input" placeholder="Email" style="flex:1;min-width:120px;padding:6px 10px;font-size:12px">
+                        <input type="password" id="admin-new-pass" class="form-input" placeholder="Пароль" style="flex:1;min-width:120px;padding:6px 10px;font-size:12px">
+                        <button class="btn btn--primary" id="admin-add-user" style="font-size:12px;padding:6px 16px">Добавить</button>
+                    </div>
+                    <div id="admin-add-user-status" style="font-size:11px;margin-top:8px;display:none"></div>
+                </div>
                 <div class="admin-card">
                     <table class="admin-table">
                         <thead>
@@ -1946,6 +1959,75 @@
                     e.preventDefault();
                     document.getElementById('admin-role-add').click();
                 }
+            });
+
+            // ===========================================
+            // Add user (admin panel)
+            // ===========================================
+            document.getElementById('admin-add-user').addEventListener('click', async function() {
+                var nick = document.getElementById('admin-new-nick').value.trim();
+                var email = document.getElementById('admin-new-email').value.trim();
+                var pass = document.getElementById('admin-new-pass').value;
+                var statusEl = document.getElementById('admin-add-user-status');
+                statusEl.style.display = 'block';
+
+                if (!nick || !email || !pass) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Заполните все поля';
+                    return;
+                }
+                if (nick.length < 2 || nick.length > 20) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Никнейм: 2–20 символов';
+                    return;
+                }
+                if (email.indexOf('@') === -1) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Введите корректный email';
+                    return;
+                }
+                if (pass.length < 4) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Пароль: минимум 4 символа';
+                    return;
+                }
+
+                var allUsers = (() => { try { return JSON.parse(localStorage.getItem('nexora_users')) || []; } catch { return []; } })();
+                if (allUsers.some(u => u.nickname === nick)) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Пользователь с таким никнеймом уже есть';
+                    return;
+                }
+                if (allUsers.some(u => u.email === email)) {
+                    statusEl.style.color = '#F87171';
+                    statusEl.textContent = 'Пользователь с таким email уже есть';
+                    return;
+                }
+
+                // SHA-256 hash
+                async function hashPw(pw) {
+                    if (window.crypto && window.crypto.subtle) {
+                        var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+                        var bytes = new Uint8Array(buf);
+                        var hex = '';
+                        for (var i = 0; i < bytes.length; i++) hex += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
+                        return 'sha256$' + hex;
+                    }
+                    // fallback
+                    return 'sha256$' + pw;
+                }
+
+                var hashed = await hashPw(pass);
+                allUsers.push({ nickname: nick, email: email, password: hashed, registeredAt: new Date().toISOString() });
+                localStorage.setItem('nexora_users', JSON.stringify(allUsers));
+
+                document.getElementById('admin-new-nick').value = '';
+                document.getElementById('admin-new-email').value = '';
+                document.getElementById('admin-new-pass').value = '';
+                statusEl.style.color = '#4ADE80';
+                statusEl.textContent = 'Пользователь «' + nick + '» добавлен!';
+                renderUsers();
+                setTimeout(function() { statusEl.style.display = 'none'; }, 4000);
             });
 
             setInterval(renderPendingRegs, 3000);
