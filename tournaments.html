@@ -1888,6 +1888,7 @@
             if (idx === -1) { closeLeave(); return; }
 
             const leavingUser = regs[idx];
+            const leaveTid = pendingLeaveId;
             closeLeave();
             if (typeof window.closeChat === 'function') window.closeChat();
             showToast('Вы вышли из турнира');
@@ -1899,7 +1900,7 @@
                     await fetch('/api/delete', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ key: 'nexora_registrations', filters: { userId: user.nickname, tournamentId: pendingLeaveId } }),
+                        body: JSON.stringify({ key: 'nexora_registrations', filters: { userId: user.nickname, tournamentId: leaveTid } }),
                         signal: ctrl ? ctrl.signal : undefined
                     });
                     if (t) clearTimeout(t);
@@ -1907,7 +1908,7 @@
 
                 regs.splice(idx, 1);
                 if (leavingUser.role === 'captain' && leavingUser.teamId) {
-                    var remaining = regs.filter(function(r) { return r.teamId === leavingUser.teamId && r.tournamentId === pendingLeaveId; });
+                    var remaining = regs.filter(function(r) { return r.teamId === leavingUser.teamId && r.tournamentId === leaveTid; });
                     if (remaining.length > 0) {
                         remaining[0].role = 'captain';
                         if (!remaining[0].teamId) remaining[0].teamId = leavingUser.teamId;
@@ -1916,8 +1917,8 @@
                 localStorage.setItem('nexora_registrations', JSON.stringify(regs));
                 try {
                     let ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
-                    ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(pendingLeaveId)));
-                    ll.push({ userId: user.nickname, tournamentId: Number(pendingLeaveId) });
+                    ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(leaveTid)));
+                    ll.push({ userId: user.nickname, tournamentId: Number(leaveTid) });
                     localStorage.setItem('nexora_left_tournaments', JSON.stringify(ll));
                 } catch(e) {}
                 setTimeout(() => location.reload(), 300);
