@@ -3357,6 +3357,12 @@
             function saveAdminNews(list) {
                 try {
                     localStorage.setItem('nexora_news', JSON.stringify(list));
+                    try {
+                        var _nt = (function() { try { return localStorage.getItem('nexora_admin_token') || ''; } catch(e) { return ''; } })();
+                        var _nh = { 'Content-Type': 'application/json' };
+                        if (_nt) _nh['X-Admin-Token'] = _nt;
+                        fetch('/api/save', { method: 'POST', headers: _nh, body: JSON.stringify({ nexora_news: list }) }).catch(function(){});
+                    } catch(e) {}
                     return true;
                 } catch (e) {
                     const isQuota = e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014);
