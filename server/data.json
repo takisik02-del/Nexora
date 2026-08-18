@@ -73,17 +73,6 @@
           "playerId": "151421"
         }
       ]
-    },
-    {
-      "userId": "MARS",
-      "tournamentId": 1787056123261,
-      "playerId": "321321",
-      "date": "2026-08-18T15:08:27.389Z",
-      "teamId": "team_msypc11s_f7la",
-      "teamName": "ЛОЛ",
-      "role": "member",
-      "paid": true,
-      "paidAt": "2026-08-18T15:08:27.389Z"
     }
   ],
   "nexora_results": [],
@@ -98,7 +87,7 @@
   ],
   "nexora_organizer_read": {
     "1": "2026-07-30T18:46:56.045Z",
-    "1787056123261": "2026-08-18T15:17:26.704Z"
+    "1787056123261": "2026-08-18T15:24:17.135Z"
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [
@@ -154,6 +143,24 @@
         "status": "paid",
         "test": true,
         "date": "2026-08-18T15:08:11.092Z"
+      }
+    },
+    {
+      "id": "req_msytanbcf8gw",
+      "teamId": "team_msypc11s_f7la",
+      "tournamentId": 1787056123261,
+      "userId": "MARS",
+      "playerId": "321321",
+      "date": "2026-08-18T15:22:51.144Z",
+      "status": "approved",
+      "paid": true,
+      "payment": {
+        "id": "pay_msytamm4_3u9r",
+        "amount": 1500,
+        "method": "card",
+        "status": "paid",
+        "test": true,
+        "date": "2026-08-18T15:22:50.237Z"
       }
     }
   ],
@@ -219,6 +226,17 @@
       "test": true,
       "fallback": false,
       "date": "2026-08-18T15:08:11.092Z"
+    },
+    {
+      "id": "pay_msytamm4_3u9r",
+      "userId": "MARS",
+      "tournamentId": 1787056123261,
+      "amount": 1500,
+      "method": "card",
+      "status": "paid",
+      "test": true,
+      "fallback": false,
+      "date": "2026-08-18T15:22:50.237Z"
     }
   ]
 }
