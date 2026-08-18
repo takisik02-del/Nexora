@@ -444,6 +444,8 @@ button{cursor:pointer}
 
 /* ===== PROFILE MODAL ===== */
 .modal--wide{max-width:580px!important;max-height:88vh}
+#chat-modal{max-width:780px!important}
+#chat-modal .chat-content{height:65vh;min-height:400px;max-height:700px}
 .modal--wide .modal__form{
   max-height:calc(88vh - 68px);overflow-y:auto;
   scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;
@@ -568,6 +570,9 @@ button{cursor:pointer}
   font-family:var(--font-mono);letter-spacing:1px;
 }
 .setting-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.chat-tab{color:var(--text-muted);transition:color .2s}
+.chat-tab.active{color:var(--text)!important}
+#chat-messages{background:var(--bg-chat,rgba(0,0,0,.15))}
 
 @media(max-width:600px){.modal--wide{max-width:calc(100% - 24px)!important;max-height:92vh}}
 @media(max-width:420px){

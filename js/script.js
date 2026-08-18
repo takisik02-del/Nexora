@@ -1879,7 +1879,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             '<button id="chat-send" style="width:38px;height:38px;padding:0;background:var(--accent);color:#0A0B0E;border:none;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">&#10148;</button>',
                         '</div>',
                     '</div>',
-                    '<div style="width:200px;border-left:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:10px">',
+                    '<div style="width:240px;border-left:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:10px">',
                         '<p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Участники</p>',
                         '<div id="chat-users" style="display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto"></div>',
                     '</div>',
