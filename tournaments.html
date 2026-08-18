@@ -1095,10 +1095,14 @@
                                 }
                                 var captains = freshRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
                                 var curUserR = (function() { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch(e) { return null; } })();
+                                var leftList = [];
+                                try { leftList = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || []; } catch(e) {}
+                                function isLeft(uid, tid) { return leftList.some(function(x) { return x.userId === uid && Number(x.tournamentId) === Number(tid); }); }
                                 var html = '';
                                 var found = false;
                                 captains.forEach(function(cap) {
-                                    var members = freshRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member'; });
+                                    if (isLeft(cap.userId, pendingTournamentId)) return;
+                                    var members = freshRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member' && !isLeft(r.userId, pendingTournamentId); });
                                     var total = 1 + members.length;
                                     if (total >= mc) return;
                                     found = true;
@@ -1150,9 +1154,13 @@
                                     var mc = 5;
                                     if (ft && ft.teamType) { var tt = ft.teamType; mc = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5; }
                                     var caps = lsRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
+                                    var ll2 = [];
+                                    try { ll2 = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || []; } catch(e) {}
+                                    function isLeft2(uid, tid) { return ll2.some(function(x) { return x.userId === uid && Number(x.tournamentId) === Number(tid); }); }
                                     var h = '';
                                     caps.forEach(function(cap) {
-                                        var members = lsRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member'; });
+                                        if (isLeft2(cap.userId, pendingTournamentId)) return;
+                                        var members = lsRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member' && !isLeft2(r.userId, pendingTournamentId); });
                                         var total = 1 + members.length;
                                         if (total >= mc) return;
                                         var capName = escapeHtml(cap.teamName || '');
@@ -1385,24 +1393,26 @@
                 if (!captainReg.teammates.some(function(t) { return t.nickname === req.userId; })) {
                     captainReg.teammates.push({ nickname: req.userId, playerId: req.playerId });
                 }
-                // Создаём отдельную регистрацию для участника
-                if (!regs.some(function(r) { return r.userId === req.userId && r.tournamentId === req.tournamentId; })) {
-                    // Определяем взнос турнира для пометки оплаты
-                    var feeTs = [];
-                    try { feeTs = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
-                    var feeT = feeTs.find(function(x) { return x.id === req.tournamentId; });
-                    var feePaid = feeT ? Number(feeT.fee) > 0 : false;
-                    regs.push({
-                        userId: req.userId,
-                        tournamentId: req.tournamentId,
-                        playerId: req.playerId,
-                        date: new Date().toISOString(),
-                        teamId: req.teamId,
-                        teamName: captainReg.teamName,
-                        role: 'member',
-                        paid: feePaid,
-                        paidAt: feePaid ? new Date().toISOString() : undefined
-                    });
+                var feeTs = [];
+                try { feeTs = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+                var feeT = feeTs.find(function(x) { return x.id === req.tournamentId; });
+                var feePaid = feeT ? Number(feeT.fee) > 0 : false;
+                var existIdx = regs.findIndex(function(r) { return r.userId === req.userId && r.tournamentId === req.tournamentId; });
+                var newReg = {
+                    userId: req.userId,
+                    tournamentId: req.tournamentId,
+                    playerId: req.playerId,
+                    date: new Date().toISOString(),
+                    teamId: req.teamId,
+                    teamName: captainReg.teamName,
+                    role: 'member',
+                    paid: feePaid,
+                    paidAt: feePaid ? new Date().toISOString() : undefined
+                };
+                if (existIdx >= 0) {
+                    regs[existIdx] = newReg;
+                } else {
+                    regs.push(newReg);
                 }
                 localStorage.setItem('nexora_registrations', JSON.stringify(regs));
             }
@@ -1870,46 +1880,39 @@
             if (idx === -1) { closeLeave(); return; }
 
             const leavingUser = regs[idx];
-            // Убираем только уходящего игрока, команда остаётся
-            regs.splice(idx, 1);
-            // Если капитан ушёл и в команде кто-то остался — назначаем нового капитана
-            if (leavingUser.role === 'captain' && leavingUser.teamId) {
-                var remaining = regs.filter(function(r) { return r.teamId === leavingUser.teamId && r.tournamentId === pendingLeaveId; });
-                if (remaining.length > 0) {
-                    remaining[0].role = 'captain';
-                    // Убедимся что teamId есть
-                    if (!remaining[0].teamId) remaining[0].teamId = leavingUser.teamId;
-                }
-            }
-            localStorage.setItem('nexora_registrations', JSON.stringify(regs));
-            // Помечаем турнир как покинутый — чат и кнопка чата станут недоступны,
-            // даже если регистрация вернётся с сервера при синхронизации
-            try {
-                let ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
-                ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(pendingLeaveId)));
-                ll.push({ userId: user.nickname, tournamentId: Number(pendingLeaveId) });
-                localStorage.setItem('nexora_left_tournaments', JSON.stringify(ll));
-            } catch(e) {}
             closeLeave();
-            // Закрываем чат, чтобы после выхода не осталось доступа к переписке турнира
             if (typeof window.closeChat === 'function') window.closeChat();
             showToast('Вы вышли из турнира');
-            // Дожидаемся удаления регистрации на сервере (с таймаутом), чтобы
-            // после перезагрузки страницы заявка не вернулась при синхронизации
+
             (async function() {
                 try {
                     const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-                    const t = ctrl ? setTimeout(() => ctrl.abort(), 1500) : null;
+                    const t = ctrl ? setTimeout(() => ctrl.abort(), 2000) : null;
                     await fetch('/api/delete', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ key: 'nexora_registrations', filters: { userId: user.nickname, tournamentId: pendingLeaveId } }),
-                        keepalive: true,
                         signal: ctrl ? ctrl.signal : undefined
                     });
                     if (t) clearTimeout(t);
                 } catch(e) {}
-                setTimeout(() => location.reload(), 400);
+
+                regs.splice(idx, 1);
+                if (leavingUser.role === 'captain' && leavingUser.teamId) {
+                    var remaining = regs.filter(function(r) { return r.teamId === leavingUser.teamId && r.tournamentId === pendingLeaveId; });
+                    if (remaining.length > 0) {
+                        remaining[0].role = 'captain';
+                        if (!remaining[0].teamId) remaining[0].teamId = leavingUser.teamId;
+                    }
+                }
+                localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                try {
+                    let ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+                    ll = ll.filter(x => !(x.userId === user.nickname && Number(x.tournamentId) === Number(pendingLeaveId)));
+                    ll.push({ userId: user.nickname, tournamentId: Number(pendingLeaveId) });
+                    localStorage.setItem('nexora_left_tournaments', JSON.stringify(ll));
+                } catch(e) {}
+                setTimeout(() => location.reload(), 300);
             })();
         });
 
