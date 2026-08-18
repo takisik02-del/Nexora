@@ -128,14 +128,4 @@
         if (document.hidden) { running = false; stop(); }
         else { running = true; start(); }
     });
-
-    // Пауза во время скролла: освобождает compositor, листание становится идеально плавным
-    var scrollTimer = null;
-    window.addEventListener('scroll', function () {
-        stop();
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(function () {
-            if (!document.hidden) start();
-        }, 120);
-    }, { passive: true });
 })();
