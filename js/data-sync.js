@@ -41,6 +41,8 @@
         var count = 0;
         for (var k in data) {
             if (data.hasOwnProperty(k) && k.indexOf(PREFIX) === 0 && data[k] !== null && !EXCLUDED_KEYS[k]) {
+                // Не затираем ключи, которые только что изменили локально
+                if (dirtyKeys[k]) continue;
                 var val = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
                 try { origSetItem.call(localStorage, k, val); count++; }
                 catch(e) { console.warn('[Nexora] не смог записать ключ (квота?):', k, e && e.message); }
