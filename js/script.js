@@ -1906,7 +1906,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // даже если регистрация вернулась с сервера при синхронизации
     function getLeftList() { try { return JSON.parse(localStorage.getItem('nexora_left_tournaments')) || []; } catch(e) { return []; } }
     function isInLeftList(u, tid) {
-        var list = getLeftList(); tid = Number(tid);
+        var regs = getRegs(); tid = Number(tid);
+        for (var i = 0; i < regs.length; i++) {
+            if (regs[i].userId === u.nickname && Number(regs[i].tournamentId) === tid) return false;
+        }
+        var list = getLeftList();
         for (var i = 0; i < list.length; i++) { if (list[i].userId === u.nickname && Number(list[i].tournamentId) === tid) return true; }
         return false;
     }
