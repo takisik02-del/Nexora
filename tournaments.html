@@ -1039,15 +1039,18 @@
                                 lsRegs2.forEach(function(r) { if (!seenIds[r.userId + '_' + r.tournamentId]) { freshRegs.push(r); seenIds[r.userId + '_' + r.tournamentId] = true; } });
                                 var freshReqs = d.nexora_join_requests || [];
                                 var freshTourns = d.nexora_tournaments || [];
+                                var lsTourns2 = [];
+                                try { lsTourns2 = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch(e) {}
+                                var seenT = {};
+                                freshTourns.forEach(function(t) { seenT[t.id] = true; });
+                                lsTourns2.forEach(function(t) { if (!seenT[t.id]) { freshTourns.push(t); seenT[t.id] = true; } });
                                 var freshTourn = freshTourns.find(function(t) { return t.id == pendingTournamentId; }) || null;
-                                var validTournIds = {};
-                                freshTourns.forEach(function(t) { validTournIds[t.id] = true; });
                                 var mc = 5;
                                 if (freshTourn && freshTourn.teamType) {
                                     var tt = freshTourn.teamType;
                                     mc = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5;
                                 }
-                                var captains = freshRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain' && validTournIds[r.tournamentId]; });
+                                var captains = freshRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
                                 var curUserR = (function() { try { return JSON.parse(localStorage.getItem('nexora_current_user')); } catch(e) { return null; } })();
                                 var html = '';
                                 var found = false;
@@ -1103,7 +1106,7 @@
                                     var ft = lsTourns.find(function(t) { return t.id == pendingTournamentId; }) || null;
                                     var mc = 5;
                                     if (ft && ft.teamType) { var tt = ft.teamType; mc = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5; }
-                                    var caps = lsRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain' && lsValidIds[r.tournamentId]; });
+                                    var caps = lsRegs.filter(function(r) { return Number(r.tournamentId) == pendingTournamentId && r.role === 'captain'; });
                                     var h = '';
                                     caps.forEach(function(cap) {
                                         var members = lsRegs.filter(function(r) { return r.teamId === cap.teamId && r.role === 'member'; });
