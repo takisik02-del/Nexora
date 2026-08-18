@@ -76,6 +76,17 @@
       "isAdmin": false,
       "chatType": "organizer",
       "teamName": "ЕЕЕ"
+    },
+    {
+      "tournamentId": 1787056123261,
+      "userId": "Taki",
+      "text": "а",
+      "timestamp": "2026-08-18T17:33:31.161Z",
+      "isAdmin": true,
+      "chatType": "general",
+      "teamName": "SOA",
+      "targetUserId": "MARS",
+      "replyToText": "здарова"
     }
   ],
   "nexora_registrations": [
@@ -149,7 +160,7 @@
   ],
   "nexora_organizer_read": {
     "1": "2026-07-30T18:46:56.045Z",
-    "1787056123261": "2026-08-18T17:29:20.539Z"
+    "1787056123261": "2026-08-18T17:33:25.896Z"
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [
