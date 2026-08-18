@@ -40,7 +40,27 @@
     "MARS": "organizer"
   },
   "nexora_chat_messages": [],
-  "nexora_registrations": [],
+  "nexora_registrations": [
+    {
+      "userId": "Taki",
+      "tournamentId": 1787056123261,
+      "playerId": "321321",
+      "date": "2026-08-18T13:31:57.137Z",
+      "teamName": "ЛОЛ",
+      "teamId": "team_msypc11s_f7la",
+      "role": "captain",
+      "paid": true,
+      "paidAt": "2026-08-18T13:31:57.137Z",
+      "payment": {
+        "id": "pay_msypc0co_flkb",
+        "amount": 1500,
+        "method": "card",
+        "status": "paid",
+        "test": true,
+        "date": "2026-08-18T13:31:56.232Z"
+      }
+    }
+  ],
   "nexora_results": [],
   "nexora_pending_regs": [
     {
@@ -67,5 +87,19 @@
     }
   ],
   "nexora_probe_test": [],
-  "nexora_matches": []
+  "nexora_matches": [],
+  "nexora_left_tournaments": [],
+  "nexora_payments": [
+    {
+      "id": "pay_msypc0co_flkb",
+      "userId": "Taki",
+      "tournamentId": 1787056123261,
+      "amount": 1500,
+      "method": "card",
+      "status": "paid",
+      "test": true,
+      "fallback": false,
+      "date": "2026-08-18T13:31:56.232Z"
+    }
+  ]
 }

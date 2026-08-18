@@ -13,9 +13,20 @@
     // Открытие через файл (file://): сервера нет, работаем только с localStorage
     var IS_FILE = window.location.protocol === 'file:';
     var EXCLUDED_KEYS = {
-        'nexora_current_user': true, // сессионные ключи — не синхронизируем
-        'nexora_admin_token': true   // ключ доступа — только в localStorage браузера, не на сервер
+        'nexora_current_user': true,
+        'nexora_admin_token': true
     };
+    var ADMIN_ONLY = [
+        'nexora_tournaments',
+        'nexora_game_cards',
+        'nexora_users',
+        'nexora_roles',
+        'nexora_results',
+        'nexora_pending_regs',
+        'nexora_settings',
+        'nexora_promocodes',
+        'nexora_matches'
+    ];
 
     var origSetItem = Storage.prototype.setItem;
     var pushTimer = null;
@@ -71,29 +82,42 @@
         var d = getAll();
         if (Object.keys(d).length === 0) return;
         var tk = getAdminToken();
+        var hasAdminKeys = Object.keys(d).some(function(k) {
+            return k.indexOf(PREFIX) === 0 && ADMIN_ONLY.indexOf(k) !== -1;
+        });
         var headers = { 'Content-Type': 'application/json' };
         if (tk) headers['X-Admin-Token'] = tk;
         try {
-            // keepalive убран намеренно: Fetch ограничивает keepalive-запросы 64 КБ,
-            // а тело пуша с фото/видео в новостях легко превышает этот лимит.
             fetch(SAVE_URL, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(d)
             }).then(function(r) {
                 if (r.ok) {
-                    // Сервер принял данные — локальные изменения подтверждены,
-                    // поллинг больше не должен затирать их серверным состоянием.
                     for (var k in d) { if (d.hasOwnProperty(k)) delete dirtyKeys[k]; }
                 } else if (r.status === 403) {
-                    // Сервер отклонил запись: неверный ключ доступа администратора.
-                    // Раньше это было тихим провалом — публикация «растворилась».
-                    console.warn('[Nexora] push rejected (403): неверный ключ доступа администратора. Проверьте Настройки → Ключ доступа.');
                     if (!window.__nexoraTokenWarned) {
                         window.__nexoraTokenWarned = true;
+                        console.warn('[Nexora] push rejected (403): неверный ключ доступа администратора.');
                         try {
-                            alert('Сервер отклонил запись данных: неверный ключ доступа администратора.\nОткройте Настройки → «Ключ доступа» и вставьте ключ из консоли сервера (или из переменных окружения на Vercel).');
+                            alert('Сервер отклонил запись: неверный ключ доступа администратора.\nОткройте Настройки → «Ключ доступа» и вставьте ключ из консоли сервера.');
                         } catch(e) {}
+                    }
+                    if (hasAdminKeys && tk) {
+                        var publicOnly = {};
+                        for (var k in d) {
+                            if (d.hasOwnProperty(k) && ADMIN_ONLY.indexOf(k) === -1) {
+                                publicOnly[k] = d[k];
+                            }
+                        }
+                        if (Object.keys(publicOnly).length > 0) {
+                            fetch(SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(publicOnly) })
+                            .then(function(r2) {
+                                if (r2.ok) {
+                                    for (var k in publicOnly) { if (publicOnly.hasOwnProperty(k)) delete dirtyKeys[k]; }
+                                }
+                            }).catch(function() {});
+                        }
                     }
                 } else {
                     console.warn('[Nexora] push status:', r.status);

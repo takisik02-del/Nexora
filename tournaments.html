@@ -1032,6 +1032,11 @@
                             .then(function(r) { return r.json(); })
                             .then(function(d) {
                                 var freshRegs = d.nexora_registrations || [];
+                                var lsRegs2 = [];
+                                try { lsRegs2 = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch(e) {}
+                                var seenIds = {};
+                                freshRegs.forEach(function(r) { seenIds[r.userId + '_' + r.tournamentId] = true; });
+                                lsRegs2.forEach(function(r) { if (!seenIds[r.userId + '_' + r.tournamentId]) { freshRegs.push(r); seenIds[r.userId + '_' + r.tournamentId] = true; } });
                                 var freshReqs = d.nexora_join_requests || [];
                                 var freshTourns = d.nexora_tournaments || [];
                                 var freshTourn = freshTourns.find(function(t) { return t.id == pendingTournamentId; }) || null;
@@ -1194,9 +1199,11 @@
                         // Обновляем цену и кнопку
                         var info = document.getElementById('payment-info');
                         if (mode === 'join') {
-                            var feeHtml2 = '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)"><span>Заявка</span><span style="color:var(--accent);font-weight:600">Бесплатно</span></div>';
-                            info.querySelector('.team-fee-info').innerHTML = feeHtml2;
-                            document.getElementById('payment-confirm').textContent = 'Отправить заявку';
+                            var joinFeeHtml = fee > 0 ?
+                                '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary)"><span>Взнос</span><span style="color:var(--text);font-weight:600">' + Number(fee).toLocaleString() + ' ₽</span></div>' :
+                                '<p style="font-size:12px;color:var(--accent);font-weight:600">Бесплатный турнир</p>';
+                            info.querySelector('.team-fee-info').innerHTML = joinFeeHtml;
+                            document.getElementById('payment-confirm').textContent = fee > 0 ? 'Оплатить ' + Number(fee).toLocaleString() + ' ₽' : 'Отправить заявку';
                         } else {
                             var mc = mode === 'create' ? memberCount : 1;
                             var tf2 = fee * mc;
@@ -1459,13 +1466,25 @@
                     closePayment();
                     return;
                 }
-                // Сохраняем заявку — не создаём регистрацию
+                // Проверяем уникальность игрока в заявках
                 var joinReqs = [];
                 try { joinReqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
                 if (joinReqs.some(function(r) { return r.teamId === pendingSelectedTeamId && r.userId === user.nickname && r.status === 'pending'; })) {
                     showToast('Вы уже отправляли заявку в эту команду');
                     return;
                 }
+                // Платёжный шаг для платных турниров
+                var joinFee = curTourn ? Number(curTourn.fee) || 0 : 0;
+                if (joinFee > 0 && pendingPayment && pendingPayment.status !== 'paid') {
+                    showToast('Оплата не завершена');
+                    pendingPayment = null;
+                    return;
+                }
+                if (joinFee > 0 && !pendingPayment) {
+                    showPaymentStep(joinFee);
+                    return;
+                }
+                // Сохраняем заявку
                 joinReqs.push({
                     id: 'req_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
                     teamId: pendingSelectedTeamId,
@@ -1473,11 +1492,21 @@
                     userId: user.nickname,
                     playerId: playerId,
                     date: new Date().toISOString(),
-                    status: 'pending'
+                    status: 'pending',
+                    paid: joinFee > 0 ? (!!pendingPayment && pendingPayment.status === 'paid') : true,
+                    payment: pendingPayment ? {
+                        id: pendingPayment.id,
+                        amount: pendingPayment.amount,
+                        method: pendingPayment.method,
+                        status: pendingPayment.status,
+                        test: !!pendingPayment.test,
+                        date: pendingPayment.date
+                    } : undefined
                 });
                 localStorage.setItem('nexora_join_requests', JSON.stringify(joinReqs));
                 var savedName2 = pendingTournamentName;
                 closePayment();
+                pendingPayment = null;
                 showToast('Заявка отправлена капитану команды');
                 setTimeout(function() { location.reload(); }, 1200);
                 return;
