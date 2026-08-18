@@ -2029,8 +2029,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     var ts = new Date(m.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
                     var tail = i === li ? (mine ? 'border-bottom-right-radius:4px' : 'border-bottom-left-radius:4px') : '';
                     var bBg = mine ? 'var(--accent)' : 'var(--surface)';
-                    var bCl = mine ? '#fff' : 'var(--text)';
-                    var tCl = mine ? 'rgba(255,255,255,.6)' : 'var(--text-muted)';
+                    var bCl = mine ? '#0A0B0E' : 'var(--text)';
+                    var tCl = mine ? 'rgba(10,11,14,.5)' : 'var(--text-muted)';
                     var replyBlock = '';
                     if (m.replyToText) {
                         var replyName = dispName(m.targetUserId || '');
