@@ -1462,9 +1462,12 @@
                             let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
                             regs = regs.filter(r => r.tournamentId !== id);
                             localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                            var _dt = (function() { try { return localStorage.getItem('nexora_admin_token') || ''; } catch(e) { return ''; } })();
+                            var _dh = { 'Content-Type': 'application/json' };
+                            if (_dt) _dh['X-Admin-Token'] = _dt;
                             fetch('/api/save', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: _dh,
                                 body: JSON.stringify({ nexora_tournaments: tournaments, nexora_registrations: regs })
                             }).catch(() => {});
                         } catch {}
@@ -1599,9 +1602,12 @@
                     let regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
                     regs = regs.filter(r => r.tournamentId !== newId);
                     localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                    var _ct = (function() { try { return localStorage.getItem('nexora_admin_token') || ''; } catch(e) { return ''; } })();
+                    var _ch = { 'Content-Type': 'application/json' };
+                    if (_ct) _ch['X-Admin-Token'] = _ct;
                     fetch('/api/save', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: _ch,
                         body: JSON.stringify({ nexora_tournaments: tournaments, nexora_registrations: regs })
                     }).catch(() => {});
                 } catch {}
