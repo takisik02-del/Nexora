@@ -112,67 +112,8 @@
   "nexora_roles": {
     "MARS": "organizer"
   },
-  "nexora_chat_messages": [
-    {
-      "tournamentId": 1,
-      "userId": "Taki",
-      "text": "ало",
-      "timestamp": "2026-07-30T18:38:46.237Z",
-      "isAdmin": true,
-      "chatType": "general",
-      "teamName": "чуваки"
-    },
-    {
-      "tournamentId": 1,
-      "userId": "MARS",
-      "text": "А",
-      "timestamp": "2026-07-30T18:39:08.744Z",
-      "isAdmin": false,
-      "chatType": "general",
-      "teamName": "чуваки"
-    },
-    {
-      "tournamentId": 1,
-      "userId": "MARS",
-      "text": "АЙ СЮДА",
-      "timestamp": "2026-07-30T18:39:57.916Z",
-      "isAdmin": false,
-      "chatType": "general",
-      "teamName": "чуваки",
-      "targetUserId": "Taki",
-      "replyToText": "ало"
-    }
-  ],
-  "nexora_registrations": [
-    {
-      "userId": "MARS",
-      "tournamentId": 1,
-      "playerId": "21213",
-      "date": "2026-07-30T18:38:38.338Z",
-      "teamId": "team_ms7uw4ta_ye78",
-      "teamName": "чуваки",
-      "role": "captain",
-      "paid": true,
-      "paidAt": "2026-07-30T18:38:38.338Z",
-      "teammates": [
-        {
-          "nickname": "Taki",
-          "playerId": "1421321"
-        }
-      ]
-    },
-    {
-      "userId": "Taki",
-      "tournamentId": 1,
-      "playerId": "1421321",
-      "date": "2026-07-30T18:39:47.155Z",
-      "teamId": "team_ms7uw4ta_ye78",
-      "teamName": "чуваки",
-      "role": "member",
-      "paid": true,
-      "paidAt": "2026-07-30T18:39:47.155Z"
-    }
-  ],
+  "nexora_chat_messages": [],
+  "nexora_registrations": [],
   "nexora_results": [],
   "nexora_pending_regs": [
     {
@@ -187,44 +128,7 @@
     "1": "2026-07-30T18:46:56.045Z"
   },
   "nexora_seed_done": true,
-  "nexora_join_requests": [
-    {
-      "id": "req_ms7t6rpy3mya",
-      "teamId": "team_ms7swzhd_j5my",
-      "tournamentId": 1,
-      "userId": "S",
-      "playerId": "21421",
-      "date": "2026-07-30T17:50:03.478Z",
-      "status": "pending"
-    },
-    {
-      "id": "req_ms7tsbn2rvs0",
-      "teamId": "team_ms7trqmd_m65x",
-      "tournamentId": 1,
-      "userId": "MARS",
-      "playerId": "421421",
-      "date": "2026-07-30T18:06:49.070Z",
-      "status": "approved"
-    },
-    {
-      "id": "req_ms7uwu1srugh",
-      "teamId": "team_ms7uw4ta_ye78",
-      "tournamentId": 1,
-      "userId": "MARS",
-      "playerId": "21213",
-      "date": "2026-07-30T18:38:19.168Z",
-      "status": "approved"
-    },
-    {
-      "id": "req_ms7uyc73ie8l",
-      "teamId": "team_ms7uw4ta_ye78",
-      "tournamentId": 1,
-      "userId": "Taki",
-      "playerId": "1421321",
-      "date": "2026-07-30T18:39:29.343Z",
-      "status": "approved"
-    }
-  ],
+  "nexora_join_requests": [],
   "nexora_news": [
     {
       "id": "news_mshqo1jw_b6pq",
