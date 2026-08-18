@@ -41,9 +41,18 @@
         var count = 0;
         for (var k in data) {
             if (data.hasOwnProperty(k) && k.indexOf(PREFIX) === 0 && data[k] !== null && !EXCLUDED_KEYS[k]) {
-                // Не затираем ключи, которые только что изменили локально
                 if (dirtyKeys[k]) continue;
-                var val = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
+                var serverVal = data[k];
+                var serverEmpty = (Array.isArray(serverVal) && serverVal.length === 0) ||
+                    (typeof serverVal === 'object' && !Array.isArray(serverVal) && Object.keys(serverVal).length === 0);
+                if (serverEmpty) {
+                    var localRaw = null;
+                    try { localRaw = localStorage.getItem(k); } catch(e) {}
+                    if (localRaw && localRaw !== 'null' && localRaw !== 'undefined') {
+                        continue;
+                    }
+                }
+                var val = typeof serverVal === 'string' ? serverVal : JSON.stringify(serverVal);
                 try { origSetItem.call(localStorage, k, val); count++; }
                 catch(e) { console.warn('[Nexora] не смог записать ключ (квота?):', k, e && e.message); }
             }
@@ -148,8 +157,12 @@
                             try {
                                 if (dirtyKeys[k] && (Date.now() - dirtyKeys[k]) < 15000) continue;
                                 var localVal = localStorage.getItem(k);
-                                var serverVal = typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]);
-                                if (localVal !== serverVal) newData[k] = data[k];
+                                var serverVal = data[k];
+                                var serverEmpty = (Array.isArray(serverVal) && serverVal.length === 0) ||
+                                    (typeof serverVal === 'object' && !Array.isArray(serverVal) && Object.keys(serverVal).length === 0);
+                                if (serverEmpty && localVal && localVal !== 'null' && localVal !== '[]' && localVal !== '{}') continue;
+                                var serverStr = typeof serverVal === 'string' ? serverVal : JSON.stringify(serverVal);
+                                if (localVal !== serverStr) newData[k] = data[k];
                             } catch(e) {}
                         }
                     }

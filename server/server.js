@@ -456,7 +456,17 @@ app.get('/api/load', (req, res) => {
     const allData = readData();
     // Гарантируем команды для "Присоединиться" (не меняет файл, только ответ)
     ensureSampleTeams(allData);
-    res.json(allData);
+    // Не отдаём клиенту пустые массивы/объекты — чтобы pull
+    // не затирал локальные данные пустотой
+    const filtered = {};
+    Object.keys(allData).forEach(function(k) {
+        const v = allData[k];
+        if (v === null || v === undefined) return;
+        if (Array.isArray(v) && v.length === 0) return;
+        if (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0) return;
+        filtered[k] = v;
+    });
+    res.json(filtered);
 });
 
 // SMTP transport для отправки писем
