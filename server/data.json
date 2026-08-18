@@ -50,101 +50,23 @@
   "nexora_chat_messages": [
     {
       "tournamentId": 1787056123261,
-      "userId": "Support",
-      "text": "ало",
-      "timestamp": "2026-08-18T16:56:59.545Z",
-      "isAdmin": false,
-      "chatType": "general",
-      "teamName": "AAAA"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Support",
+      "userId": "Taki",
       "text": "всем ку",
-      "timestamp": "2026-08-18T16:59:36.480Z",
-      "isAdmin": false,
-      "chatType": "general",
-      "teamName": "AAAA"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Support",
-      "text": "здарова",
-      "timestamp": "2026-08-18T16:59:39.757Z",
-      "isAdmin": false,
-      "chatType": "organizer",
-      "teamName": "AAAA"
+      "timestamp": "2026-08-18T17:09:46.654Z",
+      "isAdmin": true,
+      "senderRole": "admin",
+      "chatType": "general"
     },
     {
       "tournamentId": 1787056123261,
       "userId": "MARS",
       "text": "здарова",
-      "timestamp": "2026-08-18T16:59:54.588Z",
+      "timestamp": "2026-08-18T17:10:21.081Z",
       "isAdmin": false,
       "chatType": "general",
       "teamName": "ЕЕЕ",
-      "targetUserId": "Support",
+      "targetUserId": "Taki",
       "replyToText": "всем ку"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "MARS",
-      "text": "ало",
-      "timestamp": "2026-08-18T17:02:24.018Z",
-      "isAdmin": false,
-      "chatType": "organizer",
-      "teamName": "ЕЕЕ"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Taki",
-      "text": "йо",
-      "timestamp": "2026-08-18T17:02:39.624Z",
-      "isAdmin": true,
-      "chatType": "general",
-      "teamName": "SOA",
-      "targetUserId": "MARS",
-      "replyToText": "здарова"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Taki",
-      "text": "да",
-      "timestamp": "2026-08-18T17:02:43.295Z",
-      "isAdmin": true,
-      "chatType": "organizer",
-      "teamName": "SOA"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Taki",
-      "text": "а",
-      "timestamp": "2026-08-18T17:03:07.075Z",
-      "isAdmin": true,
-      "chatType": "general",
-      "teamName": "SOA"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Taki",
-      "text": "йо",
-      "timestamp": "2026-08-18T17:03:09.518Z",
-      "isAdmin": true,
-      "chatType": "general",
-      "teamName": "SOA",
-      "targetUserId": "MARS",
-      "replyToText": "здарова"
-    },
-    {
-      "tournamentId": 1787056123261,
-      "userId": "Taki",
-      "text": "ало",
-      "timestamp": "2026-08-18T17:03:29.961Z",
-      "isAdmin": true,
-      "chatType": "general",
-      "teamName": "SOA",
-      "targetUserId": "MARS",
-      "replyToText": "здарова"
     }
   ],
   "nexora_registrations": [
@@ -218,7 +140,7 @@
   ],
   "nexora_organizer_read": {
     "1": "2026-07-30T18:46:56.045Z",
-    "1787056123261": "2026-08-18T17:03:04.576Z"
+    "1787056123261": "2026-08-18T17:12:14.423Z"
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [
@@ -397,5 +319,15 @@
       "fallback": false,
       "date": "2026-08-18T16:56:41.130Z"
     }
-  ]
+  ],
+  "nexora_user_settings": {
+    "marse2007@bk.ru": {
+      "notifications": {
+        "new-tournament": true,
+        "results": true,
+        "start": true,
+        "news": false
+      }
+    }
+  }
 }
