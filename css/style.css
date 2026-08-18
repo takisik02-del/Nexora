@@ -591,10 +591,11 @@ button{cursor:pointer}
 .modal{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);
   z-index:2001;width:100%;max-width:420px;
+  max-height:85vh;
   background:linear-gradient(180deg,var(--surface),var(--bg-alt));
   border:1px solid var(--border-light);border-radius:var(--radius-lg);
   padding:0;opacity:0;pointer-events:none;transition:all .3s ease;
-  box-shadow:var(--shadow-card);overflow:hidden;
+  box-shadow:var(--shadow-card);overflow:hidden;display:flex;flex-direction:column;
 }
 .modal::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
@@ -608,7 +609,7 @@ button{cursor:pointer}
   color:var(--text-muted);transition:var(--transition);font-size:16px;
 }
 .modal__close:hover{background:var(--surface-hover);color:var(--text)}
-.modal__form{padding:24px 28px 28px}
+.modal__form{padding:24px 28px 28px;overflow-y:auto;flex:1;min-height:0}
 
 .form-group{margin-bottom:16px}
 .form-group--row{display:flex;justify-content:space-between;align-items:center}
@@ -763,7 +764,7 @@ button{cursor:pointer}
   .tournament-grid{grid-template-columns:1fr}
   .footer__top{grid-template-columns:1fr 1fr;gap:24px}
   .footer__bottom{flex-direction:column;gap:8px;text-align:center}
-  .modal{max-width:calc(100% - 24px)}
+  .modal{max-width:calc(100% - 24px);max-height:90vh}
   /* Таблица рейтинга — горизонтальный скролл */
   .rating-table-wrap{overflow-x:auto}
   .rating-table-wrap table,.rating-table{min-width:560px}
