@@ -83,7 +83,6 @@ const ADMIN_ONLY_KEYS = [
     'nexora_roles',
     'nexora_results',
     'nexora_pending_regs',
-    'nexora_news',
     'nexora_settings',
     'nexora_promocodes',
     'nexora_matches'

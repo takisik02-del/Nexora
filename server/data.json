@@ -56,34 +56,7 @@
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [],
-  "nexora_news": [
-    {
-      "id": "news_mshqo1jw_b6pq",
-      "title": "Тест медиа-новости",
-      "text": "Проверка загрузки фото и видео из админки.",
-      "tag": "Анонс",
-      "pinned": false,
-      "images": [
-        {
-          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWL6z8BQDwAAAP//Rw5c5gAAAAZJREFUAwAEigGBVgbgmAAAAABJRU5ErkJggg==",
-          "name": "nex_test_photo.png"
-        }
-      ],
-      "videos": [
-        {
-          "type": "file",
-          "src": "data:video/mp4;base64,ZmFrZS12aWRlby1ieXRlcy1mb3ItcGlwZWxpbmUtdGVzdA==",
-          "name": "nex_test_clip.mp4"
-        },
-        {
-          "type": "url",
-          "src": "https://www.youtube.com/watch?v=abcXYZ123",
-          "name": "https://www.youtube.com/watch?v=abcXYZ123"
-        }
-      ],
-      "date": "2026-08-06T16:37:12.284Z"
-    }
-  ],
+  "nexora_news": [],
   "nexora_probe_test": [],
   "nexora_matches": []
 }
