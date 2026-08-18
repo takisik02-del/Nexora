@@ -3187,6 +3187,16 @@
                 if (!t) { adminResultsArea.style.display = 'none'; return; }
                 adminResultsTitle.textContent = 'Участники — ' + t.name;
 
+                // Update table headers based on team type
+                var thead = adminResultsArea.querySelector('thead tr');
+                if (thead) {
+                    var isTeam = (t.teamType || 'solo') !== 'solo';
+                    thead.innerHTML = '<th style="width:40px;text-align:center">#</th>' +
+                        '<th>' + (isTeam ? 'Команда' : 'Никнейм') + '</th>' +
+                        '<th>' + (isTeam ? 'Капитан' : 'ID игрока') + '</th>' +
+                        '<th style="width:120px;text-align:center">Место</th>';
+                }
+
                 const regs = (() => {
                     try { return JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch { return []; }
                 })();
@@ -3242,42 +3252,42 @@
                         const firstMember = team.members[0];
                         const existing = results.find(r => r.tournamentId === id && r.userId === team.captain);
                         const place = existing ? existing.place : '';
+                        const cardId = 'team-result-' + teamIdx;
 
-                        // Team header row
                         rows += `
-                            <tr style="background:var(--accent-dim)">
-                                <td style="text-align:center;color:var(--text-muted);font-size:12px;font-weight:700">${teamIdx}</td>
-                                <td colspan="3" style="font-weight:700;color:var(--text)">
-                                    <span style="color:var(--accent);font-family:var(--font-heading);letter-spacing:1px">${esc(team.teamName)}</span>
-                                    <span style="font-size:10px;color:var(--text-muted);margin-left:8px">(${allMembers.length} игроков)</span>
+                            <tr class="team-result-card" data-card="${cardId}" style="cursor:pointer;transition:background .15s" onmouseenter="this.style.background='var(--bg-alt)'" onmouseleave="this.style.background=''">
+                                <td style="text-align:center;font-weight:700;color:var(--accent);font-size:14px">${teamIdx}</td>
+                                <td style="font-weight:700">
+                                    <span style="color:var(--accent);font-family:var(--font-heading);letter-spacing:1px;font-size:14px">${esc(team.teamName)}</span>
+                                    <span style="font-size:11px;color:var(--text-muted);margin-left:8px">${allMembers.length} игроков</span>
+                                    <span style="font-size:10px;color:var(--text-muted);margin-left:8px" class="team-expand-icon" data-target="${cardId}">▸</span>
+                                </td>
+                                <td style="font-size:12px;color:var(--text-secondary)">${esc(team.captain)}</td>
+                                <td style="text-align:center">
+                                    <select class="admin-results-place" data-user="${esc(team.captain)}" onclick="event.stopPropagation()" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 6px;font-size:12px;font-family:var(--font-sans);cursor:pointer;min-width:90px">
+                                        <option value="">—</option>
+                                        <option value="1" ${place === 1 ? 'selected' : ''}>1 место</option>
+                                        <option value="2" ${place === 2 ? 'selected' : ''}>2 место</option>
+                                        <option value="3" ${place === 3 ? 'selected' : ''}>3 место</option>
+                                        <option value="4" ${place === 4 ? 'selected' : ''}>4 место</option>
+                                        <option value="${place && place >= 5 ? place : 'other'}" ${place >= 5 ? 'selected' : ''}>${place >= 5 ? place + ' место' : 'Другое'}</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr class="team-members-row" data-parent="${cardId}" style="display:none">
+                                <td colspan="4" style="padding:0">
+                                    <div style="padding:8px 16px 12px 40px;background:var(--bg-alt);border-top:1px solid var(--border)">
+                                        ${allMembers.map((m, mi) => `
+                                            <div style="display:flex;align-items:center;gap:10px;padding:5px 0;${mi < allMembers.length - 1 ? 'border-bottom:1px solid var(--border)' : ''}">
+                                                <span style="font-size:11px;color:var(--text-muted);min-width:16px;text-align:center">${mi + 1}</span>
+                                                <span style="font-weight:${mi === 0 ? '700' : '400'};color:${mi === 0 ? 'var(--accent)' : 'var(--text)'};font-size:13px">${esc(m.nickname || '—')}${mi === 0 ? ' <span style="font-size:9px;color:var(--text-muted)">(капитан)</span>' : ''}</span>
+                                                <span style="font-size:11px;color:var(--text-secondary)">${esc(m.playerId || '—')}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
                                 </td>
                             </tr>
                         `;
-
-                        // Team members
-                        allMembers.forEach((member, mi) => {
-                            const memberName = member.nickname || '—';
-                            const memberId = member.playerId || '—';
-                            const isCaptain = mi === 0;
-                            rows += `
-                                <tr>
-                                    <td style="text-align:center;color:var(--text-muted);font-size:11px">${mi + 1}</td>
-                                    <td style="${isCaptain ? 'font-weight:700;color:var(--accent)' : ''}">${esc(memberName)} ${isCaptain ? '<span style="font-size:9px;color:var(--text-muted)">(капитан)</span>' : ''}</td>
-                                    <td style="color:var(--text-secondary);font-size:12px">${esc(memberId)}</td>
-                                    <td style="text-align:center">
-                                        ${mi === 0 ? `
-                                        <select class="admin-results-place" data-user="${esc(team.captain)}" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 6px;font-size:12px;font-family:var(--font-sans);cursor:pointer;min-width:90px">
-                                            <option value="">—</option>
-                                            <option value="1" ${place === 1 ? 'selected' : ''}>1 место</option>
-                                            <option value="2" ${place === 2 ? 'selected' : ''}>2 место</option>
-                                            <option value="3" ${place === 3 ? 'selected' : ''}>3 место</option>
-                                            <option value="4" ${place === 4 ? 'selected' : ''}>4 место</option>
-                                            <option value="${place && place >= 5 ? place : 'other'}" ${place >= 5 ? 'selected' : ''}>${place >= 5 ? place + ' место' : 'Другое'}</option>
-                                        </select>` : ''}
-                                    </td>
-                                </tr>
-                            `;
-                        });
                     });
                 }
 
@@ -3331,6 +3341,19 @@
                 const orig = adminResultsSave.textContent;
                 adminResultsSave.textContent = 'Сохранено';
                 setTimeout(() => { adminResultsSave.textContent = orig; }, 1500);
+            });
+
+            // Expand/collapse team cards in results
+            adminResultsList.addEventListener('click', function(e) {
+                var card = e.target.closest('.team-result-card');
+                if (!card || e.target.closest('select')) return;
+                var id = card.dataset.card;
+                var membersRow = adminResultsList.querySelector('[data-parent="' + id + '"]');
+                var icon = card.querySelector('.team-expand-icon');
+                if (!membersRow) return;
+                var show = membersRow.style.display === 'none';
+                membersRow.style.display = show ? '' : 'none';
+                if (icon) icon.textContent = show ? '▾' : '▸';
             });
 
             // Refresh results list when section becomes active
