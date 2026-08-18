@@ -22,12 +22,12 @@
         .news-list::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:10px;margin:4px 0}
         .news-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.08));border-radius:10px;border:1px solid rgba(255,255,255,.06)}
         .news-list::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.18));box-shadow:0 0 6px rgba(255,255,255,.1)}
-        .news-card{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:var(--surface,#181818);border:1px solid var(--border,#222);border-radius:10px;transition:border-color .2s ease,transform .2s ease;position:relative}
-        .news-card:hover{border-color:rgba(255,255,255,.28);transform:translateY(-1px)}
-        .news-dot{flex-shrink:0;width:7px;height:7px;border-radius:50%;margin-top:7px}
+        .news-card{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:rgba(18,19,24,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:all .25s ease;position:relative}
+        .news-card:hover{border-color:rgba(255,255,255,.2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.05)}
+        .news-dot{flex-shrink:0;width:7px;height:7px;border-radius:50%;margin-top:7px;box-shadow:0 0 6px currentColor}
         .news-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
-        .news-tag{color:#fff;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.4px}
-        .news-pinned{font-size:9px;color:var(--accent);font-weight:600;letter-spacing:.5px}
+        .news-tag{color:#fff;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.4px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        .news-pinned{font-size:9px;color:var(--accent);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
         .news-date{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.5px}
         .news-title{font-family:var(--font-heading);font-size:17px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.25;letter-spacing:.3px}
         .news-text{font-size:12px;color:var(--text-secondary);line-height:1.6;white-space:pre-line}
@@ -38,7 +38,7 @@
         .news-video{width:100%;max-width:560px;aspect-ratio:16/9;object-fit:contain;margin-top:12px;border-radius:10px;border:1px solid var(--border);background:#000;display:block}
         .news-video__frame{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;display:block;background:#000}
         .news-page{position:relative;overflow:visible}
-        .news-page::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background:url('img/news-bg.jpg') center 50%/cover no-repeat;opacity:.55}
+        .news-page::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;background:url('img/news-bg.jpg') center 65%/cover no-repeat;opacity:.55}
         .news-page::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:
             linear-gradient(90deg,var(--bg,#0A0B0E) 0%,rgba(10,11,14,.5) 40%,rgba(10,11,14,.15) 100%),
             linear-gradient(180deg,var(--bg,#0A0B0E) 0%,rgba(10,11,14,.3) 12%,rgba(10,11,14,.08) 50%,rgba(10,11,14,.5) 100%)}
@@ -221,7 +221,7 @@
                 } else {
                     html = '';
                     sorted.forEach(function(n) {
-                        var color = COLORS[n.tag] || '#60A5FA';
+                        var color = n.tag ? (COLORS[n.tag] || '#60A5FA') : 'rgba(255,255,255,.2)';
                         var d = n.date ? new Date(n.date) : null;
                         var dateStr = d && !isNaN(d.getTime()) ? d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
                         var images = Array.isArray(n.images) ? n.images : [];
@@ -230,7 +230,7 @@
                             '<div class="news-dot" style="background:' + color + '"></div>' +
                             '<div style="flex:1;min-width:0">' +
                                 '<div class="news-meta">' +
-                                    '<span class="news-tag" style="background:' + color + '">' + esc(n.tag || 'Новость') + '</span>' +
+                                    (n.tag ? '<span class="news-tag" style="background:' + color + '">' + esc(n.tag) + '</span>' : '') +
                                     (n.pinned ? '<span class="news-pinned">Закреплено</span>' : '') +
                                     (dateStr ? '<span class="news-date">' + esc(dateStr) + '</span>' : '') +
                                 '</div>' +

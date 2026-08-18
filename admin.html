@@ -598,6 +598,7 @@
                         <div class="form-group" style="flex:1;min-width:160px;margin-bottom:0">
                             <label class="form-label">Категория</label>
                             <select class="form-input" id="news-tag" style="padding:8px 12px;font-size:13px;appearance:auto">
+                                <option value="">Без категории</option>
                                 <option value="Анонс">Анонс</option>
                                 <option value="Обновление">Обновление</option>
                                 <option value="Результаты">Результаты</option>
@@ -3654,7 +3655,7 @@
                 newsVideos = [];
                 document.getElementById('news-title').value = '';
                 document.getElementById('news-text').value = '';
-                document.getElementById('news-tag').value = 'Анонс';
+                document.getElementById('news-tag').value = '';
                 document.getElementById('news-pinned').checked = false;
                 document.getElementById('news-form-title').textContent = 'Новая запись';
                 document.getElementById('news-save').textContent = 'Опубликовать';
@@ -3754,7 +3755,7 @@
                 newsEditingId = n.id;
                 document.getElementById('news-title').value = n.title;
                 document.getElementById('news-text').value = n.text;
-                document.getElementById('news-tag').value = n.tag || 'Анонс';
+                document.getElementById('news-tag').value = n.tag || '';
                 document.getElementById('news-pinned').checked = !!n.pinned;
                 newsImages = (n.images || []).slice();
                 newsVideos = (n.videos || []).slice();
