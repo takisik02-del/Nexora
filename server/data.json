@@ -56,7 +56,16 @@
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [],
-  "nexora_news": [],
+  "nexora_news": [
+    {
+      "id": "news_welcome",
+      "title": "Добро пожаловать в Nexora!",
+      "text": "Платформа работает и турниры уже запускаются. Заходите на страницу «Турниры», выбирайте свой и регистрируйтесь. Новости и анонсы будут появляться в этом разделе.",
+      "tag": "Анонс",
+      "pinned": true,
+      "date": "2026-08-18T09:15:48.250Z"
+    }
+  ],
   "nexora_probe_test": [],
   "nexora_matches": []
 }
