@@ -655,6 +655,9 @@
         // Локальный список покинутых турниров — вышедший игрок не считается участником
         function isInLeftList(userId, tid) {
             try {
+                var regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+                var hasCurrentReg = regs.some(function(r) { return r.userId === userId && Number(r.tournamentId) === Number(tid); });
+                if (hasCurrentReg) return false;
                 const ll = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
                 return ll.some(x => x.userId === userId && Number(x.tournamentId) === Number(tid));
             } catch { return false; }
@@ -1415,6 +1418,11 @@
                     regs.push(newReg);
                 }
                 localStorage.setItem('nexora_registrations', JSON.stringify(regs));
+                try {
+                    var llApr = JSON.parse(localStorage.getItem('nexora_left_tournaments')) || [];
+                    llApr = llApr.filter(function(x) { return !(x.userId === req.userId && Number(x.tournamentId) === Number(req.tournamentId)); });
+                    localStorage.setItem('nexora_left_tournaments', JSON.stringify(llApr));
+                } catch(e) {}
             }
             localStorage.setItem('nexora_join_requests', JSON.stringify(reqs));
             showToast('Заявка одобрена, игрок добавлен в команду');
