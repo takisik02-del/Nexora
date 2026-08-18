@@ -2279,3 +2279,146 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 })();
+
+
+// ===========================================
+// 10. JOIN REQUESTS — one system for all pages
+// ===========================================
+(function() {
+    if (!document.getElementById('modal-overlay')) {
+        var ov = document.createElement('div'); ov.id = 'modal-overlay'; ov.className = 'modal-overlay';
+        document.body.appendChild(ov);
+    }
+
+    if (!document.getElementById('requests-modal')) {
+        var rm = document.createElement('div'); rm.id = 'requests-modal'; rm.className = 'modal modal--wide';
+        rm.innerHTML = '<div class="modal__header"><h3 class="modal__title">Заявки в команды</h3><button class="modal__close" id="requests-close">&#10005;</button></div><div class="modal__form" style="padding:20px 24px"><div id="requests-content" style="max-height:65vh;overflow-y:auto"></div></div>';
+        document.body.appendChild(rm);
+    }
+
+    var headerActions = document.querySelector('.header__actions');
+    if (headerActions && !document.getElementById('btn-requests')) {
+        var rbtn = document.createElement('button');
+        rbtn.className = 'btn btn--ghost';
+        rbtn.id = 'btn-requests';
+        rbtn.style.cssText = 'display:none;position:relative';
+        rbtn.innerHTML = 'Заявки<span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-10px;background:#EF4444;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:16px">0</span>';
+        var spacer = headerActions.querySelector('.header__spacer');
+        if (spacer) headerActions.insertBefore(rbtn, spacer);
+        else headerActions.appendChild(rbtn);
+    }
+
+    function escReq(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+    window.updateRequestsBadge = function() {
+        var user = null; try { user = JSON.parse(localStorage.getItem('nexora_current_user')); } catch {}
+        var badge = document.getElementById('requests-badge');
+        var btn = document.getElementById('btn-requests');
+        if (!btn || !badge) return;
+        if (!user) { btn.style.display = 'none'; return; }
+        btn.style.display = '';
+        var reqs = []; try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+        var regs = []; try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+        var myTeams = regs.filter(function(r) { return r.userId === user.nickname && r.role === 'captain'; });
+        var teamIds = myTeams.map(function(t) { return t.teamId; });
+        var pendingCount = reqs.filter(function(r) { return teamIds.indexOf(r.teamId) !== -1 && r.status === 'pending'; }).length;
+        badge.style.display = pendingCount > 0 ? 'flex' : 'none';
+        badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+    };
+
+    function renderPendingRequests(teamId, tournamentId, reqs) {
+        var pending = reqs.filter(function(r) { return r.teamId === teamId && r.tournamentId === tournamentId && r.status === 'pending'; });
+        if (pending.length === 0) return '<p style="text-align:center;padding:16px;font-size:13px;color:var(--text-muted)">Нет ожидающих заявок</p>';
+        var html = '';
+        pending.forEach(function(req) {
+            html += '<div class="join-request" data-req-id="' + req.id + '" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">' +
+                '<div style="flex:1;min-width:0">' +
+                    '<div style="font-size:15px;font-weight:600;color:var(--text);cursor:pointer" class="profile-link" data-user="' + escReq(req.userId) + '">' + escReq(req.userId) + '</div>' +
+                    '<div style="font-size:12px;color:var(--text-muted);margin-top:1px">ID: ' + escReq(req.playerId || '—') + '</div>' +
+                '</div>' +
+                '<button class="req-approve" data-req-id="' + req.id + '" style="padding:8px 20px;border:none;border-radius:6px;background:var(--accent);color:#0A0B0E;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">Принять</button>' +
+                '<button class="req-reject" data-req-id="' + req.id + '" style="padding:8px 14px;border:none;border-radius:6px;background:#EF4444;color:#fff;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">Нет</button></div>';
+        });
+        return html;
+    }
+
+    window.refreshRequestsList = function() {
+        var user = null; try { user = JSON.parse(localStorage.getItem('nexora_current_user')); } catch {}
+        if (!user) return;
+        var regs = []; try { regs = JSON.parse(localStorage.getItem('nexora_registrations')) || []; } catch {}
+        var reqs = []; try { reqs = JSON.parse(localStorage.getItem('nexora_join_requests')) || []; } catch {}
+        var tns = []; try { tns = JSON.parse(localStorage.getItem('nexora_tournaments')) || []; } catch {}
+        var myTeams = regs.filter(function(r) { return r.userId === user.nickname && r.role === 'captain'; });
+        var content = document.getElementById('requests-content');
+        if (!content) return;
+        if (myTeams.length === 0) {
+            content.innerHTML = '<p style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:14px">Нет команд, в которых вы капитан</p>';
+        } else {
+            var html = '';
+            myTeams.forEach(function(team) {
+                var tn = tns.find(function(t) { return t.id === team.tournamentId; });
+                var tournName = tn ? tn.name : 'Турнир';
+                var tt = tn ? (tn.teamType || 'solo') : 'solo';
+                var memberCount = tt === 'duo' ? 2 : tt === 'trio' ? 3 : tt === 'team4' ? 4 : tt === 'team8' ? 8 : 5;
+                var teamMembers = regs.filter(function(r) { return r.teamId === team.teamId; });
+                html += '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--surface)">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
+                        '<div>' +
+                            '<div style="font-size:16px;font-weight:700;color:var(--text)">' + escReq(tournName) + '</div>' +
+                            '<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:3px">«' + escReq(team.teamName) + '» · ' + teamMembers.length + '/' + memberCount + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div data-team-id="' + team.teamId + '" data-tournament-id="' + team.tournamentId + '">' +
+                        renderPendingRequests(team.teamId, team.tournamentId, reqs) +
+                    '</div></div>';
+            });
+            content.innerHTML = html;
+        }
+    };
+
+    function openRequestsModal() {
+        var user = null; try { user = JSON.parse(localStorage.getItem('nexora_current_user')); } catch {}
+        if (!user) return;
+        window.refreshRequestsList();
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById('requests-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRequestsModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('requests-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'btn-requests') { openRequestsModal(); return; }
+        if (e.target.id === 'requests-close') { closeRequestsModal(); return; }
+        var approveBtn = e.target.closest('.req-approve');
+        if (approveBtn && typeof window.approveJoinRequest === 'function') {
+            window.approveJoinRequest(approveBtn.dataset.reqId);
+            window.updateRequestsBadge();
+            window.refreshRequestsList();
+            return;
+        }
+        var rejectBtn = e.target.closest('.req-reject');
+        if (rejectBtn && typeof window.rejectJoinRequest === 'function') {
+            window.rejectJoinRequest(rejectBtn.dataset.reqId);
+            window.updateRequestsBadge();
+            window.refreshRequestsList();
+            return;
+        }
+    });
+
+    document.getElementById('modal-overlay').addEventListener('click', function() {
+        var rm = document.getElementById('requests-modal');
+        if (rm && rm.classList.contains('active')) closeRequestsModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        var rm = document.getElementById('requests-modal');
+        if (e.key === 'Escape' && rm && rm.classList.contains('active')) closeRequestsModal();
+    });
+
+    window.updateRequestsBadge();
+    setInterval(window.updateRequestsBadge, 5000);
+})();
