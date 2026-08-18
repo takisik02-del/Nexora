@@ -2296,17 +2296,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(rm);
     }
 
+    // --- button already in HTML ---
     var headerActions = document.querySelector('.header__actions');
-    if (headerActions && !document.getElementById('btn-requests')) {
-        var rbtn = document.createElement('button');
-        rbtn.className = 'btn btn--ghost';
-        rbtn.id = 'btn-requests';
-        rbtn.style.cssText = 'display:none;position:relative';
-        rbtn.innerHTML = 'Заявки<span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-10px;background:#EF4444;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:16px">0</span>';
-        var spacer = headerActions.querySelector('.header__spacer');
-        if (spacer) headerActions.insertBefore(rbtn, spacer);
-        else headerActions.appendChild(rbtn);
-    }
+    var rbtn = document.getElementById('btn-requests');
 
     function escReq(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 

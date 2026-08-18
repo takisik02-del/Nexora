@@ -169,8 +169,9 @@
                 </ul>
             </nav>
             <div class="header__actions">
-                <button class="btn btn--ghost" data-modal="register" id="btn-register">Регистрация</button>
-                <button class="btn btn--primary" data-modal="login" id="btn-login">Вход</button>
+                <button class="btn btn--ghost" data-modal="register" id="btn-register" style="display:none">Регистрация</button>
+                <button class="btn btn--primary" data-modal="login" id="btn-login" style="display:none">Вход</button>
+                <button class="btn btn--ghost" id="btn-requests" style="display:none;position:relative">Заявки<span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-10px;background:#EF4444;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 4px;line-height:16px">0</span></button>
                 <div class="header__spacer"></div>
                 <div class="header__profile-wrap" id="profile-wrap" style="display:none">
                     <button class="btn btn--ghost" id="btn-profile">Профиль</button>
