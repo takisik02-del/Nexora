@@ -2034,11 +2034,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     var replyBlock = '';
                     if (m.replyToText) {
                         var replyName = dispName(m.targetUserId || '');
-                        var rBg = mine ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.05)';
-                        var rBorder = mine ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.15)';
-                        var rNameCl = mine ? 'rgba(255,255,255,.7)' : 'rgba(255,255,255,.4)';
-                        var rTextCl = mine ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.3)';
-                        replyBlock = '<div style="padding:6px 10px;margin-bottom:6px;background:' + rBg + ';border-left:2px solid ' + rBorder + ';border-radius:6px;font-size:11px;line-height:1.3">' +
+                        var rBg = mine ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.08)';
+                        var rBorder = mine ? 'rgba(255,255,255,.25)' : 'var(--accent)';
+                        var rNameCl = mine ? 'rgba(255,255,255,.7)' : 'rgba(255,255,255,.6)';
+                        var rTextCl = mine ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.5)';
+                        replyBlock = '<div style="padding:6px 10px;margin-bottom:6px;background:' + rBg + ';border-left:3px solid ' + rBorder + ';border-radius:6px;font-size:11px;line-height:1.3">' +
                             '<div style="font-weight:600;color:' + rNameCl + ';margin-bottom:2px">' + esc(replyName) + '</div>' +
                             '<div style="color:' + rTextCl + ';word-break:break-word">' + esc(m.replyToText) + '</div></div>';
                     }

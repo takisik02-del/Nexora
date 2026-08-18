@@ -56,6 +56,44 @@
       "isAdmin": false,
       "chatType": "general",
       "teamName": "AAAA"
+    },
+    {
+      "tournamentId": 1787056123261,
+      "userId": "Support",
+      "text": "всем ку",
+      "timestamp": "2026-08-18T16:59:36.480Z",
+      "isAdmin": false,
+      "chatType": "general",
+      "teamName": "AAAA"
+    },
+    {
+      "tournamentId": 1787056123261,
+      "userId": "Support",
+      "text": "здарова",
+      "timestamp": "2026-08-18T16:59:39.757Z",
+      "isAdmin": false,
+      "chatType": "organizer",
+      "teamName": "AAAA"
+    },
+    {
+      "tournamentId": 1787056123261,
+      "userId": "MARS",
+      "text": "здарова",
+      "timestamp": "2026-08-18T16:59:54.588Z",
+      "isAdmin": false,
+      "chatType": "general",
+      "teamName": "ЕЕЕ",
+      "targetUserId": "Support",
+      "replyToText": "всем ку"
+    },
+    {
+      "tournamentId": 1787056123261,
+      "userId": "MARS",
+      "text": "ало",
+      "timestamp": "2026-08-18T17:02:24.018Z",
+      "isAdmin": false,
+      "chatType": "organizer",
+      "teamName": "ЕЕЕ"
     }
   ],
   "nexora_registrations": [
@@ -129,7 +167,7 @@
   ],
   "nexora_organizer_read": {
     "1": "2026-07-30T18:46:56.045Z",
-    "1787056123261": "2026-08-18T16:56:54.411Z"
+    "1787056123261": "2026-08-18T17:02:22.054Z"
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [
