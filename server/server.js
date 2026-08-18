@@ -372,8 +372,12 @@ app.post('/api/save', async (req, res) => {
     Object.keys(clean).forEach(key => {
         const val = clean[key];
         // Skip empty arrays/objects to avoid wiping server data
-        if (Array.isArray(val) && val.length === 0) return;
-        if (typeof val === 'object' && val !== null && !Array.isArray(val) && Object.keys(val).length === 0) return;
+        // EXCEPT tournaments and registrations — those can be emptied by admin
+        const canBeEmpty = ['nexora_tournaments', 'nexora_registrations', 'nexora_join_requests', 'nexora_chat_messages', 'nexora_left_tournaments'];
+        if (canBeEmpty.indexOf(key) === -1) {
+            if (Array.isArray(val) && val.length === 0) return;
+            if (typeof val === 'object' && val !== null && !Array.isArray(val) && Object.keys(val).length === 0) return;
+        }
         if (val === null || val === undefined) return;
 
         // Мержим массивы регистраций и заявок по уникальному ключу,
