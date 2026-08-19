@@ -72,7 +72,17 @@
     // Вход / Регистрация / Личный кабинет → на главную с автооткрытием модалки
     if (btnLogin) btnLogin.addEventListener('click', function (e) { e.preventDefault(); location.href = 'index.html?auth=login'; });
     if (btnRegister) btnRegister.addEventListener('click', function (e) { e.preventDefault(); location.href = 'index.html?auth=register'; });
-    if (btnProfileLink) btnProfileLink.addEventListener('click', function (e) { e.preventDefault(); location.href = 'index.html?auth=profile'; });
+    if (btnProfileLink) btnProfileLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        var user = getCurrentUser();
+        if (typeof window.openProfile === 'function' && user && user.nickname) {
+            var dd = document.getElementById('profile-dropdown');
+            if (dd) dd.classList.remove('open');
+            window.openProfile(user.nickname);
+        } else {
+            location.href = 'index.html?auth=profile';
+        }
+    });
 
     // Если авторизация изменилась где-то ещё (например, после выхода) — обновим шапку
     window.addEventListener('nexora:auth', render);

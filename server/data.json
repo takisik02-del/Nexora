@@ -16,6 +16,14 @@
       "avatarImage": null,
       "wins": 0,
       "losses": 0
+    },
+    "Support": {
+      "avatar": "",
+      "bgColor": "#0EA5E9",
+      "bio": "",
+      "avatarImage": null,
+      "wins": 0,
+      "losses": 0
     }
   },
   "nexora_users": [
@@ -160,7 +168,7 @@
   ],
   "nexora_organizer_read": {
     "1": "2026-07-30T18:46:56.045Z",
-    "1787056123261": "2026-08-18T18:15:16.194Z"
+    "1787056123261": "2026-08-19T08:49:23.676Z"
   },
   "nexora_seed_done": true,
   "nexora_join_requests": [
@@ -342,6 +350,14 @@
   ],
   "nexora_user_settings": {
     "marse2007@bk.ru": {
+      "notifications": {
+        "new-tournament": true,
+        "results": true,
+        "start": true,
+        "news": false
+      }
+    },
+    "anfajue@bk.ru": {
       "notifications": {
         "new-tournament": true,
         "results": true,
