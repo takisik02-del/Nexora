@@ -2414,3 +2414,121 @@ document.addEventListener('DOMContentLoaded', () => {
     window.updateRequestsBadge();
     setInterval(window.updateRequestsBadge, 5000);
 })();
+
+
+// ===========================================
+// 11. PROFILE VIEW — works on all pages
+// ===========================================
+(function() {
+    if (!document.getElementById('modal-overlay')) {
+        var ov = document.createElement('div'); ov.id = 'modal-overlay'; ov.className = 'modal-overlay';
+        document.body.appendChild(ov);
+    }
+
+    if (!document.getElementById('profile-view-modal')) {
+        var pm = document.createElement('div'); pm.id = 'profile-view-modal'; pm.className = 'modal modal--wide';
+        pm.innerHTML = '<div class="modal__header"><h3 class="modal__title" id="profile-view-title">Профиль игрока</h3><button class="modal__close" id="profile-view-close">&#10005;</button></div><div class="modal__form" style="padding:20px 24px"><div id="profile-view-content" style="max-height:65vh;overflow-y:auto"></div></div>';
+        document.body.appendChild(pm);
+    }
+
+    var PROFILE_COLORS = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#98D8C8','#F7DC6F','#BB8FCE','#85C1E9'];
+
+    function escP(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    function getProfileData(nickname) {
+        if (!nickname) return { avatar: '', bgColor: '#3A3F4B', bio: '', avatarImage: null, wins: 0, losses: 0 };
+        try {
+            var all = JSON.parse(localStorage.getItem('nexora_profiles'));
+            if (all && all[nickname]) return all[nickname];
+        } catch(e) {}
+        var hash = 0;
+        for (var i = 0; i < nickname.length; i++) { hash = nickname.charCodeAt(i) + ((hash << 5) - hash); }
+        var p = { avatar: '', bgColor: PROFILE_COLORS[Math.abs(hash) % PROFILE_COLORS.length], bio: '', avatarImage: null, wins: 0, losses: 0 };
+        try { var a = JSON.parse(localStorage.getItem('nexora_profiles')) || {}; a[nickname] = p; localStorage.setItem('nexora_profiles', JSON.stringify(a)); } catch(e) {}
+        return p;
+    }
+
+    function calcPlayed(nickname) {
+        try {
+            var regs = JSON.parse(localStorage.getItem('nexora_registrations')) || [];
+            var tns = JSON.parse(localStorage.getItem('nexora_tournaments')) || [];
+            var count = 0;
+            regs.forEach(function(r) {
+                if (r.userId === nickname) {
+                    var tn = tns.find(function(t) { return t.id === r.tournamentId; });
+                    if (tn && (tn.status === 'completed' || tn.status === 'active')) count++;
+                }
+            });
+            return count;
+        } catch(e) { return 0; }
+    }
+
+    function renderAvatarP(profile, size) {
+        size = size || 80;
+        if (profile.avatarImage) {
+            return '<img src="' + escP(profile.avatarImage) + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover;display:block;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.3)">';
+        }
+        return '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + escP(profile.bgColor) + ';margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.3)"></div>';
+    }
+
+    if (!window.openProfile) {
+        window.openProfile = function(nickname) {
+            if (!nickname) return;
+            var content = document.getElementById('profile-view-content');
+            if (!content) return;
+            var profile = getProfileData(nickname);
+            var tournamentsPlayed = calcPlayed(nickname);
+            var cur = null; try { cur = JSON.parse(localStorage.getItem('nexora_current_user')); } catch(e) {}
+
+            content.innerHTML =
+                '<div style="text-align:center;padding:8px 0 16px">' +
+                    renderAvatarP(profile, 90) +
+                    '<h2 style="font-size:20px;font-weight:700;color:var(--text);margin:14px 0 4px">' + escP(nickname) + '</h2>' +
+                    (profile.bio ? '<p style="font-size:13px;color:var(--text-muted);margin:4px auto 0;max-width:280px">' + escP(profile.bio) + '</p>' : '') +
+                '</div>' +
+                '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">' +
+                    '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                        '<div style="font-size:22px;font-weight:700;color:var(--accent)">' + tournamentsPlayed + '</div>' +
+                        '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Турниров</div>' +
+                    '</div>' +
+                    '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                        '<div style="font-size:22px;font-weight:700;color:#FFFFFF">' + (profile.wins || 0) + '</div>' +
+                        '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Побед</div>' +
+                    '</div>' +
+                    '<div style="text-align:center;padding:14px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px">' +
+                        '<div style="font-size:22px;font-weight:700;color:#EF4444">' + (profile.losses || 0) + '</div>' +
+                        '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:500">Поражений</div>' +
+                    '</div>' +
+                '</div>';
+
+            document.getElementById('profile-view-title').textContent = '\u041f\u0440\u043e\u0444\u0438\u043b\u2014 ' + nickname;
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('profile-view-modal').classList.add('active');
+            document.getElementById('profile-view-modal').style.zIndex = '2101';
+            document.body.style.overflow = 'hidden';
+        };
+    }
+
+    function closeProfileModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        var pm = document.getElementById('profile-view-modal');
+        if (pm) { pm.classList.remove('active'); pm.style.zIndex = ''; }
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'profile-view-close') { closeProfileModal(); }
+    });
+
+    document.getElementById('modal-overlay').addEventListener('click', function() {
+        var pm = document.getElementById('profile-view-modal');
+        if (pm && pm.classList.contains('active')) closeProfileModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            var pm = document.getElementById('profile-view-modal');
+            if (pm && pm.classList.contains('active')) closeProfileModal();
+        }
+    });
+})();
