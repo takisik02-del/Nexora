@@ -49,16 +49,7 @@
         }
     }
 
-    // Выпадающее меню профиля
-    btnProfile.addEventListener('click', function (e) {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('open');
-    });
-    document.addEventListener('click', function (e) {
-        if (!profileWrap.contains(e.target)) {
-            profileDropdown.classList.remove('open');
-        }
-    });
+    // Выпадающее меню профиля — обрабатывается в script.js (единый обработчик на всех страницах)
 
     // Выход
     if (btnLogout) {
@@ -74,14 +65,6 @@
     if (btnRegister) btnRegister.addEventListener('click', function (e) { e.preventDefault(); location.href = 'index.html?auth=register'; });
     if (btnProfileLink) btnProfileLink.addEventListener('click', function (e) {
         e.preventDefault();
-        var user = getCurrentUser();
-        if (typeof window.openProfile === 'function' && user && user.nickname) {
-            var dd = document.getElementById('profile-dropdown');
-            if (dd) dd.classList.remove('open');
-            window.openProfile(user.nickname);
-        } else {
-            location.href = 'index.html?auth=profile';
-        }
     });
 
     // Если авторизация изменилась где-то ещё (например, после выхода) — обновим шапку

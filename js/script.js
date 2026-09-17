@@ -695,18 +695,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Profile dropdown toggle
-    btnProfile.addEventListener('click', e => {
-        e.stopPropagation();
-        profileDropdown.classList.toggle('open');
-    });
-
-    // Close dropdown on outside click
-    document.addEventListener('click', e => {
-        if (!profileWrap.contains(e.target)) {
-            profileDropdown.classList.remove('open');
-        }
-    });
+    // Profile dropdown toggle (ediniy obrabotchik na vsekh stranitsakh)
+    if (btnProfile && profileDropdown) {
+        btnProfile.addEventListener('click', e => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', e => {
+            if (!profileWrap.contains(e.target)) {
+                profileDropdown.classList.remove('open');
+            }
+        });
+    }
 
     // --- REGISTER (two-step email verification) ---
     const registerForm = document.getElementById('register-form');
@@ -1485,9 +1485,14 @@ document.addEventListener('DOMContentLoaded', () => {
         btnProfileLink.addEventListener('click', e => {
             e.preventDefault();
             profileDropdown.classList.remove('open');
-            openModal('profile');
-            renderProfile();
-            renderSettings();
+            var u = getCurrentUser();
+            if (typeof window.openProfile === 'function' && u && u.nickname) {
+                window.openProfile(u.nickname);
+            } else {
+                openModal('profile');
+                renderProfile();
+                renderSettings();
+            }
         });
     }
 

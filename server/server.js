@@ -291,7 +291,13 @@ function mergeTickets(serverArr, clientArr) {
     clientArr.forEach(function(t) {
         if (!t || !t.id) return;
         const cur = merged[t.id];
-        if (!cur) { merged[t.id] = JSON.parse(JSON.stringify(t)); return; }
+        if (!cur) {
+            // Не добавляем тикеты, которых нет на сервере.
+            // Новые тикеты создаются через POST /api/tickets/new.
+            // Это предотвращает восстановление удалённых/очищенных тикетов
+            // из устаревшего localStorage других клиентов.
+            return;
+        }
 
         const msgMap = {};
         function addMsg(m) {
@@ -316,11 +322,14 @@ function mergeTickets(serverArr, clientArr) {
             if (cur[f] == null && t[f] != null) cur[f] = t[f];
         });
 
-        // Статус определяет последнее сообщение: ответ игрока → «Ожидает ответа»,
-        // ответ организатора → «Отвечен». Закрытое обращение переоткрываем только
-        // если в пуше действительно появилось новое сообщение игрока.
+        // Статус определяется так:
+        // 1. Если клиент явно закрыл обращение — статус «closed».
+        // 2. Если клиент ответил (последнее сообщение от admin) — «answered».
+        // 3. Если игрок написал (последнее сообщение от user) — «open».
         const last = msgs[msgs.length - 1];
-        if (last) {
+        if (t.status === 'closed') {
+            cur.status = 'closed';
+        } else if (last) {
             const desired = last.from === 'user' ? 'open' : 'answered';
             if (cur.status !== 'closed' || desired === 'open') cur.status = desired;
         }
@@ -372,7 +381,7 @@ app.post('/api/save', async (req, res) => {
         const val = clean[key];
         // Skip empty arrays/objects to avoid wiping server data
         // EXCEPT tournaments and registrations — those can be emptied by admin
-        const canBeEmpty = ['nexora_tournaments', 'nexora_registrations', 'nexora_join_requests', 'nexora_chat_messages', 'nexora_left_tournaments'];
+        const canBeEmpty = ['nexora_tournaments', 'nexora_registrations', 'nexora_join_requests', 'nexora_chat_messages', 'nexora_left_tournaments', 'nexora_support_tickets'];
         if (canBeEmpty.indexOf(key) === -1) {
             if (Array.isArray(val) && val.length === 0) return;
             if (typeof val === 'object' && val !== null && !Array.isArray(val) && Object.keys(val).length === 0) return;
@@ -445,6 +454,42 @@ app.post('/api/delete', (req, res) => {
     });
     writeData(data);
     res.json({ success: true, deleted: before - data[key].length });
+});
+
+// POST /api/tickets/close — закрыть обращение (минуя mergeTickets)
+app.post('/api/tickets/close', (req, res) => {
+    if (!isAdminAuthorized(req)) return res.status(403).json({ success: false, error: 'Forbidden' });
+    const { id } = req.body || {};
+    if (!id) return res.status(400).json({ success: false, error: 'Missing id' });
+    const data = readData();
+    const arr = Array.isArray(data.nexora_support_tickets) ? data.nexora_support_tickets : [];
+    const t = arr.find(x => x && x.id === id);
+    if (!t) return res.status(404).json({ success: false, error: 'Ticket not found' });
+    t.status = 'closed';
+    data.nexora_support_tickets = arr;
+    writeData(data);
+    res.json({ success: true });
+});
+
+// POST /api/tickets/clear — удалить все обращения
+app.post('/api/tickets/clear', (req, res) => {
+    if (!isAdminAuthorized(req)) return res.status(403).json({ success: false, error: 'Forbidden' });
+    const data = readData();
+    data.nexora_support_tickets = [];
+    data.nexora_tickets_cleared_at = new Date().toISOString();
+    writeData(data);
+    res.json({ success: true });
+});
+
+// POST /api/tickets/new — создать новое обращение (без mergeTickets)
+app.post('/api/tickets/new', (req, res) => {
+    const ticket = req.body;
+    if (!ticket || !ticket.id) return res.status(400).json({ success: false, error: 'Missing ticket' });
+    const data = readData();
+    if (!Array.isArray(data.nexora_support_tickets)) data.nexora_support_tickets = [];
+    data.nexora_support_tickets.push(ticket);
+    writeData(data);
+    res.json({ success: true });
 });
 
 // GET /api/load — load all nexora data for client

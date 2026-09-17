@@ -1,2 +1,2 @@
 @echo off
-start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" "%~dp0tournaments.html"
+start "" "https://nexora-public-delta.vercel.app"

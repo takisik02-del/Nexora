@@ -182,7 +182,7 @@
                         <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
                     </div>
                 </div>
-                <a href="contacts.html" class="btn btn--ghost header-support" title="Помощь"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Помощь</a>
+                <a href="contacts.html" class="btn btn--ghost header-support" title="Поддержка"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Поддержка</a>
                 <button class="header__burger" id="burger" aria-label="Меню">
                     <span></span><span></span><span></span>
                 </button>
@@ -625,7 +625,7 @@
             <div class="admin-section" id="section-tickets">
                 <div class="admin-header">
                     <h1 class="admin-header__title"><span>Тикеты</span> поддержки</h1>
-                    <span style="font-size:12px;color:var(--text-muted)">Обращения игроков с формы на странице «Помощь»</span>
+                    <span style="font-size:12px;color:var(--text-muted)">Обращения игроков с формы на странице «Поддержка»</span>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="tickets-filters">
                     <button class="btn btn--ghost active" data-ticket-filter="all" style="font-size:11px;padding:6px 14px">Все</button>
@@ -3783,8 +3783,39 @@
                 try { return JSON.parse(localStorage.getItem('nexora_support_tickets')) || []; }
                 catch (e) { return []; }
             }
-            function saveAdminTickets(list) {
-                localStorage.setItem('nexora_support_tickets', JSON.stringify(list));
+            function saveAdminTickets(list, skipPush) {
+                if (skipPush && window.setNexoraLocal) window.setNexoraLocal('nexora_support_tickets', JSON.stringify(list));
+                else localStorage.setItem('nexora_support_tickets', JSON.stringify(list));
+                if (skipPush && window.setNexoraDirty) window.setNexoraDirty('nexora_support_tickets');
+            }
+            // Синхронизация тикетов с сервером: удаляем все старые, сохраняем актуальный список.
+            // mergeTickets видит каждый тикет как «новый» → статус не перезаписывается.
+            function syncTicketsToServer(list) {
+                try {
+                    const h = { 'Content-Type': 'application/json' };
+                    const tk = (function(){ try { return localStorage.getItem('nexora_admin_token') || ''; } catch(e) { return ''; } })();
+                    if (tk) h['X-Admin-Token'] = tk;
+                    const old = getAdminTickets();
+                    let chain = Promise.resolve();
+                    old.forEach(function(t) {
+                        chain = chain.then(function() {
+                            if (window.setNexoraDirty) window.setNexoraDirty('nexora_support_tickets');
+                            return fetch('/api/delete', {
+                                method: 'POST', headers: h,
+                                body: JSON.stringify({ key: 'nexora_support_tickets', filters: { id: t.id } })
+                            }).catch(function(){});
+                        });
+                    });
+                    chain.then(function() {
+                        if (window.setNexoraDirty) window.setNexoraDirty('nexora_support_tickets');
+                        return fetch('/api/save', {
+                            method: 'POST', headers: h,
+                            body: JSON.stringify({ nexora_support_tickets: list })
+                        });
+                    }).then(function() {
+                        if (window.setNexoraDirty) window.setNexoraDirty('nexora_support_tickets');
+                    }).catch(function(){});
+                } catch(e) {}
             }
             let ticketFilter = 'all';
             function ticketStatusBadge(s) {
@@ -3830,7 +3861,13 @@
                 const el = document.getElementById('admin-tickets-list');
                 if (!el) return;
                 const all = getAdminTickets();
-                const list = all
+                const wasExpanded = {};
+                document.querySelectorAll('[data-ticket-group-toggle]').forEach(function(gt) {
+                    var idx = gt.dataset.ticketGroupToggle;
+                    var body = document.getElementById('ticket-group-body-' + idx);
+                    if (body && body.style.display !== 'none') wasExpanded[idx] = true;
+                });
+                const filtered = all
                     .filter(t => ticketFilter === 'all' || t.status === ticketFilter)
                     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
                 const countEl = document.getElementById('tickets-count');
@@ -3838,33 +3875,87 @@
                     const open = all.filter(t => t.status === 'open').length;
                     countEl.textContent = open ? open + ' открыто' : 'Открытых нет';
                 }
-                if (!list.length) {
+                if (!filtered.length) {
                     el.innerHTML = '<div class="admin-empty">' + (all.length ? 'В этой категории обращений нет' : 'Обращений пока нет') + '</div>';
                     return;
                 }
-                el.innerHTML = list.map(t => `
-                    <div style="padding:14px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg)">
-                        <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
-                            <div style="flex:1;min-width:0">
-                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+
+                // Группировка по игроку
+                const groups = {};
+                filtered.forEach(t => {
+                    const key = t.userId || t.email || 'Неизвестный';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(t);
+                });
+
+                const groupKeys = Object.keys(groups);
+                el.innerHTML = groupKeys.map((user, idx) => {
+                    const tickets = groups[user];
+                    const isOpen = tickets.some(t => t.status === 'open');
+                    const first = tickets[0];
+                    const topics = [...new Set(tickets.map(t => t.topic || 'Обращение'))];
+                    const topicLabel = topics.length === 1 ? topics[0] : topics.join(', ');
+                    const isMulti = tickets.length > 1;
+
+                    let body = '';
+                    if (isMulti) {
+                        // Сворачиваемый список тикетов
+                        body = tickets.map(t => `
+                            <div style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--surface)">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
                                     ${ticketStatusBadge(t.status)}
                                     <span style="font-size:11px;color:var(--accent);font-weight:600">${esc(t.topic || 'Обращение')}</span>
-                                    <span style="font-size:11px;color:var(--text-muted)">${formatTicketDate(t.createdAt)}</span>
-                                </div>
-                                <div style="display:flex;gap:8px;font-size:11px;color:var(--text-muted);margin-bottom:8px">
-                                    <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(t.userId || '—')}</span>
-                                    <span>✉ ${esc(t.email || '—')}</span>
+                                    <span style="font-size:10px;color:var(--text-muted)">${formatTicketDate(t.createdAt)}</span>
                                 </div>
                                 ${adminTicketChat(t)}
-                                <div style="display:flex;gap:8px;flex-wrap:wrap" data-ticket-reply-box="${esc(t.id)}">
-                                    <input type="text" class="form-input" data-ticket-reply-input="${esc(t.id)}" placeholder="Ответ игроку..." style="flex:1;min-width:200px;padding:8px 12px;font-size:12px">
-                                    <button class="btn btn--primary" data-ticket-answer="${esc(t.id)}" style="font-size:11px;padding:6px 14px">Ответить</button>
-                                    ${t.status !== 'closed' ? '<button class="btn btn--ghost" data-ticket-close="' + esc(t.id) + '" style="font-size:11px;padding:6px 14px;color:#EF4444">Закрыть</button>' : ''}
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" data-ticket-reply-box="${esc(t.id)}">
+                                    <input type="text" class="form-input" data-ticket-reply-input="${esc(t.id)}" placeholder="Ответ игроку..." style="flex:1;min-width:180px;padding:6px 10px;font-size:11px">
+                                    <button class="btn btn--primary" data-ticket-answer="${esc(t.id)}" style="font-size:10px;padding:5px 12px">Ответить</button>
+                                    ${t.status !== 'closed' ? '<button class="btn btn--ghost" data-ticket-close="' + esc(t.id) + '" style="font-size:10px;padding:5px 12px;color:#EF4444">Закрыть</button>' : ''}
                                 </div>
                             </div>
+                        `).join('');
+                    } else {
+                        // Один тикет — прямой показ
+                        const t = tickets[0];
+                        body = `
+                            ${adminTicketChat(t)}
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" data-ticket-reply-box="${esc(t.id)}">
+                                <input type="text" class="form-input" data-ticket-reply-input="${esc(t.id)}" placeholder="Ответ игроку..." style="flex:1;min-width:180px;padding:6px 10px;font-size:11px">
+                                <button class="btn btn--primary" data-ticket-answer="${esc(t.id)}" style="font-size:10px;padding:5px 12px">Ответить</button>
+                                ${t.status !== 'closed' ? '<button class="btn btn--ghost" data-ticket-close="' + esc(t.id) + '" style="font-size:10px;padding:5px 12px;color:#EF4444">Закрыть</button>' : ''}
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div style="padding:14px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg)">
+                            <div style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none" data-ticket-group-toggle="${idx}">
+                                <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:var(--surface);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent)">${esc((user || '?').substring(0,1).toUpperCase())}</div>
+                                <div style="flex:1;min-width:0">
+                                    <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(user)}</div>
+                                    <div style="font-size:11px;color:var(--text-muted);margin-top:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                                        ${ticketStatusBadge(isOpen ? 'open' : tickets[0].status)}
+                                        <span>${esc(topicLabel)}</span>
+                                        ${isMulti ? '<span style="color:var(--accent);font-weight:600">· ' + tickets.length + ' обращений</span>' : ''}
+                                    </div>
+                                </div>
+                                ${isMulti ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text-muted);transition:transform .2s" data-ticket-chevron="' + idx + '"><polyline points="6 9 12 15 18 9"/></svg>' : ''}
+                            </div>
+                            ${isMulti ? '<div style="display:none;margin-top:12px" id="ticket-group-body-' + idx + '">' + body + '</div>' : '<div style="margin-top:12px">' + body + '</div>'}
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
+
+                // Восстанавливаем развёрнутые группы после перерендера
+                if (Object.keys(wasExpanded).length) {
+                    Object.keys(wasExpanded).forEach(function(idx) {
+                        var body = document.getElementById('ticket-group-body-' + idx);
+                        var chevron = el.querySelector('[data-ticket-chevron="' + idx + '"]');
+                        if (body) body.style.display = '';
+                        if (chevron) chevron.style.transform = 'rotate(180deg)';
+                    });
+                }
             }
 
             document.getElementById('tickets-filters').addEventListener('click', e => {
@@ -3887,25 +3978,35 @@
                 if (!all.length) { alert('Обращений пока нет'); return; }
                 if (!confirm('Удалить все ' + all.length + ' обращений поддержки?')) return;
                 if (!confirm('Точно удалить? Это действие необратимо.')) return;
-                // Локально — через setNexoraLocal, чтобы не триггерить data-sync push (гонка с поллингом)
                 if (window.setNexoraLocal) window.setNexoraLocal('nexora_support_tickets', '[]');
                 else localStorage.setItem('nexora_support_tickets', '[]');
-                // На сервере — флаг очистки (требует ключа доступа администратора)
+                if (window.setNexoraDirty) window.setNexoraDirty('nexora_support_tickets');
+                renderAdminTickets();
                 try {
                     const h = { 'Content-Type': 'application/json' };
                     const tk = (function(){ try { return localStorage.getItem('nexora_admin_token') || ''; } catch(e) { return ''; } })();
                     if (tk) h['X-Admin-Token'] = tk;
-                    fetch('/api/save', {
-                        method: 'POST',
-                        headers: h,
-                        body: JSON.stringify({ nexora_clear_support_tickets: true })
-                    }).catch(function(){});
-                } catch(e) {}
-                renderAdminTickets();
-                alert('Все обращения удалены');
+                    fetch('/api/tickets/clear', { method: 'POST', headers: h, body: JSON.stringify({}) })
+                        .then(function() { alert('Все обращения удалены'); })
+                        .catch(function() { alert('Ошибка сервера'); });
+                } catch(e) { alert('Ошибка сервера'); }
             });
 
             document.getElementById('admin-tickets-list').addEventListener('click', e => {
+                // Toggle group (expand/collapse multiple tickets per player)
+                const groupToggle = e.target.closest('[data-ticket-group-toggle]');
+                if (groupToggle) {
+                    const idx = groupToggle.dataset.ticketGroupToggle;
+                    const body = document.getElementById('ticket-group-body-' + idx);
+                    const chevron = groupToggle.querySelector('[data-ticket-chevron]');
+                    if (body) {
+                        const show = body.style.display === 'none';
+                        body.style.display = show ? '' : 'none';
+                        if (chevron) chevron.style.transform = show ? 'rotate(180deg)' : '';
+                    }
+                    return;
+                }
+
                 const answerBtn = e.target.closest('[data-ticket-answer]');
                 if (answerBtn) {
                     const id = answerBtn.dataset.ticketAnswer;
@@ -3928,14 +4029,15 @@
                         if (oldReply) t.messages.push({ from: 'admin', text: oldReply, at: oldRepliedAt });
                     }
                     t.messages.push({ from: 'admin', text: reply, at: t.repliedAt });
-                    saveAdminTickets(list);
+                    saveAdminTickets(list, true);
+                    syncTicketsToServer(list);
                     renderAdminTickets();
                     // Email-уведомление игроку об ответе (если скрипт с хелпером загружен)
                     if (typeof nexoraSendNotify === 'function' && typeof nexoraEmailBody === 'function' && t.email) {
                         nexoraSendNotify(t.email, 'Ответ на обращение — Nexora', nexoraEmailBody('Тебе ответили!', [
                             'По твоему обращению «' + (t.topic || 'поддержка') + '» организатор Nexora ответил:',
                             '«' + reply + '»',
-                            'Открыть обращение можно на странице «Помощь» — блок «Мои обращения».'
+                            'Открыть обращение можно на странице «Поддержка» — блок «Мои обращения».'
                         ]));
                     }
                     return;
@@ -3948,7 +4050,8 @@
                 const t = list.find(x => x.id === id);
                 if (!t) return;
                 t.status = 'closed';
-                saveAdminTickets(list);
+                saveAdminTickets(list, true);
+                syncTicketsToServer(list);
                 renderAdminTickets();
             });
 

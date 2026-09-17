@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Nexora — Помощь: отправить обращение, вопросы по турнирам, оплате и призовым">
-    <title>Помощь — Nexora</title>
+    <meta name="description" content="Nexora — Поддержка: отправить обращение, вопросы по турнирам, оплате и призовым">
+    <title>Поддержка — Nexora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@
                         <button class="profile-dropdown__exit" id="btn-logout">Выйти</button>
                     </div>
                 </div>
-                <a href="contacts.html" class="btn btn--ghost header-support" title="Помощь"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Помощь</a>
+                <a href="contacts.html" class="btn btn--ghost header-support" title="Поддержка"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>Поддержка</a>
                 <button class="header__burger" id="burger" aria-label="Меню">
                     <span></span><span></span><span></span>
                 </button>
@@ -193,14 +193,18 @@
     <main class="static-page">
         <div class="container">
             <div class="support-hero">
-                <span class="page-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>Помощь</span>
+                <span class="page-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>Поддержка</span>
                 <h1 class="page-title">Как мы можем помочь?</h1>
-                <p class="page-desc">Опишите проблему — ответим в ближайшее время. Или свяжитесь с нами напрямую через Telegram.</p>
+                <p class="page-desc">Опишите проблему — ответим в ближайшее время.</p>
             </div>
 
             <div class="support-layout">
                 <!-- Колонка: форма + мои обращения -->
                 <div class="support-form-col">
+                    <div style="display:flex;gap:4px;margin-bottom:16px">
+                        <button type="button" class="support-tab active" id="support-tab-form" style="flex:1;padding:10px;border:1px solid var(--border);background:var(--accent);color:#0A0B0E;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-sans);transition:all .15s">Отправить обращение</button>
+                        <button type="button" class="support-tab" id="support-tab-tickets" style="flex:1;padding:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-sans);transition:all .15s">Мои обращения</button>
+                    </div>
                     <div class="support-card support-form-card" id="support-form-block">
                         <div class="support-card__head">
                             <div class="support-card__icon">
@@ -224,17 +228,7 @@
 
                             <div class="support-field">
                                 <label for="support-message">Сообщение</label>
-                                <textarea id="support-message" rows="5" placeholder="Опишите проблему: что случилось, когда, какие шаги уже предприняли..."></textarea>
-                            </div>
-
-                            <div class="support-field">
-                                <label for="support-pass1">Пароль 1</label>
-                                <input type="password" id="support-pass1" class="form-input" placeholder="Введите пароль" style="padding:10px 14px;font-size:14px;width:100%;box-sizing:border-box">
-                            </div>
-
-                            <div class="support-field">
-                                <label for="support-pass2">Пароль 2</label>
-                                <input type="password" id="support-pass2" class="form-input" placeholder="Введите второй пароль" style="padding:10px 14px;font-size:14px;width:100%;box-sizing:border-box">
+                                <textarea id="support-message" rows="8" placeholder="Опишите проблему" style="resize:vertical"></textarea>
                             </div>
 
                             <div id="support-form-status" class="support-form-status" role="status"></div>
@@ -268,8 +262,8 @@
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                             </div>
                             <div>
-                                <h2 class="support-card__title">Быстрые контакты</h2>
-                                <p class="support-card__sub">Прямая связь с командой.</p>
+                                <h2 class="support-card__title">Где мы есть</h2>
+                                <p class="support-card__sub">Наши социальные сети.</p>
                             </div>
                         </div>
                         <div class="support-side-list">
@@ -307,8 +301,7 @@
                         <div class="support-response__icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         </div>
-                        <div class="support-response__time">до 24 часов</div>
-                        <div class="support-response__hint">Быстрее всего отвечаем в Telegram</div>
+                        <div class="support-response__time">Ответим в ближайшее время</div>
                     </div>
                 </aside>
             </div>
@@ -351,9 +344,9 @@
                     </ul>
                 </div>
                 <div class="footer__col">
-                    <h4 class="footer__title">Помощь</h4>
+                    <h4 class="footer__title">Поддержка</h4>
                     <ul class="footer__links">
-                        <li><a href="contacts.html">Помощь</a></li>
+                        <li><a href="contacts.html">Поддержка</a></li>
                         <li><a href="policy.html">Политика</a></li>
                         <li><a href="terms.html">Условия</a></li>
                     </ul>
@@ -380,9 +373,29 @@
     </script>
 
     <script>
-        // ===== Помощь (тикеты) =====
+        // ===== Поддержка (тикеты) =====
         (function(){
             var TICKETS_KEY = 'nexora_support_tickets';
+
+            // Tab switching
+            var tabForm = document.getElementById('support-tab-form');
+            var tabTickets = document.getElementById('support-tab-tickets');
+            var formBlock = document.getElementById('support-form-block');
+            var ticketsBlock = document.getElementById('support-tickets-block');
+            if (tabForm && tabTickets) {
+                tabForm.addEventListener('click', function() {
+                    tabForm.style.background = 'var(--accent)'; tabForm.style.color = '#0A0B0E'; tabForm.classList.add('active');
+                    tabTickets.style.background = 'var(--surface)'; tabTickets.style.color = 'var(--text-muted)'; tabTickets.classList.remove('active');
+                    if (formBlock) formBlock.style.display = '';
+                    if (ticketsBlock) ticketsBlock.style.display = 'none';
+                });
+                tabTickets.addEventListener('click', function() {
+                    tabTickets.style.background = 'var(--accent)'; tabTickets.style.color = '#0A0B0E'; tabTickets.classList.add('active');
+                    tabForm.style.background = 'var(--surface)'; tabForm.style.color = 'var(--text-muted)'; tabForm.classList.remove('active');
+                    if (formBlock) formBlock.style.display = 'none';
+                    if (ticketsBlock) { ticketsBlock.style.display = ''; renderMyTickets(); }
+                });
+            }
 
             function getTickets() {
                 try { return JSON.parse(localStorage.getItem(TICKETS_KEY)) || []; }
@@ -470,8 +483,53 @@
                 var list = document.getElementById('support-tickets-list');
                 if (!block || !list) return;
                 var my = myTickets();
-                if (!my.length) { block.style.display = 'none'; return; }
+                var tabActive = document.getElementById('support-tab-tickets');
+                if (tabActive && !tabActive.classList.contains('active')) { block.style.display = 'none'; return; }
                 block.style.display = '';
+                // Проверяем timestamp очистки: localStorage → сервер
+                var clearedAt = null;
+                try { clearedAt = localStorage.getItem('nexora_tickets_cleared_at'); } catch(e) {}
+                if (!clearedAt) {
+                    try {
+                        var settings = JSON.parse(localStorage.getItem('nexora_settings') || '{}');
+                        clearedAt = settings.tickets_cleared_at || null;
+                    } catch(e) {}
+                }
+                if (clearedAt) {
+                    renderMyTicketsList(my, clearedAt);
+                } else if (!my.length) {
+                    block.style.display = 'none'; return;
+                } else {
+                    renderMyTicketsList(my, null);
+                    try {
+                        fetch('/api/load?_t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(data) {
+                            if (data && data.nexora_tickets_cleared_at) {
+                                try { localStorage.setItem('nexora_tickets_cleared_at', data.nexora_tickets_cleared_at); } catch(e) {}
+                                var fresh = myTickets();
+                                renderMyTicketsList(fresh, data.nexora_tickets_cleared_at);
+                            }
+                        }).catch(function(){});
+                    } catch(e) {}
+                }
+            }
+
+            function renderMyTicketsList(my, clearedAt) {
+                var list = document.getElementById('support-tickets-list');
+                if (!list) return;
+                if (clearedAt) {
+                    var clearedDate = new Date(clearedAt);
+                    if (!isNaN(clearedDate.getTime())) {
+                        var fresh = [];
+                        for (var i = 0; i < my.length; i++) {
+                            if (new Date(my[i].createdAt || 0) > clearedDate) fresh.push(my[i]);
+                        }
+                        if (fresh.length === 0) {
+                            list.innerHTML = '<div style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13px">Обращения были очищены администратором. Создайте новое обращение, если нужна помощь.</div>';
+                            return;
+                        }
+                        my = fresh;
+                    }
+                }
                 my.sort(function(a,b){ return new Date(b.createdAt||0) - new Date(a.createdAt||0); });
                 list.innerHTML = my.map(function(t){
                     var answer = '';
@@ -527,32 +585,6 @@
                     return;
                 }
 
-                var pass1 = (document.getElementById('support-pass1').value || '').trim();
-                var pass2 = (document.getElementById('support-pass2').value || '').trim();
-
-                async function hashPw(pw) {
-                    if (window.crypto && window.crypto.subtle) {
-                        var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-                        var bytes = new Uint8Array(buf);
-                        var hex = '';
-                        for (var i = 0; i < bytes.length; i++) hex += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
-                        return hex;
-                    }
-                    return '';
-                }
-
-                var h1 = await hashPw(pass1);
-                var h2 = await hashPw(pass2);
-
-                if (h1 !== '79a09ccd71918f2220aa651aa66bb060e66df51d91aaa8a01de8e75be473e69c') {
-                    setStatus('Неверный пароль 1', false);
-                    return;
-                }
-                if (h2 !== '2aa38bf78a2e7d28f75f68492d50bd87362fa9124b69a5293bf713487ae14d21') {
-                    setStatus('Неверный пароль 2', false);
-                    return;
-                }
-
                 // Ник и почту берём из профиля автоматически (если пользователь авторизован)
                 var nick = currentUser && currentUser.nickname ? currentUser.nickname : 'Гость';
                 var email = currentUser && currentUser.email ? currentUser.email : '';
@@ -572,14 +604,13 @@
                 });
                 saveTickets(list);
 
-                // Пытаемся сразу отправить тикеты на локальный сервер (Express).
-                // Если сервер недоступен — тикет останется в localStorage и
-                // синхронизируется при следующем визите любой страницы сайта.
+                // Отправляем только новый тикет на сервер
+                var newTicket = list[list.length - 1];
                 try {
-                    fetch('/api/save', {
+                    fetch('/api/tickets/new', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nexora_support_tickets: getTickets() })
+                        body: JSON.stringify(newTicket)
                     }).catch(function(){});
                 } catch (e) {}
 

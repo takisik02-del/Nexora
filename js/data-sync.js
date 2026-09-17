@@ -217,6 +217,12 @@
             origSetItem.call(localStorage, key, value);
         }
     };
+    // Пометить ключ как «грязный» без записи — поллинг не будет затирать его 15 сек.
+    window.setNexoraDirty = function(key) {
+        if (key && key.indexOf(PREFIX) === 0) {
+            dirtyKeys[key] = Date.now();
+        }
+    };
 
     // Перерисовать динамические блоки страницы после того, как пришли
     // свежие данные с сервера (тикеты, турниры). Страницы сами
